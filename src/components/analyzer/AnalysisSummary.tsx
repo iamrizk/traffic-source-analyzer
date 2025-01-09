@@ -32,29 +32,43 @@ export const AnalysisSummary = ({ matches }: AnalysisSummaryProps) => {
   const summary = getSummary(matches);
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       {summary.types.length > 0 && (
         <div className="space-y-2">
-          <span className="font-medium">Visit nature:</span>
-          <div className="pl-4">
-            {summary.types.join(", ")}
-          </div>
+          <h4 className="font-semibold text-lg">Visit Nature</h4>
+          <ul className="list-disc pl-6 space-y-1">
+            {summary.types.map((type, index) => (
+              <li key={index} className="text-gray-700">
+                {type}
+              </li>
+            ))}
+          </ul>
         </div>
       )}
+      
       {summary.platforms.length > 0 && (
         <div className="space-y-2">
-          <span className="font-medium">Platforms:</span>
-          <div className="pl-4">
-            {summary.platforms.join(", ")}
-          </div>
+          <h4 className="font-semibold text-lg">Platforms</h4>
+          <ul className="list-disc pl-6 space-y-1">
+            {summary.platforms.map((platform, index) => (
+              <li key={index} className="text-gray-700">
+                {platform}
+              </li>
+            ))}
+          </ul>
         </div>
       )}
+      
       {summary.channels.length > 0 && (
         <div className="space-y-2">
-          <span className="font-medium">Channels:</span>
-          <div className="pl-4">
-            {summary.channels.join(", ")}
-          </div>
+          <h4 className="font-semibold text-lg">Channels</h4>
+          <ul className="list-disc pl-6 space-y-1">
+            {summary.channels.map((channel, index) => (
+              <li key={index} className="text-gray-700">
+                {channel}
+              </li>
+            ))}
+          </ul>
         </div>
       )}
     </div>
