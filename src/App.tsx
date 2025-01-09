@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Layout } from "./components/Layout";
 import UrlAnalyzer from "./pages/UrlAnalyzer";
 import Settings from "./pages/Settings";
+import TestCases from "./pages/TestCases";
 
 const queryClient = new QueryClient();
 
@@ -19,6 +20,7 @@ const App = () => (
           <Route element={<Layout />}>
             <Route path="/" element={<UrlAnalyzer />} />
             <Route path="/settings" element={<Settings />} />
+            <Route path="/test-cases" element={<TestCases />} />
           </Route>
         </Routes>
       </BrowserRouter>

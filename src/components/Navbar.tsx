@@ -7,6 +7,7 @@ export const Navbar = () => {
 
   const links = [
     { href: "/", label: "URL Analyzer" },
+    { href: "/test-cases", label: "Test Cases" },
     { href: "/settings", label: "Settings" },
   ];
 
@@ -26,7 +27,7 @@ export const Navbar = () => {
                     location.pathname === link.href && "text-blue-600 font-medium"
                   )}
                 >
-                  {link.href === "/" ? "URL Analyzer" : link.label}
+                  {link.label}
                 </Link>
               ))}
             </div>
