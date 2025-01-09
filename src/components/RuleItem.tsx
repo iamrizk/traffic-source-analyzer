@@ -1,7 +1,7 @@
 import { Rule } from "@/hooks/useRules";
 import { Button } from "./ui/button";
 import { Card } from "./ui/card";
-import { Edit, Save, Trash2 } from "lucide-react";
+import { Edit, Save, Trash2, ChevronUp, ChevronDown } from "lucide-react";
 import { useState } from "react";
 import { RuleCondition } from "./rule/RuleCondition";
 import { RuleOutput } from "./rule/RuleOutput";
@@ -80,67 +80,68 @@ export const RuleItem = ({
   };
 
   return (
-    <Card className="p-4 mb-4">
-      <div className="flex justify-between items-center mb-4">
-        <div className="flex items-center space-x-2">
-          <span className="font-medium">Rule {index + 1}</span>
+    <Card className="p-4 mb-4 relative">
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center space-x-4">
+          <span className="font-medium text-lg">Rule {index + 1}</span>
           {!isEditing && rule.name && (
-            <span className="text-muted-foreground">- {rule.name}</span>
+            <span className="text-muted-foreground font-medium">{rule.name}</span>
           )}
         </div>
+        
         <div className="flex items-center space-x-2">
-          {!isFirst && (
-            <Button variant="outline" size="sm" onClick={() => onMoveUp(index)}>
-              ↑
-            </Button>
-          )}
-          {!isLast && (
-            <Button variant="outline" size="sm" onClick={() => onMoveDown(index)}>
-              ↓
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => (isEditing ? handleSave() : setIsEditing(true))}
+            className="gap-2"
+          >
+            {isEditing ? (
+              <>
+                <Save className="w-4 h-4" />
+                Save
+              </>
+            ) : (
+              <>
+                <Edit className="w-4 h-4" />
+                Edit
+              </>
+            )}
+          </Button>
+          {isEditing && (
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={() => onDelete(index)}
+              className="gap-2"
+            >
+              <Trash2 className="w-4 h-4" />
+              Delete
             </Button>
           )}
         </div>
       </div>
 
+      <div className="absolute right-4 top-16 flex flex-col space-y-1">
+        {!isFirst && (
+          <Button variant="ghost" size="sm" onClick={() => onMoveUp(index)} className="p-1 h-auto">
+            <ChevronUp className="w-4 h-4" />
+          </Button>
+        )}
+        {!isLast && (
+          <Button variant="ghost" size="sm" onClick={() => onMoveDown(index)} className="p-1 h-auto">
+            <ChevronDown className="w-4 h-4" />
+          </Button>
+        )}
+      </div>
+
       <Accordion type="single" collapsible>
-        <AccordionItem value="item-1">
-          <AccordionTrigger>
-            <span className="text-sm font-medium">View Rule Details</span>
+        <AccordionItem value="item-1" className="border-none">
+          <AccordionTrigger className="py-2 hover:no-underline">
+            <span className="text-sm font-medium hover:underline">View Rule Details</span>
           </AccordionTrigger>
           <AccordionContent>
-            <div className="space-y-4">
-              <div className="flex justify-end mb-4 space-x-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => (isEditing ? handleSave() : setIsEditing(true))}
-                  className="gap-2"
-                >
-                  {isEditing ? (
-                    <>
-                      <Save className="w-4 h-4" />
-                      Save
-                    </>
-                  ) : (
-                    <>
-                      <Edit className="w-4 h-4" />
-                      Edit
-                    </>
-                  )}
-                </Button>
-                {isEditing && (
-                  <Button
-                    variant="destructive"
-                    size="sm"
-                    onClick={() => onDelete(index)}
-                    className="gap-2"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                    Delete
-                  </Button>
-                )}
-              </div>
-
+            <div className="space-y-4 pr-8">
               {isEditing ? (
                 <div className="space-y-4">
                   <div className="space-y-2">
