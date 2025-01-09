@@ -30,9 +30,10 @@ const TestCases = () => {
 
   const loadSampleTestCases = async (filename: string) => {
     try {
-      const response = await fetch(`/test-cases/${filename}`);
+      // Using absolute path from the public directory
+      const response = await fetch(`/${filename}`);
       if (!response.ok) {
-        throw new Error(`Failed to fetch ${filename}`);
+        throw new Error(`Failed to fetch ${filename}: ${response.status} ${response.statusText}`);
       }
       
       const text = await response.text();

@@ -6,9 +6,10 @@ import { toast } from "sonner";
 const GettingStarted = () => {
   const handleDownloadConfig = async () => {
     try {
+      // Using absolute path from the public directory
       const response = await fetch('/starter-config.json');
       if (!response.ok) {
-        throw new Error(`Failed to fetch configuration file: ${response.status}`);
+        throw new Error(`Failed to fetch configuration file: ${response.status} ${response.statusText}`);
       }
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
@@ -30,9 +31,10 @@ const GettingStarted = () => {
 
   const handleDownloadTestCases = async (fileNumber: number) => {
     try {
+      // Using absolute path from the public directory
       const response = await fetch(`/test-case-${fileNumber}.csv`);
       if (!response.ok) {
-        throw new Error(`Failed to fetch test case ${fileNumber}: ${response.status}`);
+        throw new Error(`Failed to fetch test case ${fileNumber}: ${response.status} ${response.statusText}`);
       }
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
