@@ -1,9 +1,8 @@
 import { Rule } from "@/hooks/useRules";
 import { Card } from "./ui/card";
 import { Button } from "./ui/button";
-import { ArrowDown, ArrowUp, ChevronDown, ChevronUp, Pencil, Trash2 } from "lucide-react";
+import { ArrowDown, ArrowUp, Trash2 } from "lucide-react";
 import { RuleDisplay } from "./rule/RuleDisplay";
-import { useState } from "react";
 
 interface RuleItemProps {
   rule: Rule;
@@ -26,27 +25,10 @@ export const RuleItem = ({
   isFirst,
   isLast,
 }: RuleItemProps) => {
-  const [isExpanded, setIsExpanded] = useState(false);
-
   return (
     <Card className="p-4">
       <div className="flex justify-between items-start mb-4">
-        <div className="flex items-center gap-2">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setIsExpanded(!isExpanded)}
-            className="h-6 w-6"
-          >
-            {isExpanded ? (
-              <ChevronUp className="h-4 w-4" />
-            ) : (
-              <ChevronDown className="h-4 w-4" />
-            )}
-          </Button>
-          <span className="text-sm font-medium text-gray-500">Rule {index + 1}</span>
-          <h4 className="text-lg font-medium">{rule.name}</h4>
-        </div>
+        <h4 className="text-lg font-medium">{rule.name}</h4>
         <div className="flex space-x-2">
           {!isFirst && (
             <Button
@@ -71,14 +53,6 @@ export const RuleItem = ({
           <Button
             variant="outline"
             size="icon"
-            onClick={() => setIsExpanded(true)}
-            title="Edit Rule"
-          >
-            <Pencil className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="outline"
-            size="icon"
             onClick={() => onDelete(index)}
             className="text-red-500 hover:text-red-600"
             title="Delete Rule"
@@ -88,12 +62,7 @@ export const RuleItem = ({
         </div>
       </div>
 
-      {isExpanded && (
-        <RuleDisplay 
-          rule={rule} 
-          onUpdate={(updatedRule) => onUpdate(index, updatedRule)} 
-        />
-      )}
+      <RuleDisplay rule={rule} />
     </Card>
   );
 };

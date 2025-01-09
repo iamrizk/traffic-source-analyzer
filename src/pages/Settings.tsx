@@ -13,7 +13,7 @@ const Settings = () => {
     name: "",
     conditions: [{ type: "parameter", parameter: "", operator: "exists" as const }],
     conditionsOperator: "and",
-    output: { trafficNature: "", platform: "", channel: "" },
+    output: { type: "", platform: "", channel: "" },
   });
 
   const addRule = () => {
@@ -22,7 +22,7 @@ const Settings = () => {
       name: "",
       conditions: [{ type: "parameter", parameter: "", operator: "exists" as const }],
       conditionsOperator: "and",
-      output: { trafficNature: "", platform: "", channel: "" },
+      output: { type: "", platform: "", channel: "" },
     });
     toast.success("Rule added successfully!");
   };
@@ -54,15 +54,10 @@ const Settings = () => {
       reader.onload = (e) => {
         try {
           const importedRules = JSON.parse(e.target?.result as string);
-          // Convert old format to new format if necessary
-          const validatedRules = importedRules.map((rule: any) => ({
+          // Ensure all imported rules have conditionsOperator
+          const validatedRules = importedRules.map((rule: Rule) => ({
             ...rule,
             conditionsOperator: rule.conditionsOperator || "and",
-            output: {
-              trafficNature: rule.output.type || rule.output.trafficNature || "",
-              platform: rule.output.platform || "",
-              channel: rule.output.channel || "",
-            },
           }));
           setRules(validatedRules);
           toast.success("Rules imported successfully!");
@@ -107,9 +102,7 @@ const Settings = () => {
 
       {rules.length > 0 && (
         <Card className="p-6">
-          <h3 className="text-xl font-semibold mb-4">
-            Existing Rules ({rules.length})
-          </h3>
+          <h3 className="text-xl font-semibold mb-4">Existing Rules</h3>
           <div className="space-y-4">
             {rules.map((rule, index) => (
               <RuleItem

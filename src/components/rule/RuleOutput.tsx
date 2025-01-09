@@ -2,20 +2,20 @@ import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 
 interface RuleOutputProps {
-  trafficNature: string;
+  type: string;
   platform: string;
   channel: string;
   onChange: (field: string, value: string) => void;
 }
 
-export const RuleOutput = ({ trafficNature, platform, channel, onChange }: RuleOutputProps) => {
+export const RuleOutput = ({ type, platform, channel, onChange }: RuleOutputProps) => {
   return (
     <div className="grid grid-cols-3 gap-4">
       <div>
         <Label>Traffic Nature</Label>
         <Input
-          value={trafficNature}
-          onChange={(e) => onChange("trafficNature", e.target.value)}
+          value={type}
+          onChange={(e) => onChange("type", e.target.value)}
         />
       </div>
       <div>

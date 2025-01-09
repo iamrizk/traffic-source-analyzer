@@ -15,11 +15,11 @@ export const RuleOutputForm = ({ output, setNewRule }: RuleOutputFormProps) => {
         <div className="space-y-2">
           <Label>Traffic Nature</Label>
           <Input
-            value={output.trafficNature}
+            value={output.type}
             onChange={(e) =>
               setNewRule((prev) => ({
                 ...prev,
-                output: { ...prev.output, trafficNature: e.target.value },
+                output: { ...prev.output, type: e.target.value },
               }))
             }
             placeholder="e.g., Paid/Organic"
