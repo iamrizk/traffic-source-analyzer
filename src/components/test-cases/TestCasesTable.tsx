@@ -47,7 +47,9 @@ export const TestCasesTable = ({ testCases }: TestCasesTableProps) => {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between gap-8">
-        <h3 className="text-xl font-semibold whitespace-nowrap">Uploaded Test Cases</h3>
+        <h3 className="text-xl font-semibold whitespace-nowrap">
+          Uploaded Test Cases ({testCases.length})
+        </h3>
         {totalPages > 1 && (
           <div className="flex-shrink-0">
             <Pagination>

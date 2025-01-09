@@ -121,8 +121,7 @@ export const FileUploader = ({ onUploadSuccess, onClear }: FileUploaderProps) =>
           accept=".csv"
           onChange={handleFileUpload}
           className="max-w-md"
-          value={fileName ? "" : undefined}
-          key={fileName} // Force re-render when cleared
+          placeholder={fileName || "Choose a file..."}
         />
         <Button disabled={isUploading}>
           <Upload className="w-4 h-4 mr-2" />
