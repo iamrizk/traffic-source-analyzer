@@ -62,7 +62,10 @@ export const RuleItem = ({
         </div>
       </div>
 
-      <RuleDisplay rule={rule} />
+      <RuleDisplay 
+        rule={rule} 
+        onUpdate={(updatedRule) => onUpdate(index, updatedRule)} 
+      />
     </Card>
   );
 };
