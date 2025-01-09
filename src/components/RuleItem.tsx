@@ -1,7 +1,7 @@
 import { Rule } from "@/hooks/useRules";
 import { Button } from "./ui/button";
 import { Card } from "./ui/card";
-import { X } from "lucide-react";
+import { Edit, Save, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { RuleCondition } from "./rule/RuleCondition";
 import { RuleOutput } from "./rule/RuleOutput";
@@ -99,27 +99,46 @@ export const RuleItem = ({
               ↓
             </Button>
           )}
-          <Button variant="ghost" size="sm" onClick={() => onDelete(index)}>
-            <X className="w-4 h-4" />
-          </Button>
         </div>
       </div>
 
       <Accordion type="single" collapsible>
-        <AccordionItem value="rule-content">
+        <AccordionItem value="item-1">
           <AccordionTrigger>
             <span className="text-sm font-medium">View Rule Details</span>
           </AccordionTrigger>
           <AccordionContent>
             <div className="space-y-4">
-              <div className="flex justify-end mb-4">
+              <div className="flex justify-end mb-4 space-x-2">
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => (isEditing ? handleSave() : setIsEditing(true))}
+                  className="gap-2"
                 >
-                  {isEditing ? "Save" : "Edit"}
+                  {isEditing ? (
+                    <>
+                      <Save className="w-4 h-4" />
+                      Save
+                    </>
+                  ) : (
+                    <>
+                      <Edit className="w-4 h-4" />
+                      Edit
+                    </>
+                  )}
                 </Button>
+                {isEditing && (
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    onClick={() => onDelete(index)}
+                    className="gap-2"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                    Delete
+                  </Button>
+                )}
               </div>
 
               {isEditing ? (
