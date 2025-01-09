@@ -33,20 +33,9 @@ export const RandomTestCaseButton = ({
       // Step 4: Set referral source
       onReferralChange(selectedCase.referralSource || "");
 
-      // Step 5: Use requestAnimationFrame to ensure state updates are processed
-      requestAnimationFrame(() => {
-        // Step 6: First analysis run
-        onAnalyze();
-
-        // Step 7: Second analysis run after a short delay to ensure states are updated
-        setTimeout(() => {
-          onAnalyze();
-          
-          // Step 8: Show success message after both analyses are complete
-          toast.success("Random test case loaded and analyzed", {
-            description: "A new test case has been loaded and analyzed successfully.",
-          });
-        }, 100);
+      // Step 5: Show success message
+      toast.success("Random test case loaded", {
+        description: "A new test case has been loaded. Click 'Analyze URL' to process it.",
       });
     } catch (error) {
       console.error('Error in handleRandomize:', error);
