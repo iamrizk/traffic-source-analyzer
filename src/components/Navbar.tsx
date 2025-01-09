@@ -9,6 +9,7 @@ export const Navbar = () => {
     { href: "/", label: "URL Analyzer" },
     { href: "/test-cases", label: "Test Cases" },
     { href: "/settings", label: "Settings" },
+    { href: "/getting-started", label: "Getting Started" },
   ];
 
   return (

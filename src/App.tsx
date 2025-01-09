@@ -7,6 +7,7 @@ import { Layout } from "./components/Layout";
 import UrlAnalyzer from "./pages/UrlAnalyzer";
 import Settings from "./pages/Settings";
 import TestCases from "./pages/TestCases";
+import GettingStarted from "./pages/GettingStarted";
 
 const queryClient = new QueryClient();
 
@@ -21,6 +22,7 @@ const App = () => (
             <Route path="/" element={<UrlAnalyzer />} />
             <Route path="/settings" element={<Settings />} />
             <Route path="/test-cases" element={<TestCases />} />
+            <Route path="/getting-started" element={<GettingStarted />} />
           </Route>
         </Routes>
       </BrowserRouter>
