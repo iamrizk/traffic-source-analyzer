@@ -16,7 +16,9 @@ export const UploadControls = ({
   onClear,
 }: UploadControlsProps) => {
   const handleClear = () => {
-    localStorage.clear(); // Clear all local storage
+    // Only remove test cases related items
+    localStorage.removeItem('testCases');
+    localStorage.removeItem('uploadedFileName');
     onClear(); // Call the original onClear function
   };
 
