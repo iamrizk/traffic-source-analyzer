@@ -94,6 +94,7 @@ const UrlAnalyzer = () => {
         if (isRuleMatched) {
           newMatches.push({
             ruleIndex,
+            ruleName: rule.name,
             output: rule.output,
             matchDetails
           });
