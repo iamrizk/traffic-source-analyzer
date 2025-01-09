@@ -1,4 +1,5 @@
 import { toast } from "sonner";
+import { decompressData } from "@/components/test-cases/utils/fileHandling";
 
 export interface TestCase {
   url: string;
@@ -15,7 +16,7 @@ export const loadTestCases = (): TestCase[] => {
   }
   
   try {
-    const testCases = JSON.parse(savedTestCases);
+    const testCases = decompressData(savedTestCases);
     // Filter out invalid test cases
     const validTestCases = testCases.filter((testCase: TestCase) => 
       testCase.url && typeof testCase.url === 'string' && 
@@ -31,6 +32,7 @@ export const loadTestCases = (): TestCase[] => {
     
     return validTestCases;
   } catch (error) {
+    console.error('Error loading test cases:', error);
     toast.error("Error loading test cases", {
       description: "Please ensure test cases are in the correct format",
     });
