@@ -6,7 +6,6 @@ import { Label } from "@/components/ui/label";
 import { useRules } from "@/hooks/useRules";
 import { toast } from "sonner";
 import { AnalysisSummary } from "@/components/analyzer/AnalysisSummary";
-import { Footer } from "@/components/analyzer/Footer";
 import { RuleMatch } from "@/types/analyzer";
 
 const UrlAnalyzer = () => {
@@ -206,8 +205,6 @@ const UrlAnalyzer = () => {
           </div>
         </Card>
       )}
-
-      <Footer />
     </div>
   );
 };
