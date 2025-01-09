@@ -5,16 +5,10 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { useRules } from "@/hooks/useRules";
 import { toast } from "sonner";
-
-interface RuleMatch {
-  ruleIndex: number;
-  output: {
-    type: string;
-    platform: string;
-    channel: string;
-  };
-  matchDetails: string[];
-}
+import { PageHeader } from "@/components/analyzer/PageHeader";
+import { Footer } from "@/components/analyzer/Footer";
+import { AnalysisSummary } from "@/components/analyzer/AnalysisSummary";
+import { RuleMatch } from "@/types/analyzer";
 
 const UrlAnalyzer = () => {
   const [url, setUrl] = useState(() => localStorage.getItem("analyzer_url") || "");
@@ -24,7 +18,6 @@ const UrlAnalyzer = () => {
 
   const { rules } = useRules();
 
-  // Save state to localStorage when it changes
   useEffect(() => {
     localStorage.setItem("analyzer_url", url);
     localStorage.setItem("analyzer_referral", referralSource);
@@ -32,7 +25,13 @@ const UrlAnalyzer = () => {
 
   const parseUrl = () => {
     try {
-      const urlObj = new URL(url);
+      // Add protocol if missing
+      let urlToParse = url;
+      if (!url.startsWith('http://') && !url.startsWith('https://')) {
+        urlToParse = `https://${url}`;
+      }
+
+      const urlObj = new URL(urlToParse);
       const params: Record<string, string> = {};
       urlObj.searchParams.forEach((value, key) => {
         params[key] = value;
@@ -101,30 +100,20 @@ const UrlAnalyzer = () => {
       });
 
       setMatches(newMatches);
-      toast.success("URL analyzed successfully!");
+      toast.success("URL analyzed successfully!", {
+        dismissible: true
+      });
     } catch (error) {
-      toast.error("Invalid URL provided");
+      toast.error("Invalid URL provided", {
+        dismissible: true
+      });
     }
-  };
-
-  const getSummary = (matches: RuleMatch[]) => {
-    const types = matches
-      .filter(match => match.output.type)
-      .map(match => `${match.output.type} (Rule #${match.ruleIndex + 1})`);
-    
-    const platforms = matches
-      .filter(match => match.output.platform)
-      .map(match => `${match.output.platform} (Rule #${match.ruleIndex + 1})`);
-    
-    const channels = matches
-      .filter(match => match.output.channel)
-      .map(match => `${match.output.channel} (Rule #${match.ruleIndex + 1})`);
-
-    return { types, platforms, channels };
   };
 
   return (
     <div className="space-y-8">
+      <PageHeader />
+      
       <Card className="p-6">
         <h2 className="text-2xl font-semibold mb-6">URL Analyzer</h2>
         <div className="space-y-4">
@@ -170,39 +159,7 @@ const UrlAnalyzer = () => {
         <>
           <Card className="p-6">
             <h3 className="text-xl font-semibold mb-4">Analysis Summary</h3>
-            <div className="space-y-4">
-              {(() => {
-                const summary = getSummary(matches);
-                return (
-                  <>
-                    {summary.types.length > 0 && (
-                      <div className="space-y-2">
-                        <span className="font-medium">Visit nature:</span>
-                        <div className="pl-4">
-                          {summary.types.join(", ")}
-                        </div>
-                      </div>
-                    )}
-                    {summary.platforms.length > 0 && (
-                      <div className="space-y-2">
-                        <span className="font-medium">Platforms:</span>
-                        <div className="pl-4">
-                          {summary.platforms.join(", ")}
-                        </div>
-                      </div>
-                    )}
-                    {summary.channels.length > 0 && (
-                      <div className="space-y-2">
-                        <span className="font-medium">Channels:</span>
-                        <div className="pl-4">
-                          {summary.channels.join(", ")}
-                        </div>
-                      </div>
-                    )}
-                  </>
-                );
-              })()}
-            </div>
+            <AnalysisSummary matches={matches} />
           </Card>
 
           <Card className="p-6">
@@ -248,6 +205,15 @@ const UrlAnalyzer = () => {
           </Card>
         </>
       )}
+
+      {matches.length === 0 && parameters && Object.keys(parameters).length > 0 && (
+        <Card className="p-6">
+          <h3 className="text-xl font-semibold mb-4">Analysis Summary</h3>
+          <AnalysisSummary matches={matches} />
+        </Card>
+      )}
+
+      <Footer />
     </div>
   );
 };
