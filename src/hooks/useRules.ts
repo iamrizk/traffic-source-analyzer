@@ -7,7 +7,8 @@ interface BaseCondition {
 interface ParameterCondition extends BaseCondition {
   type: "parameter";
   parameter: string;
-  operator: "exists" | "not_exists";
+  operator: "exists" | "not_exists" | "equals" | "not_equals";
+  value?: string;
 }
 
 interface ReferralCondition extends BaseCondition {

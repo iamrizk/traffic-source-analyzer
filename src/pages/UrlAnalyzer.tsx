@@ -38,6 +38,8 @@ const UrlAnalyzer = () => {
         for (const condition of rule.conditions) {
           if (condition.type === "parameter") {
             const paramExists = condition.parameter in params;
+            const paramValue = params[condition.parameter];
+
             if (condition.operator === "exists" && !paramExists) {
               matchDetails.push(`Parameter '${condition.parameter}' does not exist (required)`);
               conditionMet = false;
@@ -48,7 +50,22 @@ const UrlAnalyzer = () => {
               conditionMet = false;
               break;
             }
-            matchDetails.push(`Parameter '${condition.parameter}' ${condition.operator === "exists" ? "exists" : "does not exist"} as required`);
+            if (condition.operator === "equals" && paramValue !== condition.value) {
+              matchDetails.push(`Parameter '${condition.parameter}' value '${paramValue}' does not match required '${condition.value}'`);
+              conditionMet = false;
+              break;
+            }
+            if (condition.operator === "not_equals" && paramValue === condition.value) {
+              matchDetails.push(`Parameter '${condition.parameter}' value '${paramValue}' matches '${condition.value}' (should not match)`);
+              conditionMet = false;
+              break;
+            }
+
+            matchDetails.push(
+              condition.operator === "exists" || condition.operator === "not_exists"
+                ? `Parameter '${condition.parameter}' ${condition.operator === "exists" ? "exists" : "does not exist"} as required`
+                : `Parameter '${condition.parameter}' value ${condition.operator === "equals" ? "matches" : "does not match"} '${condition.value}'`
+            );
           } else if (condition.type === "referral") {
             if (condition.value !== referralSource) {
               matchDetails.push(`Referral source '${referralSource}' does not match required '${condition.value}'`);

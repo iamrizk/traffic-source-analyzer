@@ -39,17 +39,24 @@ export const RuleItem = ({
   const updateCondition = (conditionIndex: number, field: string, value: string) => {
     const updatedConditions = [...editedRule.conditions];
     if (field === "type") {
-      // Reset condition when type changes
       updatedConditions[conditionIndex] = value === "parameter"
         ? { type: "parameter", parameter: "", operator: "exists" as const }
         : { type: "referral", value: "" };
     } else {
-      // Type guard to ensure type safety
       const condition = updatedConditions[conditionIndex];
-      if (condition.type === "parameter" && field === "parameter") {
-        condition.parameter = value;
-      } else if (condition.type === "parameter" && field === "operator") {
-        condition.operator = value as "exists" | "not_exists";
+      if (condition.type === "parameter") {
+        if (field === "parameter") {
+          condition.parameter = value;
+        } else if (field === "operator") {
+          condition.operator = value as "exists" | "not_exists" | "equals" | "not_equals";
+          if (["equals", "not_equals"].includes(value)) {
+            condition.value = condition.value || "";
+          } else {
+            delete condition.value;
+          }
+        } else if (field === "value") {
+          condition.value = value;
+        }
       } else if (condition.type === "referral" && field === "value") {
         condition.value = value;
       }
@@ -129,9 +136,21 @@ export const RuleItem = ({
                         <SelectContent>
                           <SelectItem value="exists">Exists</SelectItem>
                           <SelectItem value="not_exists">Does not exist</SelectItem>
+                          <SelectItem value="equals">Equals</SelectItem>
+                          <SelectItem value="not_equals">Does not equal</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
+                    {["equals", "not_equals"].includes(condition.operator) && (
+                      <div className="flex-1">
+                        <Label>Value</Label>
+                        <Input
+                          value={condition.value || ""}
+                          onChange={(e) => updateCondition(condIndex, "value", e.target.value)}
+                          placeholder="Parameter value"
+                        />
+                      </div>
+                    )}
                   </>
                 )}
 
@@ -195,7 +214,11 @@ export const RuleItem = ({
               {rule.conditions.map((condition, idx) => (
                 <li key={idx}>
                   {condition.type === "parameter"
-                    ? `Parameter "${condition.parameter}" ${condition.operator}`
+                    ? `Parameter "${condition.parameter}" ${condition.operator}${
+                        ["equals", "not_equals"].includes(condition.operator) 
+                          ? ` value "${condition.value}"` 
+                          : ""
+                      }`
                     : `Referral source is "${condition.value}"`}
                 </li>
               ))}
