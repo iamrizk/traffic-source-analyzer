@@ -31,7 +31,6 @@ const Settings = () => {
     const dataStr = JSON.stringify(rules, null, 2);
     const dataUri = "data:application/json;charset=utf-8," + encodeURIComponent(dataStr);
     
-    // Create filename with current date and time
     const now = new Date();
     const year = now.getFullYear().toString().slice(-2);
     const month = String(now.getMonth() + 1).padStart(2, '0');
