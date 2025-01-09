@@ -5,7 +5,7 @@ import { toast } from "sonner";
 
 const GettingStarted = () => {
   const handleDownloadConfig = () => {
-    const configUrl = "/config/starter-config.json.json";
+    const configUrl = "/config/starter-config.json";
     window.open(configUrl, "_blank");
     toast.success("Starting configuration download");
   };
