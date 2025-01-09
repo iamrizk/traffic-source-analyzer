@@ -14,6 +14,7 @@ interface ParameterCondition extends BaseCondition {
 interface ReferralCondition extends BaseCondition {
   type: "referral";
   value: string;
+  operator: "equals" | "contains";
 }
 
 export type Condition = ParameterCondition | ReferralCondition;

@@ -18,7 +18,7 @@ export const RuleDisplay = ({ rule }: RuleDisplayProps) => {
                       ? ` value "${condition.value}"` 
                       : ""
                   }`
-                : `Referral source is "${condition.value}"`}
+                : `Referral source ${(condition as any).operator || "equals"} "${condition.value}"`}
             </li>
           ))}
         </ul>

@@ -73,14 +73,31 @@ export const RuleCondition = ({
       )}
 
       {condition.type === "referral" && (
-        <div className="flex-1">
-          <Label>Value</Label>
-          <Input
-            value={condition.value || ""}
-            onChange={(e) => updateCondition(conditionIndex, "value", e.target.value)}
-            placeholder="Referral source"
-          />
-        </div>
+        <>
+          <div className="flex-1">
+            <Label>Operator</Label>
+            <Select
+              value={(condition as any).operator || "equals"}
+              onValueChange={(value) => updateCondition(conditionIndex, "operator", value)}
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="equals">Equals</SelectItem>
+                <SelectItem value="contains">Contains</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="flex-1">
+            <Label>Value</Label>
+            <Input
+              value={condition.value || ""}
+              onChange={(e) => updateCondition(conditionIndex, "value", e.target.value)}
+              placeholder="Referral source"
+            />
+          </div>
+        </>
       )}
     </div>
   );

@@ -31,7 +31,7 @@ export const NewRuleForm = ({ newRule, setNewRule, addRule }: NewRuleFormProps) 
     if (field === "type") {
       updatedConditions[conditionIndex] = value === "parameter"
         ? { type: "parameter", parameter: "", operator: "exists" as const }
-        : { type: "referral", value: "" };
+        : { type: "referral", value: "", operator: "equals" as const };
     } else {
       const condition = updatedConditions[conditionIndex];
       if (condition.type === "parameter") {
@@ -47,8 +47,12 @@ export const NewRuleForm = ({ newRule, setNewRule, addRule }: NewRuleFormProps) 
         } else if (field === "value") {
           condition.value = value;
         }
-      } else if (condition.type === "referral" && field === "value") {
-        condition.value = value;
+      } else if (condition.type === "referral") {
+        if (field === "value") {
+          condition.value = value;
+        } else if (field === "operator") {
+          (condition as any).operator = value;
+        }
       }
     }
     setNewRule({ ...newRule, conditions: updatedConditions });
@@ -118,14 +122,31 @@ export const NewRuleForm = ({ newRule, setNewRule, addRule }: NewRuleFormProps) 
           )}
 
           {condition.type === "referral" && (
-            <div className="flex-1 space-y-2">
-              <Label>Value</Label>
-              <Input
-                value={condition.value || ""}
-                onChange={(e) => updateCondition(index, "value", e.target.value)}
-                placeholder="Referral source"
-              />
-            </div>
+            <>
+              <div className="flex-1 space-y-2">
+                <Label>Operator</Label>
+                <Select
+                  value={(condition as any).operator || "equals"}
+                  onValueChange={(value) => updateCondition(index, "operator", value)}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="equals">Equals</SelectItem>
+                    <SelectItem value="contains">Contains</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="flex-1 space-y-2">
+                <Label>Value</Label>
+                <Input
+                  value={condition.value || ""}
+                  onChange={(e) => updateCondition(index, "value", e.target.value)}
+                  placeholder="Referral source"
+                />
+              </div>
+            </>
           )}
 
           <Button
