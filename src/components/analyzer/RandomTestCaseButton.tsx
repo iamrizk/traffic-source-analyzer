@@ -29,22 +29,12 @@ export const RandomTestCaseButton = ({
       // Step 1: Clear all states and results
       onClear();
 
-      // Step 2: Get a random test case with normalized URL
-      const selectedCase = getRandomTestCase(testCases);
-      const selectedIndex = testCases.findIndex(
-        (tc) => tc.url === selectedCase.url && tc.referralSource === selectedCase.referralSource
-      );
+      // Step 2: Get a random test case
+      const randomIndex = Math.floor(Math.random() * testCases.length);
+      const selectedCase = testCases[randomIndex];
+      const serialNumber = randomIndex + 1; // Serial numbers start from 1
 
-      if (selectedIndex === -1) {
-        toast.error("Error loading test case", {
-          description: "Could not find the selected test case in the table.",
-        });
-        return;
-      }
-
-      const serialNumber = selectedIndex + 1;
-
-      // Step 3: Set URL first
+      // Step 3: Set URL
       onUrlChange(selectedCase.url);
 
       // Step 4: Set referral source
