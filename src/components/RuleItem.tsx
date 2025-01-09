@@ -41,7 +41,7 @@ export const RuleItem = ({
     if (field === "type") {
       updatedConditions[conditionIndex] = value === "parameter"
         ? { type: "parameter", parameter: "", operator: "exists" as const }
-        : { type: "referral", value: "" };
+        : { type: "referral", value: "", operator: "equals" as const };
     } else {
       const condition = updatedConditions[conditionIndex];
       if (condition.type === "parameter") {
@@ -57,8 +57,12 @@ export const RuleItem = ({
         } else if (field === "value") {
           condition.value = value;
         }
-      } else if (condition.type === "referral" && field === "value") {
-        condition.value = value;
+      } else if (condition.type === "referral") {
+        if (field === "value") {
+          condition.value = value;
+        } else if (field === "operator") {
+          condition.operator = value as "equals" | "contains";
+        }
       }
     }
     setEditedRule({ ...editedRule, conditions: updatedConditions });
