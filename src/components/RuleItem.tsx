@@ -82,6 +82,8 @@ export const RuleItem = ({
       <div className="flex justify-between items-center mb-4">
         <div className="flex items-center space-x-2">
           <span className="font-medium">Rule {index + 1}</span>
+        </div>
+        <div className="flex items-center space-x-2">
           {!isFirst && (
             <Button variant="outline" size="sm" onClick={() => onMoveUp(index)}>
               ↑
@@ -92,8 +94,6 @@ export const RuleItem = ({
               ↓
             </Button>
           )}
-        </div>
-        <div className="flex space-x-2">
           <Button
             variant="outline"
             size="sm"
