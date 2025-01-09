@@ -101,11 +101,13 @@ const UrlAnalyzer = () => {
 
       setMatches(newMatches);
       toast.success("URL analyzed successfully!", {
-        dismissible: true
+        dismissible: true,
+        duration: 5000,
       });
     } catch (error) {
       toast.error("Invalid URL provided", {
-        dismissible: true
+        dismissible: true,
+        duration: 5000,
       });
     }
   };

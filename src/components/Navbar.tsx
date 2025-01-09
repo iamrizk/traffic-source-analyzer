@@ -1,5 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
+import { PageHeader } from "./analyzer/PageHeader";
 
 export const Navbar = () => {
   const location = useLocation();
@@ -11,8 +12,9 @@ export const Navbar = () => {
 
   return (
     <nav className="bg-white shadow-sm">
-      <div className="container mx-auto px-4">
-        <div className="flex h-16 items-center justify-between">
+      <div className="container mx-auto px-4 py-4">
+        <PageHeader />
+        <div className="flex h-16 items-center justify-between border-t mt-4">
           <div className="flex items-center space-x-8">
             {links.map((link) => (
               <Link
@@ -23,7 +25,7 @@ export const Navbar = () => {
                   location.pathname === link.href && "text-blue-600 font-medium"
                 )}
               >
-                {link.label}
+                {link.href === "/" ? "URL Analyzer" : link.label}
               </Link>
             ))}
           </div>
