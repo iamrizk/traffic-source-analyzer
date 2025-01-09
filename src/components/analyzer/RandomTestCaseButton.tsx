@@ -26,6 +26,10 @@ export const RandomTestCaseButton = ({
 
       // Step 2: Get a random test case with normalized URL
       const selectedCase = getRandomTestCase(testCases);
+      const selectedIndex = testCases.findIndex(
+        (tc) => tc.url === selectedCase.url && tc.referralSource === selectedCase.referralSource
+      );
+      const serialNumber = selectedIndex + 1;
 
       // Step 3: Set URL first
       onUrlChange(selectedCase.url);
@@ -33,9 +37,9 @@ export const RandomTestCaseButton = ({
       // Step 4: Set referral source
       onReferralChange(selectedCase.referralSource || "");
 
-      // Step 5: Show success message
+      // Step 5: Show success message with serial number
       toast.success("Random test case loaded", {
-        description: "A new test case has been loaded. Click 'Analyze URL' to process it.",
+        description: `Test case #${serialNumber} has been loaded. Click 'Analyze URL' to process it.`,
       });
     } catch (error) {
       console.error('Error in handleRandomize:', error);
