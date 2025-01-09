@@ -29,7 +29,7 @@ export const AnalysisResults = ({ matches }: AnalysisResultsProps) => {
             <div className="space-y-2">
               {match.output.type && (
                 <div className="flex justify-between items-center p-2 bg-gray-50 rounded">
-                  <span className="font-medium">Traffic Nature</span>
+                  <span className="font-medium">Visit nature</span>
                   <span className="text-gray-600">{match.output.type}</span>
                 </div>
               )}
