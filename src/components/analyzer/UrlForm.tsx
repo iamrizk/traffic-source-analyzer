@@ -2,6 +2,8 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
+import { Shuffle } from "lucide-react";
+import { toast } from "sonner";
 
 interface UrlFormProps {
   url: string;
@@ -18,6 +20,31 @@ export const UrlForm = ({
   onReferralChange,
   onAnalyze,
 }: UrlFormProps) => {
+  const handleRandomize = () => {
+    const savedTestCases = localStorage.getItem('testCases');
+    if (!savedTestCases) {
+      toast("No test cases available", {
+        description: "Please upload test cases first in the Test Cases page",
+      });
+      return;
+    }
+
+    const testCases = JSON.parse(savedTestCases);
+    if (testCases.length === 0) {
+      toast("No test cases available", {
+        description: "Please upload test cases first in the Test Cases page",
+      });
+      return;
+    }
+
+    const randomIndex = Math.floor(Math.random() * testCases.length);
+    const selectedCase = testCases[randomIndex];
+    
+    onUrlChange(selectedCase.url);
+    onReferralChange(selectedCase.referralSource || "");
+    onAnalyze();
+  };
+
   return (
     <Card className="p-6">
       <h2 className="text-2xl font-semibold mb-6">URL Analyzer</h2>
@@ -40,9 +67,19 @@ export const UrlForm = ({
             placeholder="Enter referral source"
           />
         </div>
-        <Button onClick={onAnalyze} className="w-full">
-          Analyze URL
-        </Button>
+        <div className="flex gap-4">
+          <Button onClick={onAnalyze} className="flex-1">
+            Analyze URL
+          </Button>
+          <Button 
+            variant="outline" 
+            onClick={handleRandomize}
+            className="gap-2"
+          >
+            <Shuffle className="w-4 h-4" />
+            Random Test Case
+          </Button>
+        </div>
       </div>
     </Card>
   );
