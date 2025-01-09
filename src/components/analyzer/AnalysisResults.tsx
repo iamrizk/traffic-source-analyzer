@@ -23,19 +23,32 @@ export const AnalysisResults = ({ matches }: AnalysisResultsProps) => {
             
             <CollapsibleContent>
               <div className="space-y-2 mt-4">
-                {match.matchDetails.map((detail, detailIndex) => {
-                  const isMatched = !detail.includes("not met");
-                  return (
-                    <div key={detailIndex} className="flex justify-between items-center p-2 bg-gray-50 rounded text-sm">
-                      <span>{detail}</span>
-                      {isMatched ? (
-                        <Check className="w-4 h-4 text-green-500 ml-2" />
-                      ) : (
-                        <X className="w-4 h-4 text-red-500 ml-2" />
-                      )}
-                    </div>
-                  );
-                })}
+                {/* Sort match details - matching conditions first */}
+                {[...match.matchDetails]
+                  .sort((a, b) => {
+                    const aMatched = !a.includes("not met");
+                    const bMatched = !b.includes("not met");
+                    return bMatched - aMatched;
+                  })
+                  .map((detail, detailIndex) => {
+                    const isMatched = !detail.includes("not met");
+                    // Bold parameter names between single quotes
+                    const formattedDetail = detail.replace(
+                      /'([^']+)'/g,
+                      (_, param) => `'<strong>${param}</strong>'`
+                    );
+
+                    return (
+                      <div key={detailIndex} className="flex items-center p-2 bg-gray-50 rounded text-sm">
+                        {isMatched ? (
+                          <Check className="w-4 h-4 text-green-500 mr-2 flex-shrink-0" />
+                        ) : (
+                          <X className="w-4 h-4 text-red-500 mr-2 flex-shrink-0" />
+                        )}
+                        <span dangerouslySetInnerHTML={{ __html: formattedDetail }} />
+                      </div>
+                    );
+                  })}
               </div>
 
               <div className="space-y-2 mt-4">
