@@ -4,14 +4,15 @@ import { Upload, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { FileInput } from "./FileInput";
 import { UploadProgress } from "./UploadProgress";
-import { parseCSVData } from "./utils/fileHandling";
+import { parseCSVData, saveTestCases } from "./utils/fileHandling";
 
 interface FileUploaderProps {
   onUploadSuccess: (testCases: { url: string; referralSource: string }[]) => void;
   onClear: () => void;
 }
 
-const MAX_STORAGE_SIZE = 4 * 1024 * 1024; // 4MB limit to be safe
+const MAX_FILE_SIZE = 1 * 1024 * 1024; // 1MB limit
+const MAX_ROWS = 1000; // Maximum number of rows to process
 
 export const FileUploader = ({ onUploadSuccess, onClear }: FileUploaderProps) => {
   const [uploadProgress, setUploadProgress] = useState(0);
@@ -29,6 +30,13 @@ export const FileUploader = ({ onUploadSuccess, onClear }: FileUploaderProps) =>
     const file = event.target.files?.[0];
     if (!file) return;
 
+    if (file.size > MAX_FILE_SIZE) {
+      toast.error("File too large", {
+        description: `Maximum file size is ${MAX_FILE_SIZE / 1024}KB. Please use a smaller file.`,
+      });
+      return;
+    }
+
     if (file.type !== "text/csv" && !file.name.endsWith('.csv')) {
       toast.error("Invalid file type", {
         description: "Please upload a CSV file",
@@ -42,41 +50,28 @@ export const FileUploader = ({ onUploadSuccess, onClear }: FileUploaderProps) =>
     setIsUploading(true);
     setUploadProgress(0);
 
-    let progressInterval: NodeJS.Timeout;
-
-    progressInterval = setInterval(() => {
-      setUploadProgress(prev => {
-        const nextProgress = prev + 5;
-        if (nextProgress >= 90) {
-          clearInterval(progressInterval);
-          return 90;
-        }
-        return nextProgress;
-      });
-    }, 300);
-
     const reader = new FileReader();
     reader.onload = (e) => {
       const text = e.target?.result as string;
       const parsedData = parseCSVData(text);
 
-      if (progressInterval) {
-        clearInterval(progressInterval);
-      }
-
-      setUploadProgress(100);
-
       if (parsedData.length === 0) {
         toast.error("Invalid CSV format", {
           description: "No valid URLs found in the file",
         });
-      } else {
-        const newDataSize = new Blob([JSON.stringify(parsedData)]).size;
-        if (newDataSize > MAX_STORAGE_SIZE) {
-          toast.error("File too large", {
-            description: "The uploaded file exceeds the storage limit. Please use a smaller file.",
+      } else if (parsedData.length > MAX_ROWS) {
+        toast.warning(`Only the first ${MAX_ROWS} rows will be processed`, {
+          description: `${parsedData.length - MAX_ROWS} rows were dropped due to limits`,
+        });
+        const truncatedData = parsedData.slice(0, MAX_ROWS);
+        if (saveTestCases(truncatedData)) {
+          onUploadSuccess(truncatedData);
+          toast.success("File uploaded successfully", {
+            description: `Loaded ${truncatedData.length} test cases`,
           });
-        } else {
+        }
+      } else {
+        if (saveTestCases(parsedData)) {
           onUploadSuccess(parsedData);
           toast.success("File uploaded successfully", {
             description: `Loaded ${parsedData.length} test cases`,
@@ -84,12 +79,16 @@ export const FileUploader = ({ onUploadSuccess, onClear }: FileUploaderProps) =>
         }
       }
 
-      requestAnimationFrame(() => {
-        setTimeout(() => {
-          setIsUploading(false);
-          setUploadProgress(0);
-        }, 500);
-      });
+      setIsUploading(false);
+      setUploadProgress(100);
+      setTimeout(() => setUploadProgress(0), 500);
+    };
+
+    reader.onprogress = (event) => {
+      if (event.lengthComputable) {
+        const progress = (event.loaded / event.total) * 100;
+        setUploadProgress(Math.min(90, progress));
+      }
     };
 
     reader.readAsText(file);

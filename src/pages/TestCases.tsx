@@ -11,6 +11,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { parseCSVData, saveTestCases } from "@/components/test-cases/utils/fileHandling";
 
 interface TestCase {
   url: string;
@@ -35,64 +36,18 @@ const TestCases = () => {
       }
       
       const text = await response.text();
-      const lines = text.split(/\r?\n/).map(line => line.trim()).filter(Boolean);
-      
-      if (lines.length === 0) {
-        throw new Error('CSV file is empty');
-      }
+      const parsedData = parseCSVData(text);
 
-      let startIndex = 0;
-      let urlIndex = 0;
-      let sourceIndex = 1;
-
-      // Try to detect headers first
-      const possibleHeaders = lines[0].toLowerCase().split(',').map(h => h.trim());
-      const hasHeaders = possibleHeaders.some(h => 
-        h.includes('url') || h.includes('link') || 
-        h.includes('source') || h.includes('referral')
-      );
-
-      if (hasHeaders) {
-        startIndex = 1;
-        urlIndex = possibleHeaders.findIndex(h => 
-          h.includes('url') || h.includes('link') || h.includes('address')
-        );
-        sourceIndex = possibleHeaders.findIndex(h => 
-          h.includes('source') || h.includes('referral') || h.includes('referrer') || h.includes('origin')
-        );
-
-        // If headers were not found, fallback to first two columns
-        if (urlIndex === -1) urlIndex = 0;
-        if (sourceIndex === -1) sourceIndex = 1;
-      }
-
-      const parsedTestCases = lines.slice(startIndex)
-        .map(line => {
-          const values = line.split(',').map(v => v.trim());
-          if (values.length >= 2) {
-            return {
-              url: values[urlIndex],
-              referralSource: values[sourceIndex] || 'direct'
-            };
-          }
-          return null;
-        })
-        .filter((testCase): testCase is TestCase => 
-          testCase !== null && 
-          testCase.url && 
-          testCase.url.length > 0 &&
-          testCase.url.includes('.')  // Basic URL validation
-        );
-
-      if (parsedTestCases.length === 0) {
+      if (parsedData.length === 0) {
         throw new Error('No valid test cases found in file');
       }
 
-      setTestCases(parsedTestCases);
-      localStorage.setItem('testCases', JSON.stringify(parsedTestCases));
-      toast.success("Sample test cases loaded", {
-        description: `Loaded ${parsedTestCases.length} test cases from ${filename}`,
-      });
+      if (saveTestCases(parsedData)) {
+        setTestCases(parsedData);
+        toast.success("Sample test cases loaded", {
+          description: `Loaded ${parsedData.length} test cases from ${filename}`,
+        });
+      }
     } catch (error) {
       console.error('Error loading sample test cases:', error);
       toast.error("Error loading sample test cases", {
