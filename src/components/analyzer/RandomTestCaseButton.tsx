@@ -19,7 +19,12 @@ export const RandomTestCaseButton = ({
   const handleRandomize = async () => {
     try {
       const testCases = loadTestCases();
-      if (testCases.length === 0) return;
+      if (testCases.length === 0) {
+        toast.error("No test cases available", {
+          description: "Please upload test cases first in the Test Cases page.",
+        });
+        return;
+      }
 
       // Step 1: Clear all states and results
       onClear();
@@ -29,6 +34,14 @@ export const RandomTestCaseButton = ({
       const selectedIndex = testCases.findIndex(
         (tc) => tc.url === selectedCase.url && tc.referralSource === selectedCase.referralSource
       );
+
+      if (selectedIndex === -1) {
+        toast.error("Error loading test case", {
+          description: "Could not find the selected test case in the table.",
+        });
+        return;
+      }
+
       const serialNumber = selectedIndex + 1;
 
       // Step 3: Set URL first
