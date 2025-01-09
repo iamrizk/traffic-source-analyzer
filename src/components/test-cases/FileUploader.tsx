@@ -12,7 +12,7 @@ interface FileUploaderProps {
 }
 
 const MAX_FILE_SIZE = 4 * 1024 * 1024; // 4MB limit
-const MAX_ROWS = 9000; // Maximum number of rows to process
+const MAX_ROWS = 9001; // Maximum number of rows to process
 
 export const FileUploader = ({ onUploadSuccess, onClear }: FileUploaderProps) => {
   const [uploadProgress, setUploadProgress] = useState(0);
@@ -60,8 +60,8 @@ export const FileUploader = ({ onUploadSuccess, onClear }: FileUploaderProps) =>
           description: "No valid URLs found in the file",
         });
       } else if (parsedData.length > MAX_ROWS) {
-        toast.warning(`Only the first ${MAX_ROWS} rows will be processed`, {
-          description: `${parsedData.length - MAX_ROWS} rows were dropped due to limits`,
+        toast.warning(`File exceeds maximum row limit`, {
+          description: `Only the first ${MAX_ROWS} rows will be processed. ${parsedData.length - MAX_ROWS} rows were removed.`,
         });
         const truncatedData = parsedData.slice(0, MAX_ROWS);
         if (saveTestCases(truncatedData)) {
