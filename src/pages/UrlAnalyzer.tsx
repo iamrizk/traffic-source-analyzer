@@ -4,6 +4,7 @@ import { AnalysisResults } from "@/components/analyzer/AnalysisResults";
 import { ParametersDisplay } from "@/components/analyzer/ParametersDisplay";
 import { useRules } from "@/hooks/useRules";
 import { useUrlAnalyzer } from "@/hooks/useUrlAnalyzer";
+import { RuleMatch } from "@/types/analyzer";
 
 const UrlAnalyzer = () => {
   const { rules } = useRules();
