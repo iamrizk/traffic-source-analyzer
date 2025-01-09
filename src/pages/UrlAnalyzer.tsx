@@ -133,9 +133,9 @@ const UrlAnalyzer = () => {
         </Card>
       )}
 
-      <ParametersDisplay parameters={parameters} />
-
       <AnalysisResults matches={matches} />
+
+      <ParametersDisplay parameters={parameters} />
     </div>
   );
 };
