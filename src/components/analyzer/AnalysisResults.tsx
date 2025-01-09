@@ -28,7 +28,7 @@ export const AnalysisResults = ({ matches }: AnalysisResultsProps) => {
                   .sort((a, b) => {
                     const aMatched = !a.includes("not met");
                     const bMatched = !b.includes("not met");
-                    return bMatched - aMatched;
+                    return Number(bMatched) - Number(aMatched);
                   })
                   .map((detail, detailIndex) => {
                     const isMatched = !detail.includes("not met");
