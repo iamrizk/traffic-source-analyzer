@@ -12,14 +12,12 @@ export const FileInput = ({ fileName, onFileChange }: FileInputProps) => {
         type="file"
         accept=".csv"
         onChange={onFileChange}
-        className="max-w-md"
+        className="max-w-md opacity-0 absolute inset-0 cursor-pointer"
         value=""
       />
-      {fileName && (
-        <div className="absolute inset-0 pointer-events-none flex items-center px-3 text-sm text-muted-foreground">
-          {fileName}
-        </div>
-      )}
+      <div className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
+        {fileName || "No file chosen"}
+      </div>
     </div>
   );
 };
