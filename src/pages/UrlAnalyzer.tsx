@@ -98,6 +98,22 @@ const UrlAnalyzer = () => {
     }
   };
 
+  const getSummary = (matches: RuleMatch[]) => {
+    const types = matches
+      .filter(match => match.output.type)
+      .map(match => `${match.output.type} (Rule #${match.ruleIndex + 1})`);
+    
+    const platforms = matches
+      .filter(match => match.output.platform)
+      .map(match => `${match.output.platform} (Rule #${match.ruleIndex + 1})`);
+    
+    const channels = matches
+      .filter(match => match.output.channel)
+      .map(match => `${match.output.channel} (Rule #${match.ruleIndex + 1})`);
+
+    return { types, platforms, channels };
+  };
+
   return (
     <div className="space-y-8">
       <Card className="p-6">
@@ -142,47 +158,86 @@ const UrlAnalyzer = () => {
       )}
 
       {matches.length > 0 && (
-        <Card className="p-6">
-          <h3 className="text-xl font-semibold mb-4">Analysis Results</h3>
-          <div className="space-y-6">
-            {matches.map((match, index) => (
-              <div key={index} className="space-y-4 border-b pb-4 last:border-b-0">
-                <div className="p-2 bg-green-50 text-green-700 rounded">
-                  Matched Rule #{match.ruleIndex + 1}
-                </div>
-                
-                <div className="space-y-2">
-                  {match.matchDetails.map((detail, detailIndex) => (
-                    <div key={detailIndex} className="p-2 bg-gray-50 rounded text-sm">
-                      {detail}
-                    </div>
-                  ))}
-                </div>
+        <>
+          <Card className="p-6">
+            <h3 className="text-xl font-semibold mb-4">Analysis Summary</h3>
+            <div className="space-y-4">
+              {(() => {
+                const summary = getSummary(matches);
+                return (
+                  <>
+                    {summary.types.length > 0 && (
+                      <div className="space-y-2">
+                        <span className="font-medium">Types:</span>
+                        <div className="pl-4">
+                          {summary.types.join(", ")}
+                        </div>
+                      </div>
+                    )}
+                    {summary.platforms.length > 0 && (
+                      <div className="space-y-2">
+                        <span className="font-medium">Platforms:</span>
+                        <div className="pl-4">
+                          {summary.platforms.join(", ")}
+                        </div>
+                      </div>
+                    )}
+                    {summary.channels.length > 0 && (
+                      <div className="space-y-2">
+                        <span className="font-medium">Channels:</span>
+                        <div className="pl-4">
+                          {summary.channels.join(", ")}
+                        </div>
+                      </div>
+                    )}
+                  </>
+                );
+              })()}
+            </div>
+          </Card>
 
-                <div className="space-y-2">
-                  {match.output.type && (
-                    <div className="flex justify-between items-center p-2 bg-gray-50 rounded">
-                      <span className="font-medium">Type</span>
-                      <span className="text-gray-600">{match.output.type}</span>
-                    </div>
-                  )}
-                  {match.output.platform && (
-                    <div className="flex justify-between items-center p-2 bg-gray-50 rounded">
-                      <span className="font-medium">Platform</span>
-                      <span className="text-gray-600">{match.output.platform}</span>
-                    </div>
-                  )}
-                  {match.output.channel && (
-                    <div className="flex justify-between items-center p-2 bg-gray-50 rounded">
-                      <span className="font-medium">Channel</span>
-                      <span className="text-gray-600">{match.output.channel}</span>
-                    </div>
-                  )}
+          <Card className="p-6">
+            <h3 className="text-xl font-semibold mb-4">Analysis Results</h3>
+            <div className="space-y-6">
+              {matches.map((match, index) => (
+                <div key={index} className="space-y-4 border-b pb-4 last:border-b-0">
+                  <div className="p-2 bg-green-50 text-green-700 rounded">
+                    Matched Rule #{match.ruleIndex + 1}
+                  </div>
+                  
+                  <div className="space-y-2">
+                    {match.matchDetails.map((detail, detailIndex) => (
+                      <div key={detailIndex} className="p-2 bg-gray-50 rounded text-sm">
+                        {detail}
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="space-y-2">
+                    {match.output.type && (
+                      <div className="flex justify-between items-center p-2 bg-gray-50 rounded">
+                        <span className="font-medium">Type</span>
+                        <span className="text-gray-600">{match.output.type}</span>
+                      </div>
+                    )}
+                    {match.output.platform && (
+                      <div className="flex justify-between items-center p-2 bg-gray-50 rounded">
+                        <span className="font-medium">Platform</span>
+                        <span className="text-gray-600">{match.output.platform}</span>
+                      </div>
+                    )}
+                    {match.output.channel && (
+                      <div className="flex justify-between items-center p-2 bg-gray-50 rounded">
+                        <span className="font-medium">Channel</span>
+                        <span className="text-gray-600">{match.output.channel}</span>
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        </Card>
+              ))}
+            </div>
+          </Card>
+        </>
       )}
     </div>
   );
