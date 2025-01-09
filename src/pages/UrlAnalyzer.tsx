@@ -8,6 +8,7 @@ import { UrlForm } from "@/components/analyzer/UrlForm";
 import { ParametersDisplay } from "@/components/analyzer/ParametersDisplay";
 import { AnalysisResults } from "@/components/analyzer/AnalysisResults";
 import { ParametersAudit } from "@/components/analyzer/ParametersAudit";
+import { ConsolidatedSummary } from "@/components/analyzer/ConsolidatedSummary";
 
 const UrlAnalyzer = () => {
   const [url, setUrl] = useState(() => localStorage.getItem("analyzer_url") || "");
@@ -152,6 +153,8 @@ const UrlAnalyzer = () => {
         onAnalyze={parseUrl}
         onClear={handleClear}
       />
+
+      <ConsolidatedSummary matches={matches} />
 
       <Card className="p-6">
         <h3 className="text-xl font-semibold mb-4">Analysis Summary</h3>
