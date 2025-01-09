@@ -1,13 +1,13 @@
 import { useState, useEffect } from "react";
 
-interface Condition {
+export interface Condition {
   type: "parameter" | "referral";
   parameter?: string;
   operator?: "exists" | "not_exists";
   value?: string;
 }
 
-interface Rule {
+export interface Rule {
   conditions: Condition[];
   output: {
     type: string;
@@ -26,5 +26,31 @@ export function useRules() {
     localStorage.setItem("url-analyzer-rules", JSON.stringify(rules));
   }, [rules]);
 
-  return { rules, setRules };
+  const updateRule = (index: number, updatedRule: Rule) => {
+    const newRules = [...rules];
+    newRules[index] = updatedRule;
+    setRules(newRules);
+  };
+
+  const deleteRule = (index: number) => {
+    setRules(rules.filter((_, i) => i !== index));
+  };
+
+  const moveRuleUp = (index: number) => {
+    if (index > 0) {
+      const newRules = [...rules];
+      [newRules[index - 1], newRules[index]] = [newRules[index], newRules[index - 1]];
+      setRules(newRules);
+    }
+  };
+
+  const moveRuleDown = (index: number) => {
+    if (index < rules.length - 1) {
+      const newRules = [...rules];
+      [newRules[index], newRules[index + 1]] = [newRules[index + 1], newRules[index]];
+      setRules(newRules);
+    }
+  };
+
+  return { rules, setRules, updateRule, deleteRule, moveRuleUp, moveRuleDown };
 }

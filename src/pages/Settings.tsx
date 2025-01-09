@@ -7,18 +7,19 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useRules } from "@/hooks/useRules";
 import { toast } from "sonner";
 import { Plus, Download, Upload, X } from "lucide-react";
+import { RuleItem } from "@/components/RuleItem";
 
 const Settings = () => {
-  const { rules, setRules } = useRules();
+  const { rules, setRules, updateRule, deleteRule, moveRuleUp, moveRuleDown } = useRules();
   const [newRule, setNewRule] = useState({
-    conditions: [{ type: "parameter", parameter: "", operator: "exists" }],
+    conditions: [{ type: "parameter" as const, parameter: "", operator: "exists" as const }],
     output: { type: "", platform: "", channel: "" },
   });
 
   const addCondition = () => {
     setNewRule({
       ...newRule,
-      conditions: [...newRule.conditions, { type: "parameter", parameter: "", operator: "exists" }],
+      conditions: [...newRule.conditions, { type: "parameter" as const, parameter: "", operator: "exists" as const }],
     });
   };
 
@@ -38,7 +39,7 @@ const Settings = () => {
   const addRule = () => {
     setRules([...rules, newRule]);
     setNewRule({
-      conditions: [{ type: "parameter", parameter: "", operator: "exists" }],
+      conditions: [{ type: "parameter" as const, parameter: "", operator: "exists" as const }],
       output: { type: "", platform: "", channel: "" },
     });
     toast.success("Rule added successfully!");
@@ -97,6 +98,7 @@ const Settings = () => {
         </div>
 
         <div className="space-y-6">
+          {/* Add New Rule Form */}
           <div className="space-y-4">
             <h3 className="text-lg font-medium">Add New Rule</h3>
             {newRule.conditions.map((condition, index) => (
@@ -105,7 +107,9 @@ const Settings = () => {
                   <Label>Condition Type</Label>
                   <Select
                     value={condition.type}
-                    onValueChange={(value) => updateCondition(index, "type", value)}
+                    onValueChange={(value: "parameter" | "referral") =>
+                      updateCondition(index, "type", value)
+                    }
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Select type" />
@@ -131,7 +135,9 @@ const Settings = () => {
                       <Label>Operator</Label>
                       <Select
                         value={condition.operator}
-                        onValueChange={(value) => updateCondition(index, "operator", value)}
+                        onValueChange={(value: "exists" | "not_exists") =>
+                          updateCondition(index, "operator", value)
+                        }
                       >
                         <SelectTrigger>
                           <SelectValue placeholder="Select operator" />
@@ -229,24 +235,17 @@ const Settings = () => {
           <h3 className="text-xl font-semibold mb-4">Existing Rules</h3>
           <div className="space-y-4">
             {rules.map((rule, index) => (
-              <div key={index} className="p-4 bg-gray-50 rounded-lg space-y-2">
-                <div className="font-medium">Conditions:</div>
-                <ul className="list-disc list-inside pl-4">
-                  {rule.conditions.map((condition, condIndex) => (
-                    <li key={condIndex}>
-                      {condition.type === "parameter"
-                        ? `Parameter "${condition.parameter}" ${condition.operator}`
-                        : `Referral source is "${condition.value}"`}
-                    </li>
-                  ))}
-                </ul>
-                <div className="font-medium mt-2">Output:</div>
-                <div className="pl-4">
-                  <div>Type: {rule.output.type}</div>
-                  <div>Platform: {rule.output.platform}</div>
-                  <div>Channel: {rule.output.channel}</div>
-                </div>
-              </div>
+              <RuleItem
+                key={index}
+                rule={rule}
+                index={index}
+                onUpdate={updateRule}
+                onDelete={deleteRule}
+                onMoveUp={moveRuleUp}
+                onMoveDown={moveRuleDown}
+                isFirst={index === 0}
+                isLast={index === rules.length - 1}
+              />
             ))}
           </div>
         </Card>
