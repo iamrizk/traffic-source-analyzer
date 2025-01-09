@@ -47,7 +47,7 @@ export const RuleDisplay = ({ rule, onUpdate }: RuleDisplayProps) => {
         <div className="space-y-2">
           <h5 className="font-medium">Output</h5>
           <div className="pl-4 space-y-1 text-sm text-gray-600">
-            <div>Traffic Nature: {rule.output.type}</div>
+            <div>Traffic Nature: {rule.output.trafficNature}</div>
             <div>Platform: {rule.output.platform}</div>
             <div>Channel: {rule.output.channel}</div>
           </div>

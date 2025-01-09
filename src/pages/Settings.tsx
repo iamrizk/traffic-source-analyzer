@@ -13,7 +13,7 @@ const Settings = () => {
     name: "",
     conditions: [{ type: "parameter", parameter: "", operator: "exists" as const }],
     conditionsOperator: "and",
-    output: { type: "", platform: "", channel: "" },
+    output: { trafficNature: "", platform: "", channel: "" },
   });
 
   const addRule = () => {
@@ -22,7 +22,7 @@ const Settings = () => {
       name: "",
       conditions: [{ type: "parameter", parameter: "", operator: "exists" as const }],
       conditionsOperator: "and",
-      output: { type: "", platform: "", channel: "" },
+      output: { trafficNature: "", platform: "", channel: "" },
     });
     toast.success("Rule added successfully!");
   };
@@ -54,10 +54,15 @@ const Settings = () => {
       reader.onload = (e) => {
         try {
           const importedRules = JSON.parse(e.target?.result as string);
-          // Ensure all imported rules have conditionsOperator
-          const validatedRules = importedRules.map((rule: Rule) => ({
+          // Convert old format to new format if necessary
+          const validatedRules = importedRules.map((rule: any) => ({
             ...rule,
             conditionsOperator: rule.conditionsOperator || "and",
+            output: {
+              trafficNature: rule.output.type || rule.output.trafficNature || "",
+              platform: rule.output.platform || "",
+              channel: rule.output.channel || "",
+            },
           }));
           setRules(validatedRules);
           toast.success("Rules imported successfully!");

@@ -24,7 +24,7 @@ export interface Rule {
   conditions: Condition[];
   conditionsOperator: "and" | "or";
   output: {
-    type: string;
+    trafficNature: string;
     platform: string;
     channel: string;
   };
@@ -33,7 +33,19 @@ export interface Rule {
 export function useRules() {
   const [rules, setRules] = useState<Rule[]>(() => {
     const savedRules = localStorage.getItem("url-analyzer-rules");
-    return savedRules ? JSON.parse(savedRules) : [];
+    if (savedRules) {
+      const parsedRules = JSON.parse(savedRules);
+      // Convert old format to new format if necessary
+      return parsedRules.map((rule: any) => ({
+        ...rule,
+        output: {
+          trafficNature: rule.output.type || rule.output.trafficNature || "",
+          platform: rule.output.platform || "",
+          channel: rule.output.channel || "",
+        },
+      }));
+    }
+    return [];
   });
 
   useEffect(() => {
