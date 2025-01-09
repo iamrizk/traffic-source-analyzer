@@ -11,8 +11,8 @@ interface FileUploaderProps {
   onClear: () => void;
 }
 
-const MAX_FILE_SIZE = 1 * 1024 * 1024; // 1MB limit
-const MAX_ROWS = 1000; // Maximum number of rows to process
+const MAX_FILE_SIZE = 4 * 1024 * 1024; // 4MB limit
+const MAX_ROWS = 9000; // Maximum number of rows to process
 
 export const FileUploader = ({ onUploadSuccess, onClear }: FileUploaderProps) => {
   const [uploadProgress, setUploadProgress] = useState(0);
@@ -32,7 +32,7 @@ export const FileUploader = ({ onUploadSuccess, onClear }: FileUploaderProps) =>
 
     if (file.size > MAX_FILE_SIZE) {
       toast.error("File too large", {
-        description: `Maximum file size is ${MAX_FILE_SIZE / 1024}KB. Please use a smaller file.`,
+        description: `Maximum file size is ${MAX_FILE_SIZE / (1024 * 1024)}MB. Please use a smaller file.`,
       });
       return;
     }
