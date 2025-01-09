@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { toast } from "sonner";
 import { FileUploader } from "@/components/test-cases/FileUploader";
 import { TestCasesTable } from "@/components/test-cases/TestCasesTable";
 import { Import, ChevronDown } from "lucide-react";
@@ -12,6 +11,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { toast } from "sonner";
 import { parseCSVData, saveTestCases } from "@/components/test-cases/utils/fileHandling";
 
 interface TestCase {
@@ -32,34 +32,35 @@ const TestCases = () => {
   const [loadingProgress, setLoadingProgress] = useState(0);
 
   const loadSampleTestCases = async (filename: string) => {
+    if (isLoading) return; // Prevent multiple simultaneous loads
+    
     try {
       setIsLoading(true);
       setLoadingProgress(10);
       
-      // Step 1: Clear all storage
+      // Step 1: Clear all storage and state
       localStorage.clear();
+      setTestCases([]);
+      await new Promise(resolve => setTimeout(resolve, 200)); // Ensure clearing is complete
       setLoadingProgress(30);
       
-      // Step 2: Reset state
-      setTestCases([]);
-      setLoadingProgress(50);
-      
-      // Step 3: Fetch new data
+      // Step 2: Fetch new data
       const response = await fetch(`/${filename}`);
       if (!response.ok) {
         throw new Error(`Failed to fetch ${filename}: ${response.status} ${response.statusText}`);
       }
-      setLoadingProgress(70);
+      setLoadingProgress(50);
       
       const text = await response.text();
+      setLoadingProgress(70);
+      
       const parsedData = parseCSVData(text);
-      setLoadingProgress(90);
-
       if (parsedData.length === 0) {
         throw new Error('No valid test cases found in file');
       }
+      setLoadingProgress(85);
 
-      // Step 4: Save new data
+      // Step 3: Save new data
       if (saveTestCases(parsedData)) {
         setTestCases(parsedData);
         toast.success("Sample test cases loaded", {
@@ -70,6 +71,7 @@ const TestCases = () => {
       setLoadingProgress(100);
     } catch (error) {
       console.error('Error loading sample test cases:', error);
+      setTestCases([]); // Reset state on error
       toast.error("Error loading sample test cases", {
         description: error instanceof Error ? error.message : "Failed to load sample test cases",
       });

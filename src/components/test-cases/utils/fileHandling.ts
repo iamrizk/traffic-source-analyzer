@@ -1,25 +1,41 @@
 import { toast } from "sonner";
 import { MAX_ROWS } from "./constants";
 
-export const isValidUrl = (urlString: string): boolean => {
-  return Boolean(urlString && urlString.trim().length > 0);
-};
+export interface TestCase {
+  url: string;
+  referralSource: string;
+}
 
-// Compress data before storing
+// Compress data before storing - with better compression ratio
 const compressData = (data: any[]): string => {
-  return btoa(JSON.stringify(data));
+  try {
+    // Remove unnecessary whitespace and minimize the JSON string
+    const minifiedData = data.map(item => ({
+      u: item.url.trim(),
+      r: (item.referralSource || '').trim()
+    }));
+    return btoa(JSON.stringify(minifiedData));
+  } catch (error) {
+    console.error('Compression error:', error);
+    return '';
+  }
 };
 
-// Decompress data after retrieving
-export const decompressData = (compressed: string): any[] => {
+// Decompress data after retrieving - handle the new compression format
+export const decompressData = (compressed: string): TestCase[] => {
   try {
-    return JSON.parse(atob(compressed));
+    const decompressed = JSON.parse(atob(compressed));
+    // Convert back from minimized format to full format
+    return decompressed.map((item: any) => ({
+      url: item.u,
+      referralSource: item.r
+    }));
   } catch {
     return [];
   }
 };
 
-export const parseCSVData = (text: string): { url: string; referralSource: string; }[] => {
+export const parseCSVData = (text: string): TestCase[] => {
   // Split into lines and remove empty lines
   const lines = text.split(/\r?\n/).map(line => line.trim()).filter(Boolean);
   if (lines.length === 0) return [];
@@ -78,29 +94,93 @@ export const parseCSVData = (text: string): { url: string; referralSource: strin
   return parsedData;
 };
 
-export const saveTestCases = (testCases: { url: string; referralSource: string }[]): boolean => {
+export const normalizeUrl = (url: string): string => {
+  if (!url) return '';
+  
   try {
-    // Clear storage first
-    localStorage.clear();
+    // Remove any existing protocol and add https://
+    const cleanUrl = url.replace(/^https?:\/\//, '');
+    const urlWithProtocol = `https://${cleanUrl}`;
+    const urlObj = new URL(urlWithProtocol);
     
-    // Truncate to maximum allowed rows
-    const truncatedTestCases = testCases.slice(0, MAX_ROWS);
+    // Sort parameters alphabetically and ensure they're lowercase
+    const params = new URLSearchParams(urlObj.search);
+    const sortedParams = new URLSearchParams();
     
-    // Try to save with compression
-    const compressed = compressData(truncatedTestCases);
+    // Convert all parameter values to lowercase and sort them
+    Array.from(params.entries())
+      .sort(([keyA], [keyB]) => keyA.localeCompare(keyB))
+      .forEach(([key, value]) => {
+        sortedParams.append(key, value.toLowerCase());
+      });
+    
+    // Reconstruct URL with sorted parameters
+    urlObj.search = sortedParams.toString();
+    return urlObj.toString();
+  } catch (error) {
+    console.error('Error normalizing URL:', error);
+    return url;
+  }
+};
+
+export const getRandomTestCase = (testCases: TestCase[]): TestCase => {
+  const randomIndex = Math.floor(Math.random() * testCases.length);
+  const selectedCase = testCases[randomIndex];
+  
+  return {
+    ...selectedCase,
+    url: normalizeUrl(selectedCase.url)
+  };
+};
+
+export const saveTestCases = (testCases: TestCase[]): boolean => {
+  try {
+    // Clear storage completely
+    for (const key of Object.keys(localStorage)) {
+      localStorage.removeItem(key);
+    }
+    
+    // Wait a brief moment to ensure clearing is complete
+    setTimeout(() => {}, 100);
+    
+    // Truncate to maximum allowed rows and remove any empty entries
+    const cleanedTestCases = testCases
+      .slice(0, MAX_ROWS)
+      .filter(tc => tc.url && tc.url.trim().length > 0);
+    
+    // Try to save with improved compression
+    const compressed = compressData(cleanedTestCases);
+    if (!compressed) {
+      throw new Error('Compression failed');
+    }
+    
     localStorage.setItem('testCases', compressed);
-    
     return true;
   } catch (error) {
     console.error('Error saving test cases:', error);
     
     if (error instanceof Error && error.name === 'QuotaExceededError') {
       toast.error("Storage limit exceeded", {
-        description: "The test cases file is too large for browser storage. Try with fewer test cases.",
+        description: "The test cases file is too large. Trying to optimize...",
       });
+      
+      // Try again with fewer test cases
+      try {
+        const reducedTestCases = testCases.slice(0, Math.floor(MAX_ROWS / 2));
+        const compressed = compressData(reducedTestCases);
+        localStorage.setItem('testCases', compressed);
+        toast.success("Loaded with reduced dataset", {
+          description: `Successfully loaded ${reducedTestCases.length} test cases`,
+        });
+        return true;
+      } catch (retryError) {
+        toast.error("Storage optimization failed", {
+          description: "Please try with a smaller test case file",
+        });
+      }
     } else {
       toast.error("Failed to save test cases", {
-        description: "Please try with fewer test cases or smaller data.",
+        description: "Please try with fewer test cases or smaller data",
       });
     }
     
@@ -108,10 +188,11 @@ export const saveTestCases = (testCases: { url: string; referralSource: string }
   }
 };
 
-export const loadTestCases = (): { url: string; referralSource: string }[] => {
+export const loadTestCases = (): TestCase[] => {
   try {
     const compressed = localStorage.getItem('testCases');
     if (!compressed) return [];
+    
     const decompressed = decompressData(compressed);
     return decompressed.slice(0, MAX_ROWS);
   } catch (error) {
