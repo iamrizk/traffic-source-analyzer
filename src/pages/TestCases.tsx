@@ -75,30 +75,46 @@ const TestCases = () => {
   const loadSampleTestCases = async (filename: string) => {
     try {
       const response = await fetch(`/test-cases/${filename}`);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch ${filename}`);
+      }
+      
       const text = await response.text();
+      const lines = text.split('\n').map(line => line.trim()).filter(Boolean);
       
-      // Split the CSV into lines and parse
-      const lines = text.split('\n');
-      const headers = lines[0].split(',');
-      const urlIndex = headers.findIndex(h => h.toLowerCase().includes('url'));
-      const sourceIndex = headers.findIndex(h => h.toLowerCase().includes('source'));
-      
+      if (lines.length < 2) {
+        throw new Error('CSV file is empty or has no data rows');
+      }
+
+      // Get headers and normalize them
+      const headers = lines[0].split(',').map(header => 
+        header.trim().toLowerCase().replace(/[^a-z0-9]/g, '')
+      );
+
+      // Find the correct column indices
+      const urlIndex = headers.findIndex(h => 
+        h.includes('url') || h.includes('link') || h.includes('address')
+      );
+      const sourceIndex = headers.findIndex(h => 
+        h.includes('source') || h.includes('referral') || h.includes('referrer') || h.includes('origin')
+      );
+
       if (urlIndex === -1 || sourceIndex === -1) {
-        throw new Error('Invalid CSV format');
+        throw new Error('Required columns not found in CSV. Need URL and Source columns.');
       }
 
       const parsedTestCases = lines.slice(1)
-        .filter(line => line.trim())
         .map(line => {
-          const values = line.split(',');
+          const values = line.split(',').map(v => v.trim());
           return {
-            url: values[urlIndex].trim(),
-            referralSource: values[sourceIndex].trim()
+            url: values[urlIndex],
+            referralSource: values[sourceIndex]
           };
-        });
+        })
+        .filter(testCase => testCase.url && testCase.referralSource);
 
       if (parsedTestCases.length === 0) {
-        throw new Error('No valid test cases found');
+        throw new Error('No valid test cases found in file');
       }
 
       setTestCases(parsedTestCases);
@@ -109,7 +125,7 @@ const TestCases = () => {
     } catch (error) {
       console.error('Error loading sample test cases:', error);
       toast.error("Error loading sample test cases", {
-        description: "Failed to load sample test cases. Please try again.",
+        description: error instanceof Error ? error.message : "Failed to load sample test cases",
       });
     }
   };
