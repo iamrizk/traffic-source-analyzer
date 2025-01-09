@@ -45,7 +45,7 @@ const TestCases = () => {
       setLoadingProgress(30);
       
       // Step 2: Fetch new data
-      const response = await fetch(`/${filename}`);
+      const response = await fetch(filename);
       if (!response.ok) {
         throw new Error(`Failed to fetch ${filename}: ${response.status} ${response.statusText}`);
       }
