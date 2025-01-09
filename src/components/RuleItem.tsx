@@ -28,7 +28,10 @@ export const RuleItem = ({
   return (
     <Card className="p-4">
       <div className="flex justify-between items-start mb-4">
-        <h4 className="text-lg font-medium">{rule.name}</h4>
+        <div className="flex items-center gap-2">
+          <span className="text-sm font-medium text-gray-500">Rule {index + 1}</span>
+          <h4 className="text-lg font-medium">{rule.name}</h4>
+        </div>
         <div className="flex space-x-2">
           {!isFirst && (
             <Button
