@@ -4,6 +4,7 @@ import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { X } from "lucide-react";
 import { RandomTestCaseButton } from "./RandomTestCaseButton";
+import { toast } from "sonner";
 
 interface UrlFormProps {
   url: string;
@@ -22,6 +23,14 @@ export const UrlForm = ({
   onAnalyze,
   onClear,
 }: UrlFormProps) => {
+  const handleClear = () => {
+    localStorage.clear();
+    onClear();
+    toast.success("All data cleared", {
+      description: "Local storage and form have been cleared",
+    });
+  };
+
   return (
     <Card className="p-6">
       <h2 className="text-2xl font-semibold mb-6">URL Analyzer</h2>
@@ -56,7 +65,7 @@ export const UrlForm = ({
           />
           <Button
             variant="outline"
-            onClick={onClear}
+            onClick={handleClear}
             className="gap-2"
           >
             <X className="w-4 h-4" />
