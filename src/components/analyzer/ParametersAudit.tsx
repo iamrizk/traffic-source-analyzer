@@ -11,13 +11,19 @@ export const ParametersAudit = ({ url, parameters }: ParametersAuditProps) => {
 
   const auditParameters = () => {
     try {
+      // Handle URLs with or without protocol
       const urlObj = new URL(url.startsWith('http') ? url : `https://${url}`);
       const urlParams = new URLSearchParams(urlObj.search);
-      const urlParamsMap = Object.fromEntries(urlParams.entries());
+      const urlParamsMap: Record<string, string> = {};
+      
+      // Convert all URL parameter values to lowercase for consistent comparison
+      urlParams.forEach((value, key) => {
+        urlParamsMap[key] = value.toLowerCase();
+      });
       
       return Object.entries(parameters).map(([key, value]) => {
         const isPresent = key in urlParamsMap;
-        const matchesValue = urlParamsMap[key] === value;
+        const matchesValue = urlParamsMap[key] === value.toLowerCase();
         
         return {
           key,
@@ -28,6 +34,7 @@ export const ParametersAudit = ({ url, parameters }: ParametersAuditProps) => {
         };
       });
     } catch (error) {
+      console.error('Error parsing URL:', error);
       return [];
     }
   };
