@@ -43,15 +43,19 @@ export const ParametersAudit = ({ url, parameters }: ParametersAuditProps) => {
 
   if (auditResults.length === 0) return null;
 
+  const StatusBadge = ({ passed }: { passed: boolean }) => (
+    <span className={`text-sm font-medium px-2 py-0.5 rounded ${passed ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+      {passed ? 'PASS' : 'FAIL'}
+    </span>
+  );
+
   return (
     <Card className="p-6" data-audit-status={allPassed ? "passed" : "failed"}>
       <Collapsible defaultOpen={false}>
         <CollapsibleTrigger className="flex w-full items-center justify-between p-2 bg-gray-50 rounded hover:bg-gray-100">
           <div className="flex items-center gap-2">
             <h3 className="text-xl font-semibold">Analysis Audit</h3>
-            <span className={`text-sm font-medium px-2 py-0.5 rounded ${allPassed ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-              {allPassed ? 'PASS' : 'FAIL'}
-            </span>
+            <StatusBadge passed={allPassed} />
           </div>
           <ChevronDown className="h-4 w-4" />
         </CollapsibleTrigger>
@@ -63,9 +67,7 @@ export const ParametersAudit = ({ url, parameters }: ParametersAuditProps) => {
                 key={key}
                 className="flex items-center gap-4 p-2 bg-gray-50 rounded"
               >
-                <span className={`text-sm font-medium px-2 py-0.5 rounded ${isPresent && matchesValue ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-                  {isPresent && matchesValue ? 'PASS' : 'FAIL'}
-                </span>
+                <StatusBadge passed={isPresent && matchesValue} />
                 <span className="text-sm text-gray-500 font-medium w-6">{index + 1}.</span>
                 <div className="flex-1">
                   <div className="font-medium">{key}</div>

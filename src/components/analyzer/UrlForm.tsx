@@ -14,6 +14,27 @@ interface UrlFormProps {
   onClear: () => void;
 }
 
+interface TestCase {
+  url: string;
+  referralSource: string;
+}
+
+const getRandomTestCase = (testCases: TestCase[]): TestCase => {
+  const randomIndex = Math.floor(Math.random() * testCases.length);
+  return testCases[randomIndex];
+};
+
+const loadTestCases = (): TestCase[] => {
+  const savedTestCases = localStorage.getItem('testCases');
+  if (!savedTestCases) {
+    toast("No test cases available", {
+      description: "Please upload test cases first in the Test Cases page",
+    });
+    return [];
+  }
+  return JSON.parse(savedTestCases);
+};
+
 export const UrlForm = ({
   url,
   referralSource,
@@ -23,43 +44,25 @@ export const UrlForm = ({
   onClear,
 }: UrlFormProps) => {
   const handleRandomize = () => {
-    const savedTestCases = localStorage.getItem('testCases');
-    if (!savedTestCases) {
-      toast("No test cases available", {
-        description: "Please upload test cases first in the Test Cases page",
-      });
-      return;
-    }
-
-    const testCases = JSON.parse(savedTestCases);
-    if (testCases.length === 0) {
-      toast("No test cases available", {
-        description: "Please upload test cases first in the Test Cases page",
-      });
-      return;
-    }
-
-    // Step 1: Clear all inputs and outputs
-    onClear();
-    onUrlChange("");
-    onReferralChange("");
-
-    // Step 2: Select a random test case and populate fields
-    const getRandomTestCase = () => {
-      const randomIndex = Math.floor(Math.random() * testCases.length);
-      return testCases[randomIndex];
-    };
+    const testCases = loadTestCases();
+    if (testCases.length === 0) return;
 
     const tryAnalysis = () => {
-      const selectedCase = getRandomTestCase();
+      // Step 1: Clear all inputs and outputs
+      onClear();
+      onUrlChange("");
+      onReferralChange("");
+
+      // Step 2: Select a random test case and populate fields
+      const selectedCase = getRandomTestCase(testCases);
       onUrlChange(selectedCase.url);
       onReferralChange(selectedCase.referralSource || "");
 
-      // Step 3 & 4: Parse, compare, and display analysis
+      // Step 3: Parse, compare, and display analysis
       setTimeout(() => {
         onAnalyze();
         
-        // Step 5: Check parameter audit
+        // Step 4: Check parameter audit
         setTimeout(() => {
           const auditElement = document.querySelector('[data-audit-status="failed"]');
           if (auditElement) {
