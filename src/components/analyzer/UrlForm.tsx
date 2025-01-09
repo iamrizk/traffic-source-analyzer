@@ -60,11 +60,17 @@ export const UrlForm = ({
         onAnalyze();
         
         // Step 5: Check parameter audit
-        const auditElement = document.querySelector('[data-audit-status="failed"]');
-        if (auditElement) {
-          console.log("Parameter audit failed, trying another test case");
-          tryAnalysis(); // Recursively try another test case if audit fails
-        }
+        setTimeout(() => {
+          const auditElement = document.querySelector('[data-audit-status="failed"]');
+          if (auditElement) {
+            console.log("Analysis audit failed, trying another test case");
+            tryAnalysis(); // Recursively try another test case if audit fails
+          } else {
+            toast.success("Analysis completed successfully", {
+              description: "Found a test case that passes all conditions",
+            });
+          }
+        }, 100); // Give DOM time to update
       }, 100);
     };
 

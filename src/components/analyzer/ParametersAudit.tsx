@@ -1,5 +1,5 @@
 import { Card } from "@/components/ui/card";
-import { Check, X, AlertTriangle, ChevronDown } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
 interface ParametersAuditProps {
@@ -48,12 +48,10 @@ export const ParametersAudit = ({ url, parameters }: ParametersAuditProps) => {
       <Collapsible defaultOpen={false}>
         <CollapsibleTrigger className="flex w-full items-center justify-between p-2 bg-gray-50 rounded hover:bg-gray-100">
           <div className="flex items-center gap-2">
-            <h3 className="text-xl font-semibold">Parameters Audit</h3>
-            {allPassed ? (
-              <Check className="w-5 h-5 text-green-500" />
-            ) : (
-              <X className="w-5 h-5 text-red-500" />
-            )}
+            <h3 className="text-xl font-semibold">Analysis Audit</h3>
+            <span className={`text-sm font-medium px-2 py-0.5 rounded ${allPassed ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+              {allPassed ? 'PASS' : 'FAIL'}
+            </span>
           </div>
           <ChevronDown className="h-4 w-4" />
         </CollapsibleTrigger>
@@ -65,13 +63,9 @@ export const ParametersAudit = ({ url, parameters }: ParametersAuditProps) => {
                 key={key}
                 className="flex items-center gap-4 p-2 bg-gray-50 rounded"
               >
-                {isPresent && matchesValue ? (
-                  <Check className="w-4 h-4 text-green-500" />
-                ) : isPresent ? (
-                  <AlertTriangle className="w-4 h-4 text-yellow-500" />
-                ) : (
-                  <X className="w-4 h-4 text-red-500" />
-                )}
+                <span className={`text-sm font-medium px-2 py-0.5 rounded ${isPresent && matchesValue ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                  {isPresent && matchesValue ? 'PASS' : 'FAIL'}
+                </span>
                 <span className="text-sm text-gray-500 font-medium w-6">{index + 1}.</span>
                 <div className="flex-1">
                   <div className="font-medium">{key}</div>
