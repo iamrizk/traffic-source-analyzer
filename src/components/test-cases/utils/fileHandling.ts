@@ -2,11 +2,7 @@ import { toast } from "sonner";
 import { MAX_ROWS } from "./constants";
 
 export const isValidUrl = (urlString: string): boolean => {
-  try {
-    return Boolean(new URL(urlString.startsWith('http') ? urlString : `https://${urlString}`));
-  } catch (e) {
-    return false;
-  }
+  return Boolean(urlString && urlString.trim().length > 0);
 };
 
 // Compress data before storing
@@ -23,7 +19,7 @@ export const decompressData = (compressed: string): any[] => {
   }
 };
 
-export const parseCSVData = (text: string): { url: string; referralSource: string; droppedRows?: number }[] => {
+export const parseCSVData = (text: string): { url: string; referralSource: string; }[] => {
   // Split into lines and remove empty lines
   const lines = text.split(/\r?\n/).map(line => line.trim()).filter(Boolean);
   if (lines.length === 0) return [];
@@ -31,12 +27,10 @@ export const parseCSVData = (text: string): { url: string; referralSource: strin
   let startIndex = 0;
   let urlIndex = 0;
   let sourceIndex = 1;
-  let hasHeaders = false;
 
   // Try to detect headers
   const possibleHeaders = lines[0].toLowerCase().split(',').map(h => h.trim());
   if (possibleHeaders.some(h => h.includes('url') || h.includes('source'))) {
-    hasHeaders = true;
     startIndex = 1;
     const urlIdx = possibleHeaders.findIndex(h => h.includes('url') || h.includes('link'));
     const sourceIdx = possibleHeaders.findIndex(h => h.includes('source') || h.includes('referral'));
@@ -48,10 +42,10 @@ export const parseCSVData = (text: string): { url: string; referralSource: strin
   let droppedRowCount = 0;
   
   // Parse data rows
-  for (let i = startIndex; i < Math.min(lines.length, MAX_ROWS + startIndex); i++) {
+  for (let i = startIndex; i < lines.length; i++) {
     const columns = lines[i].split(',').map(col => col.trim());
     
-    if (columns.length >= 2) {
+    if (columns.length >= Math.max(urlIndex, sourceIndex) + 1) {
       const url = columns[urlIndex];
       const referralSource = columns[sourceIndex] || 'direct';
       
@@ -63,56 +57,47 @@ export const parseCSVData = (text: string): { url: string; referralSource: strin
     } else {
       droppedRowCount++;
     }
+
+    // Check if we've reached the maximum number of rows
+    if (parsedData.length >= MAX_ROWS) {
+      if (lines.length > MAX_ROWS + startIndex) {
+        toast.warning(`File exceeds maximum row limit`, {
+          description: `Only the first ${MAX_ROWS} rows will be processed.`,
+        });
+      }
+      break;
+    }
   }
 
-  // Show toast for dropped rows if any
   if (droppedRowCount > 0) {
     toast.warning(`${droppedRowCount} invalid rows were skipped`, {
-      description: "These rows had invalid URLs or missing data",
-    });
-  }
-
-  // Show warning if file exceeds row limit
-  if (lines.length > MAX_ROWS + startIndex) {
-    const removedRows = lines.length - MAX_ROWS - startIndex;
-    toast.warning(`File exceeds maximum row limit`, {
-      description: `Only the first ${MAX_ROWS} rows will be processed. ${removedRows} rows were removed.`,
+      description: "These rows had missing data",
     });
   }
 
   return parsedData;
 };
 
-// Save test cases with compression
 export const saveTestCases = (testCases: { url: string; referralSource: string }[]): boolean => {
   try {
-    // Ensure we don't exceed MAX_ROWS when saving
     const truncatedTestCases = testCases.slice(0, MAX_ROWS);
-    if (testCases.length > MAX_ROWS) {
-      toast.warning(`Test cases exceed maximum limit`, {
-        description: `Only the first ${MAX_ROWS} test cases will be saved.`,
-      });
-    }
-    
     const compressed = compressData(truncatedTestCases);
     localStorage.setItem('testCases', compressed);
     return true;
   } catch (error) {
     console.error('Error saving test cases:', error);
     toast.error("Failed to save test cases", {
-      description: "The data size exceeds storage limits. Try with fewer test cases.",
+      description: "Please try with fewer test cases or smaller data.",
     });
     return false;
   }
 };
 
-// Load test cases with decompression
 export const loadTestCases = (): { url: string; referralSource: string }[] => {
   try {
     const compressed = localStorage.getItem('testCases');
     if (!compressed) return [];
     const decompressed = decompressData(compressed);
-    // Ensure we don't exceed MAX_ROWS when loading
     return decompressed.slice(0, MAX_ROWS);
   } catch (error) {
     console.error('Error loading test cases:', error);
