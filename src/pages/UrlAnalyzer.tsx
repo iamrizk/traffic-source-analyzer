@@ -22,6 +22,10 @@ const UrlAnalyzer = () => {
   }, [url, referralSource]);
 
   const parseUrl = () => {
+    // Clear previous results first
+    setParameters({});
+    setMatches([]);
+    
     try {
       let urlToParse = url;
       if (!url.startsWith('http://') && !url.startsWith('https://')) {
