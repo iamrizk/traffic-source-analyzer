@@ -9,7 +9,7 @@ import { RuleDisplay } from "./rule/RuleDisplay";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import { Label } from "./ui/label";
 import { Input } from "./ui/input";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "./ui/accordion";
+import { Accordion, AccordionContent, AccordionItem } from "./ui/accordion";
 
 interface RuleItemProps {
   rule: Rule;
@@ -34,6 +34,7 @@ export const RuleItem = ({
 }: RuleItemProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedRule, setEditedRule] = useState<Rule>(rule);
+  const [isExpanded, setIsExpanded] = useState(false);
 
   const handleSave = () => {
     onUpdate(index, editedRule);
@@ -79,8 +80,23 @@ export const RuleItem = ({
     });
   };
 
+  const handleCardClick = (e: React.MouseEvent) => {
+    // Prevent expanding when clicking on buttons or inputs
+    if (
+      e.target instanceof HTMLElement && 
+      !e.target.closest('button') && 
+      !e.target.closest('input') && 
+      !e.target.closest('select')
+    ) {
+      setIsExpanded(!isExpanded);
+    }
+  };
+
   return (
-    <Card className="p-4 mb-4">
+    <Card 
+      className="p-4 mb-4 cursor-pointer transition-all duration-200 hover:bg-accent/50" 
+      onClick={handleCardClick}
+    >
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center space-x-4">
           <span className="font-medium text-lg">Rule {index + 1}</span>
@@ -134,67 +150,62 @@ export const RuleItem = ({
         </div>
       </div>
 
-      <Accordion type="single" collapsible>
-        <AccordionItem value="item-1" className="border-none">
-          <AccordionTrigger className="py-2 hover:no-underline">
-            <span className="text-sm font-medium hover:underline">View Rule Details</span>
-          </AccordionTrigger>
-          <AccordionContent>
-            <div className="space-y-4">
-              {isEditing ? (
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    <Label>Rule Name</Label>
-                    <Input
-                      value={editedRule.name}
-                      onChange={(e) => setEditedRule({ ...editedRule, name: e.target.value })}
-                      placeholder="Enter rule name"
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label>Conditions Operator</Label>
-                    <Select
-                      value={editedRule.conditionsOperator}
-                      onValueChange={(value: "and" | "or") =>
-                        setEditedRule({ ...editedRule, conditionsOperator: value })
-                      }
-                    >
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="and">AND</SelectItem>
-                        <SelectItem value="or">OR</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div className="space-y-4">
-                    {editedRule.conditions.map((condition, condIndex) => (
-                      <RuleCondition
-                        key={condIndex}
-                        condition={condition}
-                        conditionIndex={condIndex}
-                        updateCondition={updateCondition}
-                      />
-                    ))}
-                  </div>
-
-                  <RuleOutput
-                    type={editedRule.output.type}
-                    platform={editedRule.output.platform}
-                    channel={editedRule.output.channel}
-                    onChange={updateOutput}
+      <AccordionItem value="item-1" className="border-none">
+        <AccordionContent className={isExpanded ? "" : "hidden"}>
+          <div className="space-y-4">
+            {isEditing ? (
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label>Rule Name</Label>
+                  <Input
+                    value={editedRule.name}
+                    onChange={(e) => setEditedRule({ ...editedRule, name: e.target.value })}
+                    placeholder="Enter rule name"
                   />
                 </div>
-              ) : (
-                <RuleDisplay rule={rule} />
-              )}
-            </div>
-          </AccordionContent>
-        </AccordionItem>
-      </Accordion>
+
+                <div className="space-y-2">
+                  <Label>Conditions Operator</Label>
+                  <Select
+                    value={editedRule.conditionsOperator}
+                    onValueChange={(value: "and" | "or") =>
+                      setEditedRule({ ...editedRule, conditionsOperator: value })
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="and">AND</SelectItem>
+                      <SelectItem value="or">OR</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-4">
+                  {editedRule.conditions.map((condition, condIndex) => (
+                    <RuleCondition
+                      key={condIndex}
+                      condition={condition}
+                      conditionIndex={condIndex}
+                      updateCondition={updateCondition}
+                    />
+                  ))}
+                </div>
+
+                <RuleOutput
+                  type={editedRule.output.type}
+                  platform={editedRule.output.platform}
+                  channel={editedRule.output.channel}
+                  onChange={updateOutput}
+                />
+              </div>
+            ) : (
+              <RuleDisplay rule={rule} />
+            )}
+          </div>
+        </AccordionContent>
+      </AccordionItem>
     </Card>
   );
 };
