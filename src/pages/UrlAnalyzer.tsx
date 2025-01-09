@@ -57,6 +57,9 @@ const UrlAnalyzer = () => {
             } else if (condition.operator === "not_exists" && !paramExists) {
               matchDetails.push(`Parameter '${condition.parameter}' does not exist as required`);
               conditionsMet++;
+            } else if (condition.operator === "not_present" && !paramExists) {
+              matchDetails.push(`Parameter '${condition.parameter}' is not present as required`);
+              conditionsMet++;
             } else if (condition.operator === "equals" && paramValue === condition.value) {
               matchDetails.push(`Parameter '${condition.parameter}' value matches '${condition.value}'`);
               conditionsMet++;
@@ -65,25 +68,25 @@ const UrlAnalyzer = () => {
               conditionsMet++;
             } else {
               matchDetails.push(
-                condition.operator === "exists" || condition.operator === "not_exists"
-                  ? `Parameter '${condition.parameter}' ${condition.operator === "exists" ? "does not exist" : "exists"} (condition not met)`
-                  : `Parameter '${condition.parameter}' value ${condition.operator === "equals" ? "does not match" : "matches"} '${condition.value}' (condition not met)`
+                `Parameter '${condition.parameter}' condition not met (${condition.operator})`
               );
             }
           } else if (condition.type === "referral") {
-            if (
+            if (condition.operator === "not_present" && !referralSource) {
+              matchDetails.push(`Referral source is not present as required`);
+              conditionsMet++;
+            } else if (
               (condition.operator === "equals" && referralSource === condition.value) ||
               (condition.operator === "contains" && referralSource.includes(condition.value))
             ) {
               matchDetails.push(`Referral source matches '${condition.value}'`);
               conditionsMet++;
             } else {
-              matchDetails.push(`Referral source does not match '${condition.value}' (condition not met)`);
+              matchDetails.push(`Referral source condition not met (${condition.operator})`);
             }
           }
         }
 
-        // Check if rule conditions are met based on the operator
         const isRuleMatched = rule.conditionsOperator === "and"
           ? conditionsMet === rule.conditions.length
           : conditionsMet > 0;
