@@ -106,13 +106,65 @@ export const RuleItem = ({
           >
             {isEditing ? "Save" : "Edit"}
           </Button>
-          <Accordion type="single" collapsible className="inline-flex">
-            <AccordionItem value="rule-content" className="border-none">
+          <Accordion type="single" collapsible>
+            <AccordionItem value="item-1">
               <AccordionTrigger className="py-0 hover:no-underline">
                 <Button variant="ghost" size="sm" className="h-9">
                   Details
                 </Button>
               </AccordionTrigger>
+              <AccordionContent>
+                {isEditing ? (
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label>Rule Name</Label>
+                      <Input
+                        value={editedRule.name}
+                        onChange={(e) => setEditedRule({ ...editedRule, name: e.target.value })}
+                        placeholder="Enter rule name"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label>Conditions Operator</Label>
+                      <Select
+                        value={editedRule.conditionsOperator}
+                        onValueChange={(value: "and" | "or") =>
+                          setEditedRule({ ...editedRule, conditionsOperator: value })
+                        }
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="and">AND</SelectItem>
+                          <SelectItem value="or">OR</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="space-y-4">
+                      {editedRule.conditions.map((condition, condIndex) => (
+                        <RuleCondition
+                          key={condIndex}
+                          condition={condition}
+                          conditionIndex={condIndex}
+                          updateCondition={updateCondition}
+                        />
+                      ))}
+                    </div>
+
+                    <RuleOutput
+                      type={editedRule.output.type}
+                      platform={editedRule.output.platform}
+                      channel={editedRule.output.channel}
+                      onChange={updateOutput}
+                    />
+                  </div>
+                ) : (
+                  <RuleDisplay rule={rule} />
+                )}
+              </AccordionContent>
             </AccordionItem>
           </Accordion>
           <Button variant="ghost" size="sm" onClick={() => onDelete(index)}>
@@ -120,59 +172,6 @@ export const RuleItem = ({
           </Button>
         </div>
       </div>
-
-      <AccordionContent value="rule-content">
-        {isEditing ? (
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label>Rule Name</Label>
-              <Input
-                value={editedRule.name}
-                onChange={(e) => setEditedRule({ ...editedRule, name: e.target.value })}
-                placeholder="Enter rule name"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label>Conditions Operator</Label>
-              <Select
-                value={editedRule.conditionsOperator}
-                onValueChange={(value: "and" | "or") =>
-                  setEditedRule({ ...editedRule, conditionsOperator: value })
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="and">AND</SelectItem>
-                  <SelectItem value="or">OR</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-4">
-              {editedRule.conditions.map((condition, condIndex) => (
-                <RuleCondition
-                  key={condIndex}
-                  condition={condition}
-                  conditionIndex={condIndex}
-                  updateCondition={updateCondition}
-                />
-              ))}
-            </div>
-
-            <RuleOutput
-              type={editedRule.output.type}
-              platform={editedRule.output.platform}
-              channel={editedRule.output.channel}
-              onChange={updateOutput}
-            />
-          </div>
-        ) : (
-          <RuleDisplay rule={rule} />
-        )}
-      </AccordionContent>
     </Card>
   );
 };
