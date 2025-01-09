@@ -1,16 +1,19 @@
 export const Footer = () => {
   // Increment this number whenever you make changes to the project
-  const buildNumber = '14'; // Updated to reflect current number of changes
-  const buildDate = new Date().toLocaleDateString('en-US', {
+  const buildNumber = '15'; // Updated build number
+  const buildDate = new Date().toLocaleString('en-US', {
     year: 'numeric',
-    month: 'long',
-    day: 'numeric'
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false
   });
 
   return (
     <footer className="m-0 pb-8 text-center">
       <div className="mb-2 text-sm text-muted-foreground">
-        <span>Build #{buildNumber}</span>
+        <span>#v{buildNumber}</span>
         <span className="mx-2">•</span>
         <span>{buildDate}</span>
       </div>
