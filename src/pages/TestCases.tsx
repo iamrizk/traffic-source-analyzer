@@ -82,16 +82,19 @@ const TestCases = () => {
     setIsUploading(true);
     setUploadProgress(0);
 
-    // Start progress animation
-    const progressInterval = setInterval(() => {
+    let progressInterval: NodeJS.Timeout;
+
+    // Start progress animation with a slower interval
+    progressInterval = setInterval(() => {
       setUploadProgress(prev => {
-        if (prev >= 90) {
+        const nextProgress = prev + 5;
+        if (nextProgress >= 90) {
           clearInterval(progressInterval);
-          return prev;
+          return 90;
         }
-        return prev + 10;
+        return nextProgress;
       });
-    }, 200);
+    }, 300); // Slower interval to prevent stack overflow
 
     const reader = new FileReader();
     reader.onload = (e) => {
@@ -114,7 +117,11 @@ const TestCases = () => {
         }
       }
 
-      clearInterval(progressInterval);
+      // Clear the progress interval if it's still running
+      if (progressInterval) {
+        clearInterval(progressInterval);
+      }
+
       setUploadProgress(100);
 
       if (parsedData.length === 0) {
@@ -136,10 +143,13 @@ const TestCases = () => {
         }
       }
 
-      setTimeout(() => {
-        setIsUploading(false);
-        setUploadProgress(0);
-      }, 500);
+      // Use RAF for smoother cleanup
+      requestAnimationFrame(() => {
+        setTimeout(() => {
+          setIsUploading(false);
+          setUploadProgress(0);
+        }, 500);
+      });
       
       // Reset the input
       event.target.value = '';
