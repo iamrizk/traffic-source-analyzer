@@ -21,14 +21,14 @@ const TestCases = () => {
 
   // Load test cases from localStorage on component mount
   useEffect(() => {
-    try {
-      const savedTestCases = localStorage.getItem('testCases');
-      if (savedTestCases) {
+    const savedTestCases = localStorage.getItem('testCases');
+    if (savedTestCases) {
+      try {
         setTestCases(JSON.parse(savedTestCases));
+      } catch (error) {
+        console.error('Error loading test cases:', error);
+        toast.error("Error loading saved test cases");
       }
-    } catch (error) {
-      console.error('Error loading test cases:', error);
-      toast.error("Error loading saved test cases");
     }
   }, []);
 
@@ -82,15 +82,22 @@ const TestCases = () => {
     setIsUploading(true);
     setUploadProgress(0);
 
+    // Start progress animation
+    const progressInterval = setInterval(() => {
+      setUploadProgress(prev => {
+        if (prev >= 90) {
+          clearInterval(progressInterval);
+          return prev;
+        }
+        return prev + 10;
+      });
+    }, 200);
+
     const reader = new FileReader();
     reader.onload = (e) => {
       const text = e.target?.result as string;
       const lines = text.split("\n");
       
-      // Simulate progress
-      const totalLines = lines.length;
-      let processedLines = 0;
-
       // Check if first row is header by validating if it contains a URL
       const startIndex = isValidUrl(lines[0].split(",")[0].trim()) ? 0 : 1;
       
@@ -105,10 +112,10 @@ const TestCases = () => {
         if (isValidUrl(url)) {
           parsedData.push({ url, referralSource });
         }
-
-        processedLines++;
-        setUploadProgress(Math.round((processedLines / totalLines) * 100));
       }
+
+      clearInterval(progressInterval);
+      setUploadProgress(100);
 
       if (parsedData.length === 0) {
         toast.error("Invalid CSV format", {
@@ -129,8 +136,10 @@ const TestCases = () => {
         }
       }
 
-      setIsUploading(false);
-      setUploadProgress(0);
+      setTimeout(() => {
+        setIsUploading(false);
+        setUploadProgress(0);
+      }, 500);
       
       // Reset the input
       event.target.value = '';
@@ -141,7 +150,7 @@ const TestCases = () => {
 
   const handleClear = () => {
     setTestCases([]);
-    localStorage.removeItem('testCases'); // Clear from localStorage as well
+    localStorage.removeItem('testCases');
     toast.success("Test cases cleared", {
       description: "All test cases have been removed",
     });
@@ -174,7 +183,10 @@ const TestCases = () => {
             </div>
             {isUploading && (
               <div className="space-y-2">
-                <Progress value={uploadProgress} className="w-[60%]" />
+                <Progress 
+                  value={uploadProgress} 
+                  className="w-[60%] transition-all duration-500 ease-in-out" 
+                />
               </div>
             )}
           </div>
