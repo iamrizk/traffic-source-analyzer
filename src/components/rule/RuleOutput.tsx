@@ -12,7 +12,7 @@ export const RuleOutput = ({ type, platform, channel, onChange }: RuleOutputProp
   return (
     <div className="grid grid-cols-3 gap-4">
       <div>
-        <Label>Traffic nature</Label>
+        <Label>Traffic Nature</Label>
         <Input
           value={type}
           onChange={(e) => onChange("type", e.target.value)}

@@ -13,7 +13,7 @@ export const RuleOutputForm = ({ output, setNewRule }: RuleOutputFormProps) => {
       <h3 className="text-lg font-medium">Output Configuration</h3>
       <div className="grid grid-cols-3 gap-4">
         <div className="space-y-2">
-          <Label>Traffic nature</Label>
+          <Label>Traffic Nature</Label>
           <Input
             value={output.type}
             onChange={(e) =>

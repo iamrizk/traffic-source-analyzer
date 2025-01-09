@@ -35,7 +35,7 @@ export const AnalysisSummary = ({ matches }: AnalysisSummaryProps) => {
     <div className="space-y-4">
       {summary.types.length > 0 && (
         <div className="space-y-2">
-          <span className="font-medium">Visit nature:</span>
+          <span className="font-medium">Traffic Nature:</span>
           <div className="pl-4">
             {summary.types.join(", ")}
           </div>
