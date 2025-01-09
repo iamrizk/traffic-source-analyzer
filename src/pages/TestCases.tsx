@@ -141,6 +141,7 @@ const TestCases = () => {
 
   const handleClear = () => {
     setTestCases([]);
+    localStorage.removeItem('testCases'); // Clear from localStorage as well
     toast.success("Test cases cleared", {
       description: "All test cases have been removed",
     });
@@ -173,9 +174,6 @@ const TestCases = () => {
             </div>
             {isUploading && (
               <div className="space-y-2">
-                <div className="text-sm text-muted-foreground">
-                  Uploading... {uploadProgress}%
-                </div>
                 <Progress value={uploadProgress} className="w-[60%]" />
               </div>
             )}
