@@ -12,7 +12,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
-import { parseCSVData, saveTestCases } from "@/components/test-cases/utils/fileHandling";
+import { 
+  parseCSVData, 
+  saveTestCases, 
+  loadTestCases 
+} from "@/components/test-cases/utils/fileHandling";
 
 interface TestCase {
   url: string;
@@ -30,6 +34,14 @@ const TestCases = () => {
   const [testCases, setTestCases] = useState<TestCase[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [loadingProgress, setLoadingProgress] = useState(0);
+
+  // Load saved test cases when component mounts
+  useEffect(() => {
+    const savedTestCases = loadTestCases();
+    if (savedTestCases.length > 0) {
+      setTestCases(savedTestCases);
+    }
+  }, []);
 
   const loadSampleTestCases = async (filename: string) => {
     if (isLoading) return; // Prevent multiple simultaneous loads
@@ -83,19 +95,6 @@ const TestCases = () => {
       }, 500);
     }
   };
-
-  useEffect(() => {
-    const savedTestCases = localStorage.getItem('testCases');
-    if (savedTestCases) {
-      try {
-        const decompressed = JSON.parse(atob(savedTestCases));
-        setTestCases(decompressed);
-      } catch (error) {
-        console.error('Error loading saved test cases:', error);
-        toast.error("Error loading saved test cases");
-      }
-    }
-  }, []);
 
   return (
     <div className="space-y-8">
