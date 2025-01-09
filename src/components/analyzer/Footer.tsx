@@ -1,6 +1,6 @@
 export const Footer = () => {
   // Increment this number whenever you make changes to the project
-  const buildNumber = '15'; // Updated build number
+  const buildNumber = '16'; // Updated build number
   const buildDate = new Date().toLocaleString('en-US', {
     year: 'numeric',
     month: '2-digit',
