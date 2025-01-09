@@ -51,20 +51,35 @@ export const parseCSVData = (text: string): TestCase[] => {
   if (lines.length === 0) return [];
 
   let startIndex = 0;
-  let urlIndex = 0;
-  let sourceIndex = 1;
+  let urlIndex = -1;
+  let sourceIndex = -1;
 
   // Try to detect headers
   const possibleHeaders = lines[0].toLowerCase().split(',').map(h => h.trim());
-  if (possibleHeaders.some(h => h.includes('url') || h.includes('source'))) {
-    startIndex = 1;
-    const urlIdx = possibleHeaders.findIndex(h => h.includes('url') || h.includes('link'));
-    const sourceIdx = possibleHeaders.findIndex(h => h.includes('source') || h.includes('referral'));
-    if (urlIdx !== -1) urlIndex = urlIdx;
-    if (sourceIdx !== -1) sourceIndex = sourceIdx;
-  }
+  
+  // Look for URL column
+  urlIndex = possibleHeaders.findIndex(h => 
+    h.includes('url') || 
+    h.includes('link') || 
+    h.includes('website')
+  );
 
-  const parsedData: { url: string; referralSource: string }[] = [];
+  // Look for referral/source column
+  sourceIndex = possibleHeaders.findIndex(h => 
+    h.includes('source') || 
+    h.includes('referral') || 
+    h.includes('referrer') || 
+    h.includes('ref')
+  );
+
+  // If headers were not found, use default indices
+  if (urlIndex === -1) urlIndex = 0;
+  if (sourceIndex === -1) sourceIndex = 1;
+
+  // Skip header row if headers were detected
+  startIndex = (urlIndex !== 0 || sourceIndex !== 1) ? 1 : 0;
+
+  const parsedData: TestCase[] = [];
   let droppedRowCount = 0;
   
   // Parse data rows
@@ -97,7 +112,7 @@ export const parseCSVData = (text: string): TestCase[] => {
 
   if (droppedRowCount > 0) {
     toast.warning(`${droppedRowCount} invalid rows were skipped`, {
-      description: "These rows had missing data",
+      description: "These rows had missing data or invalid URLs",
     });
   }
 
