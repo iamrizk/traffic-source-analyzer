@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { FileUploader } from "@/components/test-cases/FileUploader";
 import { TestCasesTable } from "@/components/test-cases/TestCasesTable";
 import { Import, ChevronDown } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -27,35 +28,57 @@ const TEST_CASE_FILES = [
 
 const TestCases = () => {
   const [testCases, setTestCases] = useState<TestCase[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [loadingProgress, setLoadingProgress] = useState(0);
 
   const loadSampleTestCases = async (filename: string) => {
     try {
-      // Clear localStorage before loading new test cases
-      localStorage.clear();
+      setIsLoading(true);
+      setLoadingProgress(10);
       
+      // Step 1: Clear all storage
+      localStorage.clear();
+      setLoadingProgress(30);
+      
+      // Step 2: Reset state
+      setTestCases([]);
+      setLoadingProgress(50);
+      
+      // Step 3: Fetch new data
       const response = await fetch(`/${filename}`);
       if (!response.ok) {
         throw new Error(`Failed to fetch ${filename}: ${response.status} ${response.statusText}`);
       }
+      setLoadingProgress(70);
       
       const text = await response.text();
       const parsedData = parseCSVData(text);
+      setLoadingProgress(90);
 
       if (parsedData.length === 0) {
         throw new Error('No valid test cases found in file');
       }
 
+      // Step 4: Save new data
       if (saveTestCases(parsedData)) {
         setTestCases(parsedData);
         toast.success("Sample test cases loaded", {
           description: `Loaded ${parsedData.length} test cases from ${filename}`,
         });
       }
+      
+      setLoadingProgress(100);
     } catch (error) {
       console.error('Error loading sample test cases:', error);
       toast.error("Error loading sample test cases", {
         description: error instanceof Error ? error.message : "Failed to load sample test cases",
       });
+    } finally {
+      // Reset loading state after a brief delay to show 100% completion
+      setTimeout(() => {
+        setIsLoading(false);
+        setLoadingProgress(0);
+      }, 500);
     }
   };
 
@@ -80,7 +103,7 @@ const TestCases = () => {
             <h2 className="text-2xl font-bold">Test Cases</h2>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline">
+                <Button variant="outline" disabled={isLoading}>
                   <Import className="w-4 h-4 mr-2" />
                   Load Sample Test Cases
                   <ChevronDown className="w-4 h-4 ml-2" />
@@ -101,6 +124,12 @@ const TestCases = () => {
           <p className="text-muted-foreground">
             Upload a CSV file with URL and Referral Source columns to test multiple URLs at once.
           </p>
+          {isLoading && (
+            <div className="space-y-2">
+              <Progress value={loadingProgress} className="w-full transition-all duration-300" />
+              <p className="text-sm text-muted-foreground">Loading test cases...</p>
+            </div>
+          )}
           <FileUploader 
             onUploadSuccess={setTestCases}
             onClear={() => setTestCases([])}

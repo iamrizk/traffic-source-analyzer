@@ -80,15 +80,30 @@ export const parseCSVData = (text: string): { url: string; referralSource: strin
 
 export const saveTestCases = (testCases: { url: string; referralSource: string }[]): boolean => {
   try {
+    // Clear storage first
+    localStorage.clear();
+    
+    // Truncate to maximum allowed rows
     const truncatedTestCases = testCases.slice(0, MAX_ROWS);
+    
+    // Try to save with compression
     const compressed = compressData(truncatedTestCases);
     localStorage.setItem('testCases', compressed);
+    
     return true;
   } catch (error) {
     console.error('Error saving test cases:', error);
-    toast.error("Failed to save test cases", {
-      description: "Please try with fewer test cases or smaller data.",
-    });
+    
+    if (error instanceof Error && error.name === 'QuotaExceededError') {
+      toast.error("Storage limit exceeded", {
+        description: "The test cases file is too large for browser storage. Try with fewer test cases.",
+      });
+    } else {
+      toast.error("Failed to save test cases", {
+        description: "Please try with fewer test cases or smaller data.",
+      });
+    }
+    
     return false;
   }
 };
