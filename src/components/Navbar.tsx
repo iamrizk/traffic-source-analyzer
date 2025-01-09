@@ -15,7 +15,7 @@ export const Navbar = () => {
       <div className="bg-white border rounded-lg shadow-sm">
         <div>
           <PageHeader />
-          <div className="flex h-16 items-center justify-between border-t">
+          <div className="flex h-16 items-center justify-between border-t px-15">
             <div className="flex items-center space-x-8">
               {links.map((link) => (
                 <Link
