@@ -2,7 +2,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
-import { Shuffle } from "lucide-react";
+import { Shuffle, X } from "lucide-react";
 import { toast } from "sonner";
 
 interface UrlFormProps {
@@ -11,6 +11,7 @@ interface UrlFormProps {
   onUrlChange: (value: string) => void;
   onReferralChange: (value: string) => void;
   onAnalyze: () => void;
+  onClear: () => void;
 }
 
 export const UrlForm = ({
@@ -19,6 +20,7 @@ export const UrlForm = ({
   onUrlChange,
   onReferralChange,
   onAnalyze,
+  onClear,
 }: UrlFormProps) => {
   const handleRandomize = () => {
     const savedTestCases = localStorage.getItem('testCases');
@@ -78,6 +80,14 @@ export const UrlForm = ({
           >
             <Shuffle className="w-4 h-4" />
             Random Test Case
+          </Button>
+          <Button
+            variant="outline"
+            onClick={onClear}
+            className="gap-2"
+          >
+            <X className="w-4 h-4" />
+            Clear
           </Button>
         </div>
       </div>

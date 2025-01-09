@@ -21,6 +21,18 @@ const UrlAnalyzer = () => {
     localStorage.setItem("analyzer_referral", referralSource);
   }, [url, referralSource]);
 
+  const handleClear = () => {
+    setUrl("");
+    setReferralSource("");
+    setParameters({});
+    setMatches([]);
+    localStorage.removeItem("analyzer_url");
+    localStorage.removeItem("analyzer_referral");
+    toast("All fields cleared", {
+      description: "The analyzer has been reset.",
+    });
+  };
+
   const parseUrl = () => {
     // Clear previous results first
     setParameters({});
@@ -128,6 +140,7 @@ const UrlAnalyzer = () => {
         onUrlChange={setUrl}
         onReferralChange={setReferralSource}
         onAnalyze={parseUrl}
+        onClear={handleClear}
       />
 
       <Card className="p-6">
