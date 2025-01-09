@@ -10,7 +10,7 @@ interface RuleHeaderProps {
   isLast: boolean;
   onEdit: () => void;
   onSave: () => void;
-  onDelete: (index: number) => void;
+  onDelete: () => void;
   onMoveUp: (index: number) => void;
   onMoveDown: (index: number) => void;
 }
@@ -70,7 +70,7 @@ export const RuleHeader = ({
             <Button
               variant="destructive"
               size="sm"
-              onClick={() => onDelete(index)}
+              onClick={onDelete}
               className="gap-2"
             >
               <Trash2 className="w-4 h-4" />
