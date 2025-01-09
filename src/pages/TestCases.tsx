@@ -11,6 +11,8 @@ interface TestCase {
   referralSource: string;
 }
 
+const MAX_STORAGE_SIZE = 4 * 1024 * 1024; // 4MB limit to be safe
+
 const TestCases = () => {
   const [testCases, setTestCases] = useState<TestCase[]>([]);
 
