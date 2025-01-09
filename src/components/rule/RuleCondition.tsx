@@ -54,6 +54,7 @@ export const RuleCondition = ({
               <SelectContent>
                 <SelectItem value="exists">Exists</SelectItem>
                 <SelectItem value="not_exists">Does not exist</SelectItem>
+                <SelectItem value="not_present">Not present</SelectItem>
                 <SelectItem value="equals">Equals</SelectItem>
                 <SelectItem value="not_equals">Does not equal</SelectItem>
               </SelectContent>
@@ -77,7 +78,7 @@ export const RuleCondition = ({
           <div className="flex-1">
             <Label>Operator</Label>
             <Select
-              value={(condition as any).operator || "equals"}
+              value={condition.operator}
               onValueChange={(value) => updateCondition(conditionIndex, "operator", value)}
             >
               <SelectTrigger>
@@ -86,6 +87,7 @@ export const RuleCondition = ({
               <SelectContent>
                 <SelectItem value="equals">Equals</SelectItem>
                 <SelectItem value="contains">Contains</SelectItem>
+                <SelectItem value="not_present">Not present</SelectItem>
               </SelectContent>
             </Select>
           </div>

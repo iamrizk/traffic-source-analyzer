@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -17,12 +17,18 @@ interface RuleMatch {
 }
 
 const UrlAnalyzer = () => {
-  const [url, setUrl] = useState("");
-  const [referralSource, setReferralSource] = useState("");
+  const [url, setUrl] = useState(() => localStorage.getItem("analyzer_url") || "");
+  const [referralSource, setReferralSource] = useState(() => localStorage.getItem("analyzer_referral") || "");
   const [parameters, setParameters] = useState<Record<string, string>>({});
   const [matches, setMatches] = useState<RuleMatch[]>([]);
 
   const { rules } = useRules();
+
+  // Save state to localStorage when it changes
+  useEffect(() => {
+    localStorage.setItem("analyzer_url", url);
+    localStorage.setItem("analyzer_referral", referralSource);
+  }, [url, referralSource]);
 
   const parseUrl = () => {
     try {
