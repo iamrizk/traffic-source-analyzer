@@ -23,7 +23,7 @@ export const RandomTestCaseButton = ({
     // Step 1: Clear all states and results
     onClear();
 
-    // Step 2: Get a random test case
+    // Step 2: Get a random test case with normalized URL
     const selectedCase = getRandomTestCase(testCases);
     
     // Step 3: Set the new input values

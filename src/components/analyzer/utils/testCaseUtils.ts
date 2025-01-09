@@ -38,14 +38,30 @@ export const loadTestCases = (): TestCase[] => {
   }
 };
 
+export const normalizeUrl = (url: string): string => {
+  try {
+    // If URL doesn't start with protocol, add https://
+    const urlWithProtocol = url.startsWith('http') ? url : `https://${url}`;
+    const urlObj = new URL(urlWithProtocol);
+    
+    // Sort parameters alphabetically to ensure consistent order
+    const params = new URLSearchParams(urlObj.search);
+    const sortedParams = new URLSearchParams([...params.entries()].sort());
+    
+    // Reconstruct URL with sorted parameters
+    urlObj.search = sortedParams.toString();
+    return urlObj.toString();
+  } catch (error) {
+    return url; // Return original URL if parsing fails
+  }
+};
+
 export const getRandomTestCase = (testCases: TestCase[]): TestCase => {
   const randomIndex = Math.floor(Math.random() * testCases.length);
   const selectedCase = testCases[randomIndex];
   
-  // Ensure the URL is properly formatted
-  if (!selectedCase.url.startsWith('http')) {
-    selectedCase.url = `https://${selectedCase.url}`;
-  }
-  
-  return selectedCase;
+  return {
+    ...selectedCase,
+    url: normalizeUrl(selectedCase.url)
+  };
 };
