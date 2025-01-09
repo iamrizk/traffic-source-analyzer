@@ -18,7 +18,8 @@ const Settings = () => {
   const addRule = () => {
     setRules([...rules, newRule]);
     setNewRule({
-      conditions: [{ type: "parameter" as const, parameter: "", operator: "exists" as const }],
+      conditions: [{ type: "parameter", parameter: "", operator: "exists" as const }],
+      conditionsOperator: "and",
       output: { type: "", platform: "", channel: "" },
     });
     toast.success("Rule added successfully!");
@@ -42,7 +43,12 @@ const Settings = () => {
       reader.onload = (e) => {
         try {
           const importedRules = JSON.parse(e.target?.result as string);
-          setRules(importedRules);
+          // Ensure all imported rules have conditionsOperator
+          const validatedRules = importedRules.map((rule: Rule) => ({
+            ...rule,
+            conditionsOperator: rule.conditionsOperator || "and",
+          }));
+          setRules(validatedRules);
           toast.success("Rules imported successfully!");
         } catch (error) {
           toast.error("Error importing rules");

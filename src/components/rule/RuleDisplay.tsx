@@ -8,7 +8,7 @@ export const RuleDisplay = ({ rule }: RuleDisplayProps) => {
   return (
     <div className="space-y-2">
       <div>
-        <span className="font-medium">Conditions ({rule.conditionsOperator.toUpperCase()}):</span>
+        <span className="font-medium">Conditions ({(rule.conditionsOperator || "and").toUpperCase()}):</span>
         <ul className="list-disc list-inside pl-4">
           {rule.conditions.map((condition, idx) => (
             <li key={idx}>
