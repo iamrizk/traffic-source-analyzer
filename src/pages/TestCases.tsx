@@ -19,10 +19,10 @@ interface TestCase {
 }
 
 const TEST_CASE_FILES = [
-  'test-case-1.csv',
-  'test-case-2.csv',
-  'test-case-3.csv',
-  'test-case-4.csv'
+  'test-cases/test-case-1.csv',
+  'test-cases/test-case-2.csv',
+  'test-cases/test-case-3.csv',
+  'test-cases/test-case-4.csv'
 ];
 
 const TestCases = () => {
@@ -30,7 +30,6 @@ const TestCases = () => {
 
   const loadSampleTestCases = async (filename: string) => {
     try {
-      // Using absolute path from the public directory
       const response = await fetch(`/${filename}`);
       if (!response.ok) {
         throw new Error(`Failed to fetch ${filename}: ${response.status} ${response.statusText}`);

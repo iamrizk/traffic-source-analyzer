@@ -6,8 +6,7 @@ import { toast } from "sonner";
 const GettingStarted = () => {
   const handleDownloadConfig = async () => {
     try {
-      // Using absolute path from the public directory
-      const response = await fetch('/starter-config.json');
+      const response = await fetch('/config/starter-config.json');
       if (!response.ok) {
         throw new Error(`Failed to fetch configuration file: ${response.status} ${response.statusText}`);
       }
@@ -31,8 +30,7 @@ const GettingStarted = () => {
 
   const handleDownloadTestCases = async (fileNumber: number) => {
     try {
-      // Using absolute path from the public directory
-      const response = await fetch(`/test-case-${fileNumber}.csv`);
+      const response = await fetch(`/test-cases/test-case-${fileNumber}.csv`);
       if (!response.ok) {
         throw new Error(`Failed to fetch test case ${fileNumber}: ${response.status} ${response.statusText}`);
       }
