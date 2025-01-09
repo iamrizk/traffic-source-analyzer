@@ -4,7 +4,13 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { FileUploader } from "@/components/test-cases/FileUploader";
 import { TestCasesTable } from "@/components/test-cases/TestCasesTable";
-import { Import } from "lucide-react";
+import { Import, ChevronDown } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface TestCase {
   url: string;
@@ -12,6 +18,13 @@ interface TestCase {
 }
 
 const MAX_STORAGE_SIZE = 4 * 1024 * 1024; // 4MB limit to be safe
+
+const TEST_CASE_FILES = [
+  'test-case-1.csv',
+  'test-case-2.csv',
+  'test-case-3.csv',
+  'test-case-4.csv'
+];
 
 const TestCases = () => {
   const [testCases, setTestCases] = useState<TestCase[]>([]);
@@ -59,21 +72,9 @@ const TestCases = () => {
     }
   }, [testCases]);
 
-  const handleUploadSuccess = (newTestCases: TestCase[]) => {
-    setTestCases(newTestCases);
-  };
-
-  const handleClear = () => {
-    setTestCases([]);
-    localStorage.removeItem('testCases');
-    toast.success("Test cases cleared", {
-      description: "All test cases have been removed",
-    });
-  };
-
-  const loadSampleTestCases = async () => {
+  const loadSampleTestCases = async (filename: string) => {
     try {
-      const response = await fetch('/test-cases/test-case-1.csv');
+      const response = await fetch(`/test-cases/${filename}`);
       const text = await response.text();
       
       // Split the CSV into lines and parse
@@ -103,7 +104,7 @@ const TestCases = () => {
       setTestCases(parsedTestCases);
       localStorage.setItem('testCases', JSON.stringify(parsedTestCases));
       toast.success("Sample test cases loaded", {
-        description: `Loaded ${parsedTestCases.length} test cases`,
+        description: `Loaded ${parsedTestCases.length} test cases from ${filename}`,
       });
     } catch (error) {
       console.error('Error loading sample test cases:', error);
@@ -117,20 +118,35 @@ const TestCases = () => {
     <div className="space-y-8">
       <Card className="p-6">
         <div className="space-y-4">
-          <h2 className="text-2xl font-bold">Test Cases</h2>
+          <div className="flex justify-between items-center">
+            <h2 className="text-2xl font-bold">Test Cases</h2>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline">
+                  <Import className="w-4 h-4 mr-2" />
+                  Load Sample Test Cases
+                  <ChevronDown className="w-4 h-4 ml-2" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                {TEST_CASE_FILES.map((filename) => (
+                  <DropdownMenuItem
+                    key={filename}
+                    onClick={() => loadSampleTestCases(filename)}
+                  >
+                    {filename}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
           <p className="text-muted-foreground">
             Upload a CSV file with URL and Referral Source columns to test multiple URLs at once.
           </p>
-          <div className="flex flex-col gap-4">
-            <FileUploader 
-              onUploadSuccess={handleUploadSuccess}
-              onClear={handleClear}
-            />
-            <Button onClick={loadSampleTestCases} variant="outline">
-              <Import className="w-4 h-4 mr-2" />
-              Load Sample Test Cases
-            </Button>
-          </div>
+          <FileUploader 
+            onUploadSuccess={setTestCases}
+            onClear={() => setTestCases([])}
+          />
         </div>
       </Card>
 
