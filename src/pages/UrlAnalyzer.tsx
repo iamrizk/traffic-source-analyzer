@@ -177,7 +177,7 @@ const UrlAnalyzer = () => {
                   <>
                     {summary.types.length > 0 && (
                       <div className="space-y-2">
-                        <span className="font-medium">Types:</span>
+                        <span className="font-medium">Visit nature:</span>
                         <div className="pl-4">
                           {summary.types.join(", ")}
                         </div>
@@ -225,7 +225,7 @@ const UrlAnalyzer = () => {
                   <div className="space-y-2">
                     {match.output.type && (
                       <div className="flex justify-between items-center p-2 bg-gray-50 rounded">
-                        <span className="font-medium">Type</span>
+                        <span className="font-medium">Visit nature</span>
                         <span className="text-gray-600">{match.output.type}</span>
                       </div>
                     )}

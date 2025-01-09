@@ -29,16 +29,22 @@ export const NewRuleForm = ({ newRule, setNewRule, addRule }: NewRuleFormProps) 
   const updateCondition = (conditionIndex: number, field: string, value: string) => {
     const updatedConditions = [...newRule.conditions];
     if (field === "type") {
-      updatedConditions[conditionIndex] = value === "parameter"
-        ? { type: "parameter", parameter: "", operator: "exists" as const }
-        : { type: "referral", value: "", operator: "equals" as const };
+      if (value === "no_parameter") {
+        updatedConditions[conditionIndex] = { type: "parameter", parameter: "", operator: "not_present" as const };
+      } else if (value === "no_referral") {
+        updatedConditions[conditionIndex] = { type: "referral", value: "", operator: "not_present" as const };
+      } else {
+        updatedConditions[conditionIndex] = value === "parameter"
+          ? { type: "parameter", parameter: "", operator: "exists" as const }
+          : { type: "referral", value: "", operator: "equals" as const };
+      }
     } else {
       const condition = updatedConditions[conditionIndex];
       if (condition.type === "parameter") {
         if (field === "parameter") {
           condition.parameter = value;
         } else if (field === "operator") {
-          condition.operator = value as "exists" | "not_exists" | "equals" | "not_equals";
+          condition.operator = value as "exists" | "not_exists" | "equals" | "not_equals" | "not_present";
           if (["equals", "not_equals"].includes(value)) {
             condition.value = condition.value || "";
           } else {
@@ -51,7 +57,7 @@ export const NewRuleForm = ({ newRule, setNewRule, addRule }: NewRuleFormProps) 
         if (field === "value") {
           condition.value = value;
         } else if (field === "operator") {
-          condition.operator = value as "equals" | "contains";
+          condition.operator = value as "equals" | "contains" | "not_present";
         }
       }
     }
@@ -85,10 +91,14 @@ export const NewRuleForm = ({ newRule, setNewRule, addRule }: NewRuleFormProps) 
           <div className="flex-1 space-y-2">
             <Label>Condition Type</Label>
             <Select
-              value={condition.type}
-              onValueChange={(value: "parameter" | "referral") =>
-                updateCondition(index, "type", value)
+              value={
+                condition.operator === "not_present"
+                  ? condition.type === "parameter"
+                    ? "no_parameter"
+                    : "no_referral"
+                  : condition.type
               }
+              onValueChange={(value) => updateCondition(index, "type", value)}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Select type" />
@@ -96,11 +106,13 @@ export const NewRuleForm = ({ newRule, setNewRule, addRule }: NewRuleFormProps) 
               <SelectContent>
                 <SelectItem value="parameter">Parameter</SelectItem>
                 <SelectItem value="referral">Referral</SelectItem>
+                <SelectItem value="no_parameter">No Parameters</SelectItem>
+                <SelectItem value="no_referral">No Referral</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
-          {condition.type === "parameter" && (
+          {condition.type === "parameter" && condition.operator !== "not_present" && (
             <>
               <div className="flex-1 space-y-2">
                 <Label>Parameter Name</Label>
@@ -140,7 +152,7 @@ export const NewRuleForm = ({ newRule, setNewRule, addRule }: NewRuleFormProps) 
             </>
           )}
 
-          {condition.type === "referral" && (
+          {condition.type === "referral" && condition.operator !== "not_present" && (
             <>
               <div className="flex-1 space-y-2">
                 <Label>Operator</Label>
@@ -188,7 +200,7 @@ export const NewRuleForm = ({ newRule, setNewRule, addRule }: NewRuleFormProps) 
         <h3 className="text-lg font-medium">Output Configuration</h3>
         <div className="grid grid-cols-3 gap-4">
           <div className="space-y-2">
-            <Label>Type</Label>
+            <Label>Visit nature</Label>
             <Input
               value={newRule.output.type}
               onChange={(e) =>
