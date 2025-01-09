@@ -10,6 +10,7 @@ import { NewRuleForm } from "@/components/rule/NewRuleForm";
 const Settings = () => {
   const { rules, setRules, updateRule, deleteRule, moveRuleUp, moveRuleDown } = useRules();
   const [newRule, setNewRule] = useState<Rule>({
+    name: "",
     conditions: [{ type: "parameter", parameter: "", operator: "exists" as const }],
     conditionsOperator: "and",
     output: { type: "", platform: "", channel: "" },
@@ -18,6 +19,7 @@ const Settings = () => {
   const addRule = () => {
     setRules([...rules, newRule]);
     setNewRule({
+      name: "",
       conditions: [{ type: "parameter", parameter: "", operator: "exists" as const }],
       conditionsOperator: "and",
       output: { type: "", platform: "", channel: "" },

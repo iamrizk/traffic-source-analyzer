@@ -4,7 +4,7 @@ import { Input } from "../../ui/input";
 
 interface RuleOutputFormProps {
   output: Rule["output"];
-  setNewRule: (rule: Rule) => void;
+  setNewRule: (rule: Rule | ((prev: Rule) => Rule)) => void;
 }
 
 export const RuleOutputForm = ({ output, setNewRule }: RuleOutputFormProps) => {

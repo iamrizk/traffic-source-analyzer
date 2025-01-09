@@ -8,7 +8,7 @@ import { Input } from "../../ui/input";
 interface RuleConditionsFormProps {
   conditions: Condition[];
   conditionsOperator: "and" | "or";
-  setNewRule: (rule: Rule) => void;
+  setNewRule: (rule: Rule | ((prev: Rule) => Rule)) => void;
 }
 
 export const RuleConditionsForm = ({
