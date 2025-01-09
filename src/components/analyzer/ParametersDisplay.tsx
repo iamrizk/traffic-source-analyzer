@@ -21,9 +21,13 @@ export const ParametersDisplay = ({ parameters }: ParametersDisplayProps) => {
     }
   };
 
+  const paramCount = Object.keys(parameters).length;
+
   return (
     <Card className="p-6">
-      <h3 className="text-xl font-semibold mb-4">Parameters</h3>
+      <h3 className="text-xl font-semibold mb-4">
+        Parameters ({paramCount})
+      </h3>
       <div className="space-y-2">
         {Object.entries(parameters).map(([key, value]) => (
           <div 
