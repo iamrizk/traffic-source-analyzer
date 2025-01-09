@@ -70,7 +70,7 @@ const Settings = () => {
 
   const loadStarterConfig = async () => {
     try {
-      const response = await fetch('/config/starter-config.json');
+      const response = await fetch('/starter-config.json');
       if (!response.ok) {
         console.error('Failed to load starter config:', response.status, response.statusText);
         throw new Error(`Failed to load starter config: ${response.status}`);

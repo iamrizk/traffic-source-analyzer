@@ -1,0 +1,11 @@
+id,source,medium,campaign,content
+1,google,cpc,spring_sale,ad1
+2,facebook,paid_social,spring_sale,ad2
+3,twitter,cpc,spring_sale,ad3
+4,google,cpc,summer_sale,ad4
+5,facebook,paid_social,summer_sale,ad5
+6,twitter,cpc,summer_sale,ad6
+7,google,cpc,fall_sale,ad7
+8,facebook,paid_social,fall_sale,ad8
+9,twitter,cpc,fall_sale,ad9
+10,google,cpc,winter_sale,ad10
