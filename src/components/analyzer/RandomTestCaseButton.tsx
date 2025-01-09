@@ -35,13 +35,18 @@ export const RandomTestCaseButton = ({
 
       // Step 5: Use requestAnimationFrame to ensure state updates are processed
       requestAnimationFrame(() => {
-        // Step 6: Trigger analysis after state updates
+        // Step 6: First analysis run
         onAnalyze();
 
-        // Step 7: Show success message
-        toast.success("Random test case loaded and analyzed", {
-          description: "A new test case has been loaded and analyzed successfully.",
-        });
+        // Step 7: Second analysis run after a short delay to ensure states are updated
+        setTimeout(() => {
+          onAnalyze();
+          
+          // Step 8: Show success message after both analyses are complete
+          toast.success("Random test case loaded and analyzed", {
+            description: "A new test case has been loaded and analyzed successfully.",
+          });
+        }, 100);
       });
     } catch (error) {
       console.error('Error in handleRandomize:', error);
