@@ -11,7 +11,7 @@ export const Navbar = () => {
   ];
 
   return (
-    <nav className="bg-white border-b">
+    <nav className="bg-white border rounded-lg shadow-sm">
       <div className="container mx-auto px-4">
         <PageHeader />
         <div className="flex h-16 items-center justify-between border-t">
