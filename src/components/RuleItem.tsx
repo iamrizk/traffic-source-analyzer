@@ -80,7 +80,7 @@ export const RuleItem = ({
   };
 
   return (
-    <Card className="p-4 mb-4 relative">
+    <Card className="p-4 mb-4">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center space-x-4">
           <span className="font-medium text-lg">Rule {index + 1}</span>
@@ -90,6 +90,18 @@ export const RuleItem = ({
         </div>
         
         <div className="flex items-center space-x-2">
+          <div className="flex space-x-1 mr-2">
+            {!isFirst && (
+              <Button variant="ghost" size="sm" onClick={() => onMoveUp(index)} className="p-1 h-9">
+                <ChevronUp className="w-4 h-4" />
+              </Button>
+            )}
+            {!isLast && (
+              <Button variant="ghost" size="sm" onClick={() => onMoveDown(index)} className="p-1 h-9">
+                <ChevronDown className="w-4 h-4" />
+              </Button>
+            )}
+          </div>
           <Button
             variant="outline"
             size="sm"
@@ -122,26 +134,13 @@ export const RuleItem = ({
         </div>
       </div>
 
-      <div className="absolute right-4 top-16 flex flex-col space-y-1">
-        {!isFirst && (
-          <Button variant="ghost" size="sm" onClick={() => onMoveUp(index)} className="p-1 h-auto">
-            <ChevronUp className="w-4 h-4" />
-          </Button>
-        )}
-        {!isLast && (
-          <Button variant="ghost" size="sm" onClick={() => onMoveDown(index)} className="p-1 h-auto">
-            <ChevronDown className="w-4 h-4" />
-          </Button>
-        )}
-      </div>
-
       <Accordion type="single" collapsible>
         <AccordionItem value="item-1" className="border-none">
           <AccordionTrigger className="py-2 hover:no-underline">
             <span className="text-sm font-medium hover:underline">View Rule Details</span>
           </AccordionTrigger>
           <AccordionContent>
-            <div className="space-y-4 pr-8">
+            <div className="space-y-4">
               {isEditing ? (
                 <div className="space-y-4">
                   <div className="space-y-2">
