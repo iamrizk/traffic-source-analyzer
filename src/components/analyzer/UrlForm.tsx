@@ -39,24 +39,36 @@ export const UrlForm = ({
       return;
     }
 
-    // First clear everything
+    // Step 1: Clear all inputs and outputs
     onClear();
     onUrlChange("");
     onReferralChange("");
 
-    // Then set new values after a brief delay
-    setTimeout(() => {
+    // Step 2: Select a random test case and populate fields
+    const getRandomTestCase = () => {
       const randomIndex = Math.floor(Math.random() * testCases.length);
-      const selectedCase = testCases[randomIndex];
-      
+      return testCases[randomIndex];
+    };
+
+    const tryAnalysis = () => {
+      const selectedCase = getRandomTestCase();
       onUrlChange(selectedCase.url);
       onReferralChange(selectedCase.referralSource || "");
-      
-      // Analyze after values are set
+
+      // Step 3 & 4: Parse, compare, and display analysis
       setTimeout(() => {
         onAnalyze();
-      }, 0);
-    }, 0);
+        
+        // Step 5: Check parameter audit
+        const auditElement = document.querySelector('[data-audit-status="failed"]');
+        if (auditElement) {
+          console.log("Parameter audit failed, trying another test case");
+          tryAnalysis(); // Recursively try another test case if audit fails
+        }
+      }, 100);
+    };
+
+    tryAnalysis();
   };
 
   return (

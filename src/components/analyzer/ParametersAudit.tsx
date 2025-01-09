@@ -12,12 +12,10 @@ export const ParametersAudit = ({ url, parameters }: ParametersAuditProps) => {
 
   const auditParameters = () => {
     try {
-      // Handle URLs with or without protocol
       const urlObj = new URL(url.startsWith('http') ? url : `https://${url}`);
       const urlParams = new URLSearchParams(urlObj.search);
       const urlParamsMap: Record<string, string> = {};
       
-      // Convert all URL parameter values to lowercase for consistent comparison
       urlParams.forEach((value, key) => {
         urlParamsMap[key] = value.toLowerCase();
       });
@@ -46,7 +44,7 @@ export const ParametersAudit = ({ url, parameters }: ParametersAuditProps) => {
   if (auditResults.length === 0) return null;
 
   return (
-    <Card className="p-6">
+    <Card className="p-6" data-audit-status={allPassed ? "passed" : "failed"}>
       <Collapsible defaultOpen={false}>
         <CollapsibleTrigger className="flex w-full items-center justify-between p-2 bg-gray-50 rounded hover:bg-gray-100">
           <div className="flex items-center gap-2">
