@@ -17,17 +17,17 @@ const GettingStarted = () => {
   };
 
   return (
-    <div className="container mx-auto py-8 space-y-8">
+    <div className="space-y-8">
       <Card className="p-6">
         <div className="flex items-center gap-2 mb-4">
           <Info className="w-6 h-6" />
           <h2 className="text-2xl font-bold">About the Tool</h2>
         </div>
         <p className="text-gray-700 leading-relaxed mb-6">
-          This tool is designed to help you understand and analyze URL parameters for better traffic source attribution. 
-          It helps identify paid advertising sources by analyzing URL parameters and referral information. 
-          You can use the sample test cases provided to see how different URL structures from various advertising platforms 
-          (like Google Ads, Meta Ads, Microsoft Ads) are analyzed and categorized.
+          This tool is designed to help you identify and analyze both paid and organic traffic sources, enabling precise attribution of conversions to specific marketing and advertising campaigns. 
+          It provides comprehensive analysis of URL parameters and referral information to accurately track the effectiveness of your marketing efforts across various platforms. 
+          Whether you're running paid campaigns on Google Ads, Meta Ads, or other advertising platforms, or tracking organic traffic sources, 
+          this tool helps you understand which channels and campaigns are driving your conversions.
         </p>
       </Card>
 
