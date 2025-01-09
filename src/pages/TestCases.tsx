@@ -84,7 +84,7 @@ const TestCases = () => {
         </div>
       </Card>
 
-      {testCases && (
+      {testCases.length > 0 && (
         <Card className="p-6">
           <TestCasesTable testCases={testCases} />
         </Card>
