@@ -8,7 +8,7 @@ import { RuleItem } from "@/components/RuleItem";
 import { NewRuleForm } from "@/components/rule/NewRuleForm";
 
 const Settings = () => {
-  const { rules, setRules, updateRule, deleteRule, moveRuleUp, moveRoveDown } = useRules();
+  const { rules, setRules, updateRule, deleteRule, moveRuleUp, moveRuleDown } = useRules();
   const [newRule, setNewRule] = useState<Rule>({
     name: "",
     conditions: [{ type: "parameter", parameter: "", operator: "exists" as const }],
@@ -140,7 +140,7 @@ const Settings = () => {
                 onUpdate={updateRule}
                 onDelete={deleteRule}
                 onMoveUp={moveRuleUp}
-                onMoveDown={moveRoveDown}
+                onMoveDown={moveRuleDown}
                 isFirst={index === 0}
                 isLast={index === rules.length - 1}
               />
