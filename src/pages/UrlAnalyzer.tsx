@@ -3,8 +3,6 @@ import { UrlForm } from "@/components/analyzer/UrlForm";
 import { AnalysisSummary } from "@/components/analyzer/AnalysisSummary";
 import { AnalysisResults } from "@/components/analyzer/AnalysisResults";
 import { ParametersDisplay } from "@/components/analyzer/ParametersDisplay";
-import { PageHeader } from "@/components/analyzer/PageHeader";
-import { Footer } from "@/components/analyzer/Footer";
 import { RuleMatch } from "@/types/analyzer";
 import { useRules } from "@/hooks/useRules";
 
@@ -154,8 +152,7 @@ const UrlAnalyzer = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8 space-y-8">
-      <PageHeader />
+    <div className="space-y-8">
       <UrlForm
         url={url}
         referralSource={referralSource}
@@ -166,7 +163,6 @@ const UrlAnalyzer = () => {
       <AnalysisSummary matches={matches} />
       <ParametersDisplay parameters={parameters} />
       <AnalysisResults matches={matches} />
-      <Footer />
     </div>
   );
 };
