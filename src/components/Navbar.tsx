@@ -16,7 +16,7 @@ export const Navbar = () => {
         <div>
           <PageHeader />
           <div className="flex h-16 items-center justify-between border-t mx-15">
-            <div className="flex items-center space-x-8">
+            <div className="flex items-center space-x-8 pl-4">
               {links.map((link) => (
                 <Link
                   key={link.href}
