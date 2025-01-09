@@ -5,13 +5,13 @@ import { toast } from "sonner";
 
 const GettingStarted = () => {
   const handleDownloadConfig = () => {
-    const configUrl = "./config/starter-config.json";
+    const configUrl = "/starter-config.json";
     window.open(configUrl, "_blank");
     toast.success("Starting configuration download");
   };
 
   const handleDownloadTestCases = (fileNumber: number) => {
-    const testCaseUrl = `./test-cases/test-case-${fileNumber}.csv`;
+    const testCaseUrl = `/test-case-${fileNumber}.csv`;
     window.open(testCaseUrl, "_blank");
     toast.success(`Test case #${fileNumber} download started`);
   };
