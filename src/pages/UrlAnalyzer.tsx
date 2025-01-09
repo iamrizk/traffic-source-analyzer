@@ -31,11 +31,13 @@ const UrlAnalyzer = () => {
       const urlObj = new URL(urlToParse);
       const params: Record<string, string> = {};
       urlObj.searchParams.forEach((value, key) => {
-        params[key] = value;
+        // Convert parameter values to lowercase
+        params[key] = value.toLowerCase();
       });
       setParameters(params);
 
       const newMatches: RuleMatch[] = [];
+      const lowerCaseReferral = referralSource.toLowerCase();
 
       rules.forEach((rule, ruleIndex) => {
         const matchDetails: string[] = [];
@@ -45,6 +47,7 @@ const UrlAnalyzer = () => {
           if (condition.type === "parameter") {
             const paramExists = condition.parameter in params;
             const paramValue = params[condition.parameter];
+            const conditionValue = condition.value?.toLowerCase();
 
             if (condition.operator === "exists" && paramExists) {
               matchDetails.push(`Parameter '${condition.parameter}' exists as required`);
@@ -55,10 +58,10 @@ const UrlAnalyzer = () => {
             } else if (condition.operator === "not_present" && !paramExists) {
               matchDetails.push(`Parameter '${condition.parameter}' is not present as required`);
               conditionsMet++;
-            } else if (condition.operator === "equals" && paramValue === condition.value) {
+            } else if (condition.operator === "equals" && paramValue === conditionValue) {
               matchDetails.push(`Parameter '${condition.parameter}' value matches '${condition.value}'`);
               conditionsMet++;
-            } else if (condition.operator === "not_equals" && paramValue !== condition.value) {
+            } else if (condition.operator === "not_equals" && paramValue !== conditionValue) {
               matchDetails.push(`Parameter '${condition.parameter}' value does not match '${condition.value}'`);
               conditionsMet++;
             } else {
@@ -67,12 +70,14 @@ const UrlAnalyzer = () => {
               );
             }
           } else if (condition.type === "referral") {
-            if (condition.operator === "not_present" && !referralSource) {
+            const conditionValue = condition.value?.toLowerCase();
+            
+            if (condition.operator === "not_present" && !lowerCaseReferral) {
               matchDetails.push(`Referral source is not present as required`);
               conditionsMet++;
             } else if (
-              (condition.operator === "equals" && referralSource === condition.value) ||
-              (condition.operator === "contains" && referralSource.includes(condition.value))
+              (condition.operator === "equals" && lowerCaseReferral === conditionValue) ||
+              (condition.operator === "contains" && lowerCaseReferral.includes(conditionValue || ''))
             ) {
               matchDetails.push(`Referral source matches '${condition.value}'`);
               conditionsMet++;
