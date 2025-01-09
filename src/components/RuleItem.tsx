@@ -1,15 +1,9 @@
 import { Rule } from "@/hooks/useRules";
-import { Button } from "./ui/button";
 import { Card } from "./ui/card";
-import { Edit, Save, Trash2, ChevronUp, ChevronDown } from "lucide-react";
 import { useState } from "react";
-import { RuleCondition } from "./rule/RuleCondition";
-import { RuleOutput } from "./rule/RuleOutput";
-import { RuleDisplay } from "./rule/RuleDisplay";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
-import { Label } from "./ui/label";
-import { Input } from "./ui/input";
 import { Accordion, AccordionContent, AccordionItem } from "./ui/accordion";
+import { RuleHeader } from "./rule/RuleHeader";
+import { RuleContent } from "./rule/RuleContent";
 
 interface RuleItemProps {
   rule: Rule;
@@ -41,47 +35,12 @@ export const RuleItem = ({
     setIsEditing(false);
   };
 
-  const updateCondition = (conditionIndex: number, field: string, value: string) => {
-    const updatedConditions = [...editedRule.conditions];
-    if (field === "type") {
-      updatedConditions[conditionIndex] = value === "parameter"
-        ? { type: "parameter", parameter: "", operator: "exists" as const }
-        : { type: "referral", value: "", operator: "equals" as const };
-    } else {
-      const condition = updatedConditions[conditionIndex];
-      if (condition.type === "parameter") {
-        if (field === "parameter") {
-          condition.parameter = value;
-        } else if (field === "operator") {
-          condition.operator = value as "exists" | "not_exists" | "equals" | "not_equals";
-          if (["equals", "not_equals"].includes(value)) {
-            condition.value = condition.value || "";
-          } else {
-            delete condition.value;
-          }
-        } else if (field === "value") {
-          condition.value = value;
-        }
-      } else if (condition.type === "referral") {
-        if (field === "value") {
-          condition.value = value;
-        } else if (field === "operator") {
-          condition.operator = value as "equals" | "contains";
-        }
-      }
-    }
-    setEditedRule({ ...editedRule, conditions: updatedConditions });
-  };
-
-  const updateOutput = (field: string, value: string) => {
-    setEditedRule({
-      ...editedRule,
-      output: { ...editedRule.output, [field]: value },
-    });
+  const handleEdit = () => {
+    setIsEditing(true);
+    setIsExpanded(true);
   };
 
   const handleCardClick = (e: React.MouseEvent) => {
-    // Prevent expanding when clicking on buttons or inputs
     if (
       e.target instanceof HTMLElement && 
       !e.target.closest('button') && 
@@ -97,114 +56,28 @@ export const RuleItem = ({
       className="p-4 mb-4 cursor-pointer transition-all duration-200 hover:bg-accent/50" 
       onClick={handleCardClick}
     >
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center space-x-4">
-          <span className="font-medium text-lg">Rule {index + 1}</span>
-          {!isEditing && rule.name && (
-            <span className="text-muted-foreground font-medium">{rule.name}</span>
-          )}
-        </div>
-        
-        <div className="flex items-center space-x-2">
-          <div className="flex items-center space-x-1">
-            {!isFirst && (
-              <Button variant="ghost" size="sm" onClick={() => onMoveUp(index)} className="p-1 h-9">
-                <ChevronUp className="w-4 h-4" />
-              </Button>
-            )}
-            {!isLast && (
-              <Button variant="ghost" size="sm" onClick={() => onMoveDown(index)} className="p-1 h-9">
-                <ChevronDown className="w-4 h-4" />
-              </Button>
-            )}
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => (isEditing ? handleSave() : setIsEditing(true))}
-              className="gap-2"
-            >
-              {isEditing ? (
-                <>
-                  <Save className="w-4 h-4" />
-                  Save
-                </>
-              ) : (
-                <>
-                  <Edit className="w-4 h-4" />
-                  Edit
-                </>
-              )}
-            </Button>
-            {isEditing && (
-              <Button
-                variant="destructive"
-                size="sm"
-                onClick={() => onDelete(index)}
-                className="gap-2"
-              >
-                <Trash2 className="w-4 h-4" />
-                Delete
-              </Button>
-            )}
-          </div>
-        </div>
-      </div>
+      <RuleHeader
+        index={index}
+        rule={rule}
+        isEditing={isEditing}
+        isFirst={isFirst}
+        isLast={isLast}
+        onEdit={handleEdit}
+        onSave={handleSave}
+        onDelete={onDelete}
+        onMoveUp={onMoveUp}
+        onMoveDown={onMoveDown}
+      />
 
       <Accordion type="single" value={isExpanded ? "item-1" : ""} onValueChange={(value) => setIsExpanded(!!value)}>
         <AccordionItem value="item-1" className="border-none">
           <AccordionContent>
-            <div className="space-y-4">
-              {isEditing ? (
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    <Label>Rule Name</Label>
-                    <Input
-                      value={editedRule.name}
-                      onChange={(e) => setEditedRule({ ...editedRule, name: e.target.value })}
-                      placeholder="Enter rule name"
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label>Conditions Operator</Label>
-                    <Select
-                      value={editedRule.conditionsOperator}
-                      onValueChange={(value: "and" | "or") =>
-                        setEditedRule({ ...editedRule, conditionsOperator: value })
-                      }
-                    >
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="and">AND</SelectItem>
-                        <SelectItem value="or">OR</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div className="space-y-4">
-                    {editedRule.conditions.map((condition, condIndex) => (
-                      <RuleCondition
-                        key={condIndex}
-                        condition={condition}
-                        conditionIndex={condIndex}
-                        updateCondition={updateCondition}
-                      />
-                    ))}
-                  </div>
-
-                  <RuleOutput
-                    type={editedRule.output.type}
-                    platform={editedRule.output.platform}
-                    channel={editedRule.output.channel}
-                    onChange={updateOutput}
-                  />
-                </div>
-              ) : (
-                <RuleDisplay rule={rule} />
-              )}
-            </div>
+            <RuleContent
+              isEditing={isEditing}
+              editedRule={editedRule}
+              setEditedRule={setEditedRule}
+              rule={rule}
+            />
           </AccordionContent>
         </AccordionItem>
       </Accordion>
