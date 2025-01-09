@@ -24,23 +24,28 @@ export const RandomTestCaseButton = ({
       // Step 1: Clear all states and results
       onClear();
 
-      // Step 2: Wait for clear to complete
-      await new Promise(resolve => setTimeout(resolve, 100));
-
-      // Step 3: Get a random test case with normalized URL
+      // Step 2: Get a random test case with normalized URL
       const selectedCase = getRandomTestCase(testCases);
       
-      // Step 4: Set the new input values
-      onUrlChange(selectedCase.url);
-      onReferralChange(selectedCase.referralSource || "");
+      // Step 3: Set the new input values using Promise.all to ensure both updates complete
+      await Promise.all([
+        new Promise<void>(resolve => {
+          onUrlChange(selectedCase.url);
+          resolve();
+        }),
+        new Promise<void>(resolve => {
+          onReferralChange(selectedCase.referralSource || "");
+          resolve();
+        })
+      ]);
 
-      // Step 5: Wait for state updates to complete
-      await new Promise(resolve => setTimeout(resolve, 100));
+      // Step 4: Wait for React to process state updates
+      await new Promise(resolve => setTimeout(resolve, 0));
 
-      // Step 6: Trigger analysis
+      // Step 5: Trigger analysis
       onAnalyze();
 
-      // Step 7: Show success message
+      // Step 6: Show success message
       toast.success("Random test case loaded and analyzed", {
         description: "A new test case has been loaded and analyzed successfully.",
       });
