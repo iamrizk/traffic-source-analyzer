@@ -12,15 +12,23 @@ import { ParametersAudit } from "@/components/analyzer/ParametersAudit";
 const UrlAnalyzer = () => {
   const [url, setUrl] = useState(() => localStorage.getItem("analyzer_url") || "");
   const [referralSource, setReferralSource] = useState(() => localStorage.getItem("analyzer_referral") || "");
-  const [parameters, setParameters] = useState<Record<string, string>>({});
-  const [matches, setMatches] = useState<RuleMatch[]>([]);
+  const [parameters, setParameters] = useState<Record<string, string>>(() => {
+    const savedParams = localStorage.getItem("analyzer_parameters");
+    return savedParams ? JSON.parse(savedParams) : {};
+  });
+  const [matches, setMatches] = useState<RuleMatch[]>(() => {
+    const savedMatches = localStorage.getItem("analyzer_matches");
+    return savedMatches ? JSON.parse(savedMatches) : [];
+  });
 
   const { rules } = useRules();
 
   useEffect(() => {
     localStorage.setItem("analyzer_url", url);
     localStorage.setItem("analyzer_referral", referralSource);
-  }, [url, referralSource]);
+    localStorage.setItem("analyzer_parameters", JSON.stringify(parameters));
+    localStorage.setItem("analyzer_matches", JSON.stringify(matches));
+  }, [url, referralSource, parameters, matches]);
 
   const handleClear = () => {
     setUrl("");
@@ -29,6 +37,8 @@ const UrlAnalyzer = () => {
     setMatches([]);
     localStorage.removeItem("analyzer_url");
     localStorage.removeItem("analyzer_referral");
+    localStorage.removeItem("analyzer_parameters");
+    localStorage.removeItem("analyzer_matches");
     toast("All fields cleared", {
       description: "The analyzer has been reset.",
     });
