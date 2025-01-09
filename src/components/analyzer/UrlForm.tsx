@@ -39,12 +39,20 @@ export const UrlForm = ({
       return;
     }
 
+    // Clear existing output first
+    onClear();
+    
+    // Set new values and analyze
     const randomIndex = Math.floor(Math.random() * testCases.length);
     const selectedCase = testCases[randomIndex];
     
     onUrlChange(selectedCase.url);
     onReferralChange(selectedCase.referralSource || "");
-    onAnalyze(); // Immediately analyze after setting the values
+    
+    // Use setTimeout to ensure state updates have propagated
+    setTimeout(() => {
+      onAnalyze();
+    }, 0);
   };
 
   return (
