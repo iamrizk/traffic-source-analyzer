@@ -8,6 +8,7 @@ import { RuleOutput } from "./rule/RuleOutput";
 import { RuleDisplay } from "./rule/RuleDisplay";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import { Label } from "./ui/label";
+import { Input } from "./ui/input";
 
 interface RuleItemProps {
   rule: Rule;
@@ -82,6 +83,9 @@ export const RuleItem = ({
       <div className="flex justify-between items-center mb-4">
         <div className="flex items-center space-x-2">
           <span className="font-medium">Rule {index + 1}</span>
+          {!isEditing && rule.name && (
+            <span className="text-muted-foreground">- {rule.name}</span>
+          )}
         </div>
         <div className="flex items-center space-x-2">
           {!isFirst && (
@@ -109,6 +113,15 @@ export const RuleItem = ({
 
       {isEditing ? (
         <div className="space-y-4">
+          <div className="space-y-2">
+            <Label>Rule Name</Label>
+            <Input
+              value={editedRule.name}
+              onChange={(e) => setEditedRule({ ...editedRule, name: e.target.value })}
+              placeholder="Enter rule name"
+            />
+          </div>
+
           <div className="space-y-2">
             <Label>Conditions Operator</Label>
             <Select

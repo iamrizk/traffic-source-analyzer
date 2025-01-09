@@ -20,6 +20,7 @@ interface ReferralCondition extends BaseCondition {
 export type Condition = ParameterCondition | ReferralCondition;
 
 export interface Rule {
+  name: string;
   conditions: Condition[];
   conditionsOperator: "and" | "or";
   output: {
