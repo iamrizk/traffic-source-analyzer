@@ -31,26 +31,31 @@ export const parseCSVData = (text: string): { url: string; referralSource: strin
   let startIndex = 0;
   let urlIndex = 0;
   let sourceIndex = 1;
+  let hasHeaders = false;
 
   // Try to detect headers
   const possibleHeaders = lines[0].toLowerCase().split(',').map(h => h.trim());
   if (possibleHeaders.some(h => h.includes('url') || h.includes('source'))) {
+    hasHeaders = true;
     startIndex = 1;
+    const urlIdx = possibleHeaders.findIndex(h => h.includes('url') || h.includes('link'));
+    const sourceIdx = possibleHeaders.findIndex(h => h.includes('source') || h.includes('referral'));
+    if (urlIdx !== -1) urlIndex = urlIdx;
+    if (sourceIdx !== -1) sourceIndex = sourceIdx;
   }
 
   const parsedData: { url: string; referralSource: string }[] = [];
   let droppedRowCount = 0;
   
   // Parse data rows
-  for (let i = startIndex; i < lines.length; i++) {
+  for (let i = startIndex; i < Math.min(lines.length, MAX_ROWS + startIndex); i++) {
     const columns = lines[i].split(',').map(col => col.trim());
     
-    if (columns.length >= 1) {
+    if (columns.length >= 2) {
       const url = columns[urlIndex];
-      const referralSource = columns[sourceIndex] || '';
+      const referralSource = columns[sourceIndex] || 'direct';
       
-      // Accept any non-empty URL string
-      if (url && url.length > 0) {
+      if (isValidUrl(url)) {
         parsedData.push({ url, referralSource });
       } else {
         droppedRowCount++;
@@ -63,7 +68,7 @@ export const parseCSVData = (text: string): { url: string; referralSource: strin
   // Show toast for dropped rows if any
   if (droppedRowCount > 0) {
     toast.warning(`${droppedRowCount} invalid rows were skipped`, {
-      description: "These rows had missing data",
+      description: "These rows had invalid URLs or missing data",
     });
   }
 
@@ -75,7 +80,7 @@ export const parseCSVData = (text: string): { url: string; referralSource: strin
     });
   }
 
-  return parsedData.slice(0, MAX_ROWS);
+  return parsedData;
 };
 
 // Save test cases with compression
