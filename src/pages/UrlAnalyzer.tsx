@@ -14,6 +14,8 @@ const UrlAnalyzer = () => {
     type?: string;
     platform?: string;
     channel?: string;
+    matchedRule?: number;
+    matchDetails?: string[];
   }>();
 
   const { rules } = useRules();
@@ -28,34 +30,49 @@ const UrlAnalyzer = () => {
       setParameters(params);
 
       // Analyze based on rules
-      for (const rule of rules) {
+      for (let ruleIndex = 0; ruleIndex < rules.length; ruleIndex++) {
+        const rule = rules[ruleIndex];
         let conditionMet = true;
+        const matchDetails: string[] = [];
+
         for (const condition of rule.conditions) {
           if (condition.type === "parameter") {
             const paramExists = condition.parameter in params;
             if (condition.operator === "exists" && !paramExists) {
+              matchDetails.push(`Parameter '${condition.parameter}' does not exist (required)`);
               conditionMet = false;
               break;
             }
             if (condition.operator === "not_exists" && paramExists) {
+              matchDetails.push(`Parameter '${condition.parameter}' exists (should not exist)`);
               conditionMet = false;
               break;
             }
+            matchDetails.push(`Parameter '${condition.parameter}' ${condition.operator === "exists" ? "exists" : "does not exist"} as required`);
           } else if (condition.type === "referral") {
             if (condition.value !== referralSource) {
+              matchDetails.push(`Referral source '${referralSource}' does not match required '${condition.value}'`);
               conditionMet = false;
               break;
             }
+            matchDetails.push(`Referral source matches '${condition.value}'`);
           }
         }
 
         if (conditionMet) {
-          setAnalysis(rule.output);
+          setAnalysis({
+            ...rule.output,
+            matchedRule: ruleIndex + 1,
+            matchDetails
+          });
+          toast.success("URL analyzed successfully!");
           return;
         }
       }
 
-      setAnalysis(undefined);
+      setAnalysis({
+        matchDetails: ["No matching rule found for the given URL and referral source"]
+      });
       toast.success("URL analyzed successfully!");
     } catch (error) {
       toast.error("Invalid URL provided");
@@ -108,7 +125,21 @@ const UrlAnalyzer = () => {
       {analysis && (
         <Card className="p-6">
           <h3 className="text-xl font-semibold mb-4">Analysis Results</h3>
-          <div className="space-y-2">
+          <div className="space-y-4">
+            {analysis.matchedRule && (
+              <div className="p-2 bg-green-50 text-green-700 rounded">
+                Matched Rule #{analysis.matchedRule}
+              </div>
+            )}
+            
+            <div className="space-y-2">
+              {analysis.matchDetails?.map((detail, index) => (
+                <div key={index} className="p-2 bg-gray-50 rounded text-sm">
+                  {detail}
+                </div>
+              ))}
+            </div>
+
             {analysis.type && (
               <div className="flex justify-between items-center p-2 bg-gray-50 rounded">
                 <span className="font-medium">Type</span>
