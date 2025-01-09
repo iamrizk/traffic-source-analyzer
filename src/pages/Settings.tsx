@@ -107,7 +107,9 @@ const Settings = () => {
 
       {rules.length > 0 && (
         <Card className="p-6">
-          <h3 className="text-xl font-semibold mb-4">Existing Rules</h3>
+          <h3 className="text-xl font-semibold mb-4">
+            Existing Rules ({rules.length})
+          </h3>
           <div className="space-y-4">
             {rules.map((rule, index) => (
               <RuleItem
