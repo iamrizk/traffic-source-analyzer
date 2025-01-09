@@ -5,19 +5,19 @@ import { toast } from "sonner";
 
 const GettingStarted = () => {
   const handleDownloadConfig = () => {
-    // This is a placeholder - we'll need the actual config file URL once uploaded to GitHub
-    const configUrl = "https://raw.githubusercontent.com/your-repo/path-to-config.json";
+    // Replace YOUR_USERNAME and YOUR_REPO with your actual GitHub username and repository name
+    const configUrl = "https://raw.githubusercontent.com/YOUR_USERNAME/YOUR_REPO/main/config/starter-config.json";
     window.open(configUrl, "_blank");
     toast.success("Starting configuration download");
   };
 
   const handleDownloadTestCases = (fileNumber: number) => {
-    // These are placeholders - we'll need the actual test case file URLs once uploaded to GitHub
+    // Replace YOUR_USERNAME and YOUR_REPO with your actual GitHub username and repository name
     const testCaseUrls = [
-      "https://raw.githubusercontent.com/your-repo/path-to-testcase1.csv",
-      "https://raw.githubusercontent.com/your-repo/path-to-testcase2.csv",
-      "https://raw.githubusercontent.com/your-repo/path-to-testcase3.csv",
-      "https://raw.githubusercontent.com/your-repo/path-to-testcase4.csv"
+      "https://raw.githubusercontent.com/YOUR_USERNAME/YOUR_REPO/main/test-cases/test-case-1.csv",
+      "https://raw.githubusercontent.com/YOUR_USERNAME/YOUR_REPO/main/test-cases/test-case-2.csv",
+      "https://raw.githubusercontent.com/YOUR_USERNAME/YOUR_REPO/main/test-cases/test-case-3.csv",
+      "https://raw.githubusercontent.com/YOUR_USERNAME/YOUR_REPO/main/test-cases/test-case-4.csv"
     ];
     window.open(testCaseUrls[fileNumber - 1], "_blank");
     toast.success(`Test case #${fileNumber} download started`);
