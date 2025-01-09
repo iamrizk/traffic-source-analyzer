@@ -112,7 +112,8 @@ const UrlAnalyzer = () => {
             ruleIndex,
             ruleName: rule.name,
             output: rule.output,
-            matchDetails
+            matchDetails,
+            conditions: rule.conditions
           });
         }
       });
@@ -150,7 +151,7 @@ const UrlAnalyzer = () => {
 
       <AnalysisResults matches={matches} />
 
-      <ParametersDisplay parameters={parameters} />
+      <ParametersDisplay parameters={parameters} matches={matches} />
     </div>
   );
 };
