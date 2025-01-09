@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Card } from "@/components/ui/card";
 import { toast } from "sonner";
 import { FileUploader } from "@/components/test-cases/FileUploader";
@@ -14,7 +14,7 @@ const MAX_STORAGE_SIZE = 4 * 1024 * 1024; // 4MB limit to be safe
 const TestCases = () => {
   const [testCases, setTestCases] = useState<TestCase[]>([]);
 
-  useEffect(() => {
+  const loadTestCases = useCallback(() => {
     const savedTestCases = localStorage.getItem('testCases');
     if (savedTestCases) {
       try {
@@ -25,6 +25,10 @@ const TestCases = () => {
       }
     }
   }, []);
+
+  useEffect(() => {
+    loadTestCases();
+  }, [loadTestCases]);
 
   useEffect(() => {
     try {
@@ -80,7 +84,7 @@ const TestCases = () => {
         </div>
       </Card>
 
-      {testCases.length > 0 && (
+      {testCases && (
         <Card className="p-6">
           <TestCasesTable testCases={testCases} />
         </Card>
