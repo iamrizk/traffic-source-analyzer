@@ -1,25 +1,19 @@
 import { useState } from "react";
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { UrlForm } from "@/components/analyzer/UrlForm";
+import { AnalysisSummary } from "@/components/analyzer/AnalysisSummary";
+import { AnalysisResults } from "@/components/analyzer/AnalysisResults";
+import { ParametersDisplay } from "@/components/analyzer/ParametersDisplay";
+import { PageHeader } from "@/components/analyzer/PageHeader";
+import { Footer } from "@/components/analyzer/Footer";
+import { RuleMatch } from "@/types/analyzer";
 import { useRules } from "@/hooks/useRules";
-import { RuleDisplay } from "@/components/rule/RuleDisplay";
-
-interface AnalysisResult {
-  url: string;
-  parameters: Record<string, string>;
-  referral: string | null;
-  output: {
-    trafficNature: string;
-    platform: string;
-    channel: string;
-  };
-}
 
 const UrlAnalyzer = () => {
   const { rules } = useRules();
   const [url, setUrl] = useState("");
-  const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
+  const [referralSource, setReferralSource] = useState("");
+  const [matches, setMatches] = useState<RuleMatch[]>([]);
+  const [parameters, setParameters] = useState<Record<string, string>>({});
 
   const parseUrl = (urlString: string) => {
     try {
@@ -28,193 +22,151 @@ const UrlAnalyzer = () => {
       url.searchParams.forEach((value, key) => {
         parameters[key] = value;
       });
-      return {
-        parameters,
-        referral: document.referrer || null,
-      };
+      return parameters;
     } catch (error) {
-      return {
-        parameters: {},
-        referral: document.referrer || null,
-      };
+      return {};
     }
   };
 
-  const analyzeUrl = (url: string) => {
-    const { parameters, referral } = parseUrl(url);
+  const analyzeUrl = () => {
+    const urlParameters = parseUrl(url);
+    setParameters(urlParameters);
+    const newMatches: RuleMatch[] = [];
 
-    for (const rule of rules) {
+    rules.forEach((rule, ruleIndex) => {
       let conditionsMet = false;
+      const matchDetails: string[] = [];
 
       if (rule.conditions.length === 0) {
         conditionsMet = true;
       } else if (rule.conditionsOperator === "and") {
         conditionsMet = rule.conditions.every((condition) => {
           if (condition.type === "parameter") {
-            const paramExists = condition.parameter in parameters;
+            const paramExists = condition.parameter in urlParameters;
+            let isMatch = false;
 
             switch (condition.operator) {
               case "exists":
-                return paramExists;
+                isMatch = paramExists;
+                break;
               case "not_exists":
-                return !paramExists;
+                isMatch = !paramExists;
+                break;
               case "equals":
-                return paramExists && parameters[condition.parameter] === condition.value;
+                isMatch = paramExists && urlParameters[condition.parameter] === condition.value;
+                break;
               case "not_equals":
-                return paramExists && parameters[condition.parameter] !== condition.value;
+                isMatch = paramExists && urlParameters[condition.parameter] !== condition.value;
+                break;
               case "not_present":
-                return !paramExists;
-              default:
-                return false;
+                isMatch = !paramExists;
+                break;
             }
+
+            if (isMatch) {
+              matchDetails.push(`Parameter "${condition.parameter}" ${condition.operator} ${condition.value || ''}`);
+            }
+            return isMatch;
           } else if (condition.type === "referral") {
+            let isMatch = false;
             switch (condition.operator) {
               case "equals":
-                return referral === condition.value;
+                isMatch = referralSource === condition.value;
+                break;
               case "contains":
-                return referral?.includes(condition.value) ?? false;
+                isMatch = referralSource.includes(condition.value);
+                break;
               case "not_present":
-                return !referral;
-              default:
-                return false;
+                isMatch = !referralSource;
+                break;
             }
+            if (isMatch) {
+              matchDetails.push(`Referral ${condition.operator} ${condition.value || ''}`);
+            }
+            return isMatch;
           }
           return false;
         });
       } else {
         conditionsMet = rule.conditions.some((condition) => {
           if (condition.type === "parameter") {
-            const paramExists = condition.parameter in parameters;
+            const paramExists = condition.parameter in urlParameters;
+            let isMatch = false;
 
             switch (condition.operator) {
               case "exists":
-                return paramExists;
+                isMatch = paramExists;
+                break;
               case "not_exists":
-                return !paramExists;
+                isMatch = !paramExists;
+                break;
               case "equals":
-                return paramExists && parameters[condition.parameter] === condition.value;
+                isMatch = paramExists && urlParameters[condition.parameter] === condition.value;
+                break;
               case "not_equals":
-                return paramExists && parameters[condition.parameter] !== condition.value;
+                isMatch = paramExists && urlParameters[condition.parameter] !== condition.value;
+                break;
               case "not_present":
-                return !paramExists;
-              default:
-                return false;
+                isMatch = !paramExists;
+                break;
             }
+
+            if (isMatch) {
+              matchDetails.push(`Parameter "${condition.parameter}" ${condition.operator} ${condition.value || ''}`);
+            }
+            return isMatch;
           } else if (condition.type === "referral") {
+            let isMatch = false;
             switch (condition.operator) {
               case "equals":
-                return referral === condition.value;
+                isMatch = referralSource === condition.value;
+                break;
               case "contains":
-                return referral?.includes(condition.value) ?? false;
+                isMatch = referralSource.includes(condition.value);
+                break;
               case "not_present":
-                return !referral;
-              default:
-                return false;
+                isMatch = !referralSource;
+                break;
             }
+            if (isMatch) {
+              matchDetails.push(`Referral ${condition.operator} ${condition.value || ''}`);
+            }
+            return isMatch;
           }
           return false;
         });
       }
 
       if (conditionsMet) {
-        setAnalysisResult({
-          url,
-          parameters,
-          referral,
+        newMatches.push({
+          ruleIndex,
+          matchDetails,
           output: {
-            trafficNature: rule.output.trafficNature,
+            type: rule.output.trafficNature,
             platform: rule.output.platform,
             channel: rule.output.channel,
           },
         });
-        return;
       }
-    }
-
-    setAnalysisResult({
-      url,
-      parameters,
-      referral,
-      output: {
-        trafficNature: "Unknown",
-        platform: "Unknown",
-        channel: "Unknown",
-      },
     });
-  };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (url) {
-      analyzeUrl(url);
-    }
+    setMatches(newMatches);
   };
 
   return (
-    <div className="space-y-8">
-      <Card className="p-6">
-        <h2 className="text-2xl font-semibold mb-6">URL Analyzer</h2>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="flex gap-4">
-            <Input
-              value={url}
-              onChange={(e) => setUrl(e.target.value)}
-              placeholder="Enter URL to analyze"
-              className="flex-1"
-            />
-            <Button type="submit">Analyze</Button>
-          </div>
-        </form>
-      </Card>
-
-      {analysisResult && (
-        <Card className="p-6">
-          <h3 className="text-xl font-semibold mb-4">Analysis Result</h3>
-          <div className="space-y-4">
-            <div>
-              <h4 className="font-medium mb-2">URL</h4>
-              <p className="text-sm text-gray-600">{analysisResult.url}</p>
-            </div>
-
-            <div>
-              <h4 className="font-medium mb-2">Parameters</h4>
-              {Object.keys(analysisResult.parameters).length > 0 ? (
-                <div className="space-y-1">
-                  {Object.entries(analysisResult.parameters).map(([key, value]) => (
-                    <p key={key} className="text-sm text-gray-600">
-                      {key}: {value}
-                    </p>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-sm text-gray-600">No parameters found</p>
-              )}
-            </div>
-
-            <div>
-              <h4 className="font-medium mb-2">Referral</h4>
-              <p className="text-sm text-gray-600">
-                {analysisResult.referral || "No referral"}
-              </p>
-            </div>
-
-            <div>
-              <h4 className="font-medium mb-2">Classification</h4>
-              <div className="space-y-1">
-                <p className="text-sm text-gray-600">
-                  Traffic Nature: {analysisResult.output.trafficNature}
-                </p>
-                <p className="text-sm text-gray-600">
-                  Platform: {analysisResult.output.platform}
-                </p>
-                <p className="text-sm text-gray-600">
-                  Channel: {analysisResult.output.channel}
-                </p>
-              </div>
-            </div>
-          </div>
-        </Card>
-      )}
+    <div className="container mx-auto px-4 py-8 space-y-8">
+      <PageHeader />
+      <UrlForm
+        url={url}
+        referralSource={referralSource}
+        onUrlChange={setUrl}
+        onReferralChange={setReferralSource}
+        onAnalyze={analyzeUrl}
+      />
+      <AnalysisSummary matches={matches} />
+      <ParametersDisplay parameters={parameters} />
+      <AnalysisResults matches={matches} />
+      <Footer />
     </div>
   );
 };
