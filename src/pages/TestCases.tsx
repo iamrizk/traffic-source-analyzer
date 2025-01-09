@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { toast } from "sonner";
-import { Upload } from "lucide-react";
+import { Upload, Trash2 } from "lucide-react";
 
 interface TestCase {
   url: string;
@@ -13,6 +13,19 @@ interface TestCase {
 
 const TestCases = () => {
   const [testCases, setTestCases] = useState<TestCase[]>([]);
+
+  // Load test cases from localStorage on component mount
+  useEffect(() => {
+    const savedTestCases = localStorage.getItem('testCases');
+    if (savedTestCases) {
+      setTestCases(JSON.parse(savedTestCases));
+    }
+  }, []);
+
+  // Save test cases to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem('testCases', JSON.stringify(testCases));
+  }, [testCases]);
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -47,6 +60,13 @@ const TestCases = () => {
     reader.readAsText(file);
   };
 
+  const handleClear = () => {
+    setTestCases([]);
+    toast("Test cases cleared", {
+      description: "All test cases have been removed",
+    });
+  };
+
   return (
     <div className="space-y-8">
       <Card className="p-6">
@@ -66,6 +86,10 @@ const TestCases = () => {
               <Upload className="w-4 h-4 mr-2" />
               Upload CSV
             </Button>
+            <Button variant="destructive" onClick={handleClear}>
+              <Trash2 className="w-4 h-4 mr-2" />
+              Clear
+            </Button>
           </div>
         </div>
       </Card>
@@ -78,15 +102,19 @@ const TestCases = () => {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>URL</TableHead>
-                    <TableHead>Referral Source</TableHead>
+                    <TableHead className="w-1/2">URL</TableHead>
+                    <TableHead className="w-1/2">Referral Source</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {testCases.map((testCase, index) => (
                     <TableRow key={index}>
-                      <TableCell>{testCase.url}</TableCell>
-                      <TableCell>{testCase.referralSource || "-"}</TableCell>
+                      <TableCell className="truncate max-w-[300px]">
+                        {testCase.url}
+                      </TableCell>
+                      <TableCell className="truncate max-w-[300px]">
+                        {testCase.referralSource || "-"}
+                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
