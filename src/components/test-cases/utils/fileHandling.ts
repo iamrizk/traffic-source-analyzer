@@ -6,6 +6,16 @@ export interface TestCase {
   referralSource: string;
 }
 
+// Utility function to validate URLs
+const isValidUrl = (urlString: string): boolean => {
+  try {
+    const url = new URL(urlString.startsWith('http') ? urlString : `https://${urlString}`);
+    return url.protocol === 'http:' || url.protocol === 'https:';
+  } catch {
+    return false;
+  }
+};
+
 // Compress data before storing - with better compression ratio
 const compressData = (data: any[]): string => {
   try {
