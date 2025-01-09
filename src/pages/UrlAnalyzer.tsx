@@ -1,30 +1,23 @@
-import { useState } from "react";
 import { UrlForm } from "@/components/analyzer/UrlForm";
 import { AnalysisSummary } from "@/components/analyzer/AnalysisSummary";
 import { AnalysisResults } from "@/components/analyzer/AnalysisResults";
 import { ParametersDisplay } from "@/components/analyzer/ParametersDisplay";
-import { RuleMatch } from "@/types/analyzer";
 import { useRules } from "@/hooks/useRules";
+import { useUrlAnalyzer } from "@/hooks/useUrlAnalyzer";
 
 const UrlAnalyzer = () => {
   const { rules } = useRules();
-  const [url, setUrl] = useState("");
-  const [referralSource, setReferralSource] = useState("");
-  const [matches, setMatches] = useState<RuleMatch[]>([]);
-  const [parameters, setParameters] = useState<Record<string, string>>({});
-
-  const parseUrl = (urlString: string) => {
-    try {
-      const url = new URL(urlString);
-      const parameters: Record<string, string> = {};
-      url.searchParams.forEach((value, key) => {
-        parameters[key] = value;
-      });
-      return parameters;
-    } catch (error) {
-      return {};
-    }
-  };
+  const {
+    url,
+    setUrl,
+    referralSource,
+    setReferralSource,
+    matches,
+    setMatches,
+    parameters,
+    setParameters,
+    parseUrl,
+  } = useUrlAnalyzer();
 
   const analyzeUrl = () => {
     const urlParameters = parseUrl(url);
