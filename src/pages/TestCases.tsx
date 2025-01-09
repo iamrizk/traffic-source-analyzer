@@ -87,31 +87,52 @@ const TestCases = () => {
       }
 
       // Get headers and normalize them
-      const headers = lines[0].split(',').map(header => 
-        header.trim().toLowerCase().replace(/[^a-z0-9]/g, '')
-      );
-
-      // Find the correct column indices
+      const headers = lines[0].toLowerCase().split(',').map(h => h.trim());
+      
+      // Find URL column - check for various possible header names
       const urlIndex = headers.findIndex(h => 
-        h.includes('url') || h.includes('link') || h.includes('address')
-      );
-      const sourceIndex = headers.findIndex(h => 
-        h.includes('source') || h.includes('referral') || h.includes('referrer') || h.includes('origin')
+        h === 'url' || 
+        h === 'link' || 
+        h === 'website' || 
+        h === 'address' ||
+        h.includes('url') ||
+        h.includes('link')
       );
 
-      if (urlIndex === -1 || sourceIndex === -1) {
-        throw new Error('Required columns not found in CSV. Need URL and Source columns.');
+      // Find Source column - check for various possible header names
+      const sourceIndex = headers.findIndex(h => 
+        h === 'source' || 
+        h === 'referral' || 
+        h === 'referrer' || 
+        h === 'origin' ||
+        h.includes('source') ||
+        h.includes('referral')
+      );
+
+      if (urlIndex === -1) {
+        throw new Error('URL column not found in CSV. Please ensure there is a column with "url" or "link" in its name.');
+      }
+
+      if (sourceIndex === -1) {
+        throw new Error('Source column not found in CSV. Please ensure there is a column with "source" or "referral" in its name.');
       }
 
       const parsedTestCases = lines.slice(1)
         .map(line => {
           const values = line.split(',').map(v => v.trim());
-          return {
-            url: values[urlIndex],
-            referralSource: values[sourceIndex]
-          };
+          if (values.length >= Math.max(urlIndex, sourceIndex) + 1) {
+            return {
+              url: values[urlIndex],
+              referralSource: values[sourceIndex] || 'direct'
+            };
+          }
+          return null;
         })
-        .filter(testCase => testCase.url && testCase.referralSource);
+        .filter((testCase): testCase is TestCase => 
+          testCase !== null && 
+          testCase.url && 
+          testCase.url.length > 0
+        );
 
       if (parsedTestCases.length === 0) {
         throw new Error('No valid test cases found in file');
