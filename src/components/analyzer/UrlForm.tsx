@@ -22,10 +22,6 @@ export const UrlForm = ({
   onAnalyze,
   onClear,
 }: UrlFormProps) => {
-  // Keep track of the last analyzed values
-  let lastAnalyzedUrl = url;
-  let lastAnalyzedReferral = referralSource;
-
   const handleRandomize = () => {
     const savedTestCases = localStorage.getItem('testCases');
     if (!savedTestCases) {
@@ -46,25 +42,13 @@ export const UrlForm = ({
     const randomIndex = Math.floor(Math.random() * testCases.length);
     const selectedCase = testCases[randomIndex];
     
-    // Update both URL and referral source synchronously
     onUrlChange(selectedCase.url);
     onReferralChange(selectedCase.referralSource || "");
     
-    // Update last analyzed values
-    lastAnalyzedUrl = selectedCase.url;
-    lastAnalyzedReferral = selectedCase.referralSource || "";
-    
-    // Trigger analysis immediately after state updates
-    onAnalyze();
-  };
-
-  const handleAnalyze = () => {
-    // Only analyze if the values have changed since last analysis
-    if (url !== lastAnalyzedUrl || referralSource !== lastAnalyzedReferral) {
-      lastAnalyzedUrl = url;
-      lastAnalyzedReferral = referralSource;
+    // Use setTimeout to ensure state updates are processed before analysis
+    setTimeout(() => {
       onAnalyze();
-    }
+    }, 0);
   };
 
   return (
@@ -90,7 +74,7 @@ export const UrlForm = ({
           />
         </div>
         <div className="flex gap-4">
-          <Button onClick={handleAnalyze} className="flex-1">
+          <Button onClick={onAnalyze} className="flex-1">
             Analyze URL
           </Button>
           <Button 
