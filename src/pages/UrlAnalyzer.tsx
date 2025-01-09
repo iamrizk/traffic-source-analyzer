@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useRules } from "@/hooks/useRules";
 import { RuleDisplay } from "@/components/rule/RuleDisplay";
-import { UrlForm } from "@/components/analyzer/UrlForm";
 
 interface AnalysisResult {
   url: string;
@@ -20,7 +19,6 @@ interface AnalysisResult {
 const UrlAnalyzer = () => {
   const { rules } = useRules();
   const [url, setUrl] = useState("");
-  const [referralSource, setReferralSource] = useState("");
   const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
 
   const parseUrl = (urlString: string) => {
@@ -32,12 +30,12 @@ const UrlAnalyzer = () => {
       });
       return {
         parameters,
-        referral: referralSource || null,
+        referral: document.referrer || null,
       };
     } catch (error) {
       return {
         parameters: {},
-        referral: referralSource || null,
+        referral: document.referrer || null,
       };
     }
   };
@@ -154,13 +152,20 @@ const UrlAnalyzer = () => {
 
   return (
     <div className="space-y-8">
-      <UrlForm
-        url={url}
-        referralSource={referralSource}
-        onUrlChange={setUrl}
-        onReferralChange={setReferralSource}
-        onAnalyze={() => analyzeUrl(url)}
-      />
+      <Card className="p-6">
+        <h2 className="text-2xl font-semibold mb-6">URL Analyzer</h2>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="flex gap-4">
+            <Input
+              value={url}
+              onChange={(e) => setUrl(e.target.value)}
+              placeholder="Enter URL to analyze"
+              className="flex-1"
+            />
+            <Button type="submit">Analyze</Button>
+          </div>
+        </form>
+      </Card>
 
       {analysisResult && (
         <Card className="p-6">
