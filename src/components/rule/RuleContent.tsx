@@ -5,6 +5,8 @@ import { RuleDisplay } from "./RuleDisplay";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
+import { Button } from "../ui/button";
+import { Plus, Trash2 } from "lucide-react";
 
 interface RuleContentProps {
   isEditing: boolean;
@@ -53,6 +55,21 @@ export const RuleContent = ({ isEditing, editedRule, setEditedRule, rule }: Rule
     });
   };
 
+  const addCondition = () => {
+    setEditedRule({
+      ...editedRule,
+      conditions: [...editedRule.conditions, { type: "parameter", parameter: "", operator: "exists" as const }],
+    });
+  };
+
+  const deleteCondition = (index: number) => {
+    const updatedConditions = editedRule.conditions.filter((_, i) => i !== index);
+    setEditedRule({
+      ...editedRule,
+      conditions: updatedConditions,
+    });
+  };
+
   return isEditing ? (
     <div className="space-y-4">
       <div className="space-y-2">
@@ -84,14 +101,31 @@ export const RuleContent = ({ isEditing, editedRule, setEditedRule, rule }: Rule
 
       <div className="space-y-4">
         {editedRule.conditions.map((condition, condIndex) => (
-          <RuleCondition
-            key={condIndex}
-            condition={condition}
-            conditionIndex={condIndex}
-            updateCondition={updateCondition}
-          />
+          <div key={condIndex} className="flex gap-2">
+            <div className="flex-1">
+              <RuleCondition
+                condition={condition}
+                conditionIndex={condIndex}
+                updateCondition={updateCondition}
+              />
+            </div>
+            <Button
+              variant="destructive"
+              size="icon"
+              onClick={() => deleteCondition(condIndex)}
+              className="mt-6"
+              disabled={editedRule.conditions.length <= 1}
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          </div>
         ))}
       </div>
+
+      <Button onClick={addCondition} variant="outline" className="w-full">
+        <Plus className="w-4 h-4 mr-2" />
+        Add Condition
+      </Button>
 
       <RuleOutput
         type={editedRule.output.type}
