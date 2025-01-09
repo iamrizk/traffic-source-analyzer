@@ -38,7 +38,20 @@ export const RuleItem = ({
 
   const updateCondition = (conditionIndex: number, field: string, value: string) => {
     const updatedConditions = [...editedRule.conditions];
-    updatedConditions[conditionIndex] = { ...updatedConditions[conditionIndex], [field]: value };
+    if (field === "type") {
+      // Reset condition when type changes
+      updatedConditions[conditionIndex] = value === "parameter"
+        ? { type: "parameter", parameter: "", operator: "exists" }
+        : { type: "referral", value: "" };
+    } else {
+      // Type guard to ensure type safety
+      const condition = updatedConditions[conditionIndex];
+      if (condition.type === "parameter" && (field === "parameter" || field === "operator")) {
+        condition[field] = value;
+      } else if (condition.type === "referral" && field === "value") {
+        condition.value = value;
+      }
+    }
     setEditedRule({ ...editedRule, conditions: updatedConditions });
   };
 

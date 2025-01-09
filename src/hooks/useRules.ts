@@ -1,11 +1,21 @@
 import { useState, useEffect } from "react";
 
-export interface Condition {
+interface BaseCondition {
   type: "parameter" | "referral";
-  parameter?: string;
-  operator?: "exists" | "not_exists";
-  value?: string;
 }
+
+interface ParameterCondition extends BaseCondition {
+  type: "parameter";
+  parameter: string;
+  operator: "exists" | "not_exists";
+}
+
+interface ReferralCondition extends BaseCondition {
+  type: "referral";
+  value: string;
+}
+
+export type Condition = ParameterCondition | ReferralCondition;
 
 export interface Rule {
   conditions: Condition[];

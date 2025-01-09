@@ -11,8 +11,8 @@ import { RuleItem } from "@/components/RuleItem";
 
 const Settings = () => {
   const { rules, setRules, updateRule, deleteRule, moveRuleUp, moveRuleDown } = useRules();
-  const [newRule, setNewRule] = useState({
-    conditions: [{ type: "parameter" as const, parameter: "", operator: "exists" as const }],
+  const [newRule, setNewRule] = useState<Rule>({
+    conditions: [{ type: "parameter", parameter: "", operator: "exists" }],
     output: { type: "", platform: "", channel: "" },
   });
 
@@ -32,7 +32,20 @@ const Settings = () => {
 
   const updateCondition = (index: number, field: string, value: string) => {
     const updatedConditions = [...newRule.conditions];
-    updatedConditions[index] = { ...updatedConditions[index], [field]: value };
+    if (field === "type") {
+      // Reset condition when type changes
+      updatedConditions[index] = value === "parameter"
+        ? { type: "parameter", parameter: "", operator: "exists" }
+        : { type: "referral", value: "" };
+    } else {
+      // Type guard to ensure type safety
+      const condition = updatedConditions[index];
+      if (condition.type === "parameter" && (field === "parameter" || field === "operator")) {
+        condition[field] = value;
+      } else if (condition.type === "referral" && field === "value") {
+        condition.value = value;
+      }
+    }
     setNewRule({ ...newRule, conditions: updatedConditions });
   };
 
