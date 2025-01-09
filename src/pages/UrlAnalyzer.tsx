@@ -120,14 +120,14 @@ const UrlAnalyzer = () => {
         onAnalyze={parseUrl}
       />
 
-      <ParametersDisplay parameters={parameters} />
-
       {(matches.length > 0 || Object.keys(parameters).length > 0) && (
         <Card className="p-6">
           <h3 className="text-xl font-semibold mb-4">Analysis Summary</h3>
           <AnalysisSummary matches={matches} />
         </Card>
       )}
+
+      <ParametersDisplay parameters={parameters} />
 
       <AnalysisResults matches={matches} />
     </div>
