@@ -8,7 +8,7 @@ const GettingStarted = () => {
     try {
       const response = await fetch('/starter-config.json');
       if (!response.ok) {
-        throw new Error('Failed to fetch configuration file');
+        throw new Error(`Failed to fetch configuration file: ${response.status}`);
       }
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
@@ -22,7 +22,9 @@ const GettingStarted = () => {
       toast.success("Starting configuration download");
     } catch (error) {
       console.error('Error downloading config:', error);
-      toast.error("Failed to download configuration");
+      toast.error("Failed to download configuration", {
+        description: error instanceof Error ? error.message : "Unknown error occurred"
+      });
     }
   };
 
@@ -30,7 +32,7 @@ const GettingStarted = () => {
     try {
       const response = await fetch(`/test-case-${fileNumber}.csv`);
       if (!response.ok) {
-        throw new Error(`Failed to fetch test case ${fileNumber}`);
+        throw new Error(`Failed to fetch test case ${fileNumber}: ${response.status}`);
       }
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
@@ -44,7 +46,9 @@ const GettingStarted = () => {
       toast.success(`Test case #${fileNumber} download started`);
     } catch (error) {
       console.error('Error downloading test case:', error);
-      toast.error(`Failed to download test case ${fileNumber}`);
+      toast.error(`Failed to download test case ${fileNumber}`, {
+        description: error instanceof Error ? error.message : "Unknown error occurred"
+      });
     }
   };
 

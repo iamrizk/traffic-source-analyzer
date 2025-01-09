@@ -73,7 +73,7 @@ const Settings = () => {
       const response = await fetch('/starter-config.json');
       if (!response.ok) {
         console.error('Failed to load starter config:', response.status, response.statusText);
-        throw new Error('Failed to load starter config');
+        throw new Error(`Failed to load starter config: ${response.status}`);
       }
       const starterConfig = await response.json();
       setRules(starterConfig);
@@ -81,7 +81,7 @@ const Settings = () => {
     } catch (error) {
       console.error('Error loading starter configuration:', error);
       toast.error("Error loading starter configuration", {
-        description: "Please try again later or contact support if the issue persists.",
+        description: error instanceof Error ? error.message : "Please try again later or contact support if the issue persists.",
       });
     }
   };
