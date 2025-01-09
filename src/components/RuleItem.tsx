@@ -41,13 +41,15 @@ export const RuleItem = ({
     if (field === "type") {
       // Reset condition when type changes
       updatedConditions[conditionIndex] = value === "parameter"
-        ? { type: "parameter", parameter: "", operator: "exists" }
+        ? { type: "parameter", parameter: "", operator: "exists" as const }
         : { type: "referral", value: "" };
     } else {
       // Type guard to ensure type safety
       const condition = updatedConditions[conditionIndex];
-      if (condition.type === "parameter" && (field === "parameter" || field === "operator")) {
-        condition[field] = value;
+      if (condition.type === "parameter" && field === "parameter") {
+        condition.parameter = value;
+      } else if (condition.type === "parameter" && field === "operator") {
+        condition.operator = value as "exists" | "not_exists";
       } else if (condition.type === "referral" && field === "value") {
         condition.value = value;
       }

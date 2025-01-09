@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useRules } from "@/hooks/useRules";
+import { useRules, Rule } from "@/hooks/useRules";
 import { toast } from "sonner";
 import { Plus, Download, Upload, X } from "lucide-react";
 import { RuleItem } from "@/components/RuleItem";
@@ -12,7 +12,7 @@ import { RuleItem } from "@/components/RuleItem";
 const Settings = () => {
   const { rules, setRules, updateRule, deleteRule, moveRuleUp, moveRuleDown } = useRules();
   const [newRule, setNewRule] = useState<Rule>({
-    conditions: [{ type: "parameter", parameter: "", operator: "exists" }],
+    conditions: [{ type: "parameter", parameter: "", operator: "exists" as const }],
     output: { type: "", platform: "", channel: "" },
   });
 
