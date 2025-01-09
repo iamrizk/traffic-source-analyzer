@@ -11,10 +11,10 @@ export const Navbar = () => {
   ];
 
   return (
-    <nav className="bg-white shadow-sm">
-      <div className="container mx-auto px-4 py-4">
+    <nav className="bg-white border-b">
+      <div className="container mx-auto px-4">
         <PageHeader />
-        <div className="flex h-16 items-center justify-between border-t mt-4">
+        <div className="flex h-16 items-center justify-between border-t">
           <div className="flex items-center space-x-8">
             {links.map((link) => (
               <Link
