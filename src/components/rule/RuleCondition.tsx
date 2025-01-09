@@ -35,10 +35,11 @@ export const RuleCondition = ({
       {condition.type === "parameter" && (
         <>
           <div className="flex-1">
-            <Label>Parameter</Label>
+            <Label>Parameter Name</Label>
             <Input
               value={condition.parameter}
               onChange={(e) => updateCondition(conditionIndex, "parameter", e.target.value)}
+              placeholder="Parameter name"
             />
           </div>
           <div className="flex-1">
@@ -60,7 +61,7 @@ export const RuleCondition = ({
           </div>
           {["equals", "not_equals"].includes(condition.operator) && (
             <div className="flex-1">
-              <Label>Value</Label>
+              <Label>Parameter Value</Label>
               <Input
                 value={condition.value || ""}
                 onChange={(e) => updateCondition(conditionIndex, "value", e.target.value)}
@@ -77,6 +78,7 @@ export const RuleCondition = ({
           <Input
             value={condition.value || ""}
             onChange={(e) => updateCondition(conditionIndex, "value", e.target.value)}
+            placeholder="Referral source"
           />
         </div>
       )}
