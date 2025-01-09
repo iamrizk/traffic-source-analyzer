@@ -92,10 +92,14 @@ export const TestCasesTable = ({ testCases }: TestCasesTableProps) => {
                   {(currentPage - 1) * ITEMS_PER_PAGE + index + 1}
                 </TableCell>
                 <TableCell className="truncate max-w-[300px]">
-                  {testCase.url}
+                  <div className="select-text cursor-text">
+                    {testCase.url}
+                  </div>
                 </TableCell>
                 <TableCell className="truncate max-w-[300px]">
-                  {testCase.referralSource || "-"}
+                  <div className="select-text cursor-text">
+                    {testCase.referralSource || "-"}
+                  </div>
                 </TableCell>
               </TableRow>
             ))}
