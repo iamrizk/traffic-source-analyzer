@@ -30,6 +30,9 @@ const TestCases = () => {
 
   const loadSampleTestCases = async (filename: string) => {
     try {
+      // Clear localStorage before loading new test cases
+      localStorage.clear();
+      
       const response = await fetch(`/${filename}`);
       if (!response.ok) {
         throw new Error(`Failed to fetch ${filename}: ${response.status} ${response.statusText}`);
