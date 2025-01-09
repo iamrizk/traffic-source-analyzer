@@ -80,6 +80,7 @@ export const TestCasesTable = ({ testCases }: TestCasesTableProps) => {
         <Table>
           <TableHeader>
             <TableRow>
+              <TableHead className="w-[80px]">No.</TableHead>
               <TableHead className="w-1/2">URL</TableHead>
               <TableHead className="w-1/2">Referral Source</TableHead>
             </TableRow>
@@ -87,6 +88,9 @@ export const TestCasesTable = ({ testCases }: TestCasesTableProps) => {
           <TableBody>
             {paginatedData.map((testCase, index) => (
               <TableRow key={index}>
+                <TableCell className="font-medium">
+                  {(currentPage - 1) * ITEMS_PER_PAGE + index + 1}
+                </TableCell>
                 <TableCell className="truncate max-w-[300px]">
                   {testCase.url}
                 </TableCell>
