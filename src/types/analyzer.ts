@@ -1,3 +1,5 @@
+import { Condition } from "@/hooks/useRules";
+
 export interface RuleMatch {
   ruleIndex: number;
   ruleName: string;
@@ -7,4 +9,5 @@ export interface RuleMatch {
     channel: string;
   };
   matchDetails: string[];
+  conditions: Condition[];
 }

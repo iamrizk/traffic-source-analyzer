@@ -1,7 +1,7 @@
 import { Card } from "@/components/ui/card";
 import { RuleMatch } from "@/types/analyzer";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, Check, X } from "lucide-react";
 
 interface AnalysisResultsProps {
   matches: RuleMatch[];
@@ -23,11 +23,19 @@ export const AnalysisResults = ({ matches }: AnalysisResultsProps) => {
             
             <CollapsibleContent>
               <div className="space-y-2 mt-4">
-                {match.matchDetails.map((detail, detailIndex) => (
-                  <div key={detailIndex} className="p-2 bg-gray-50 rounded text-sm">
-                    {detail}
-                  </div>
-                ))}
+                {match.matchDetails.map((detail, detailIndex) => {
+                  const isMatched = !detail.includes("not met");
+                  return (
+                    <div key={detailIndex} className="flex justify-between items-center p-2 bg-gray-50 rounded text-sm">
+                      <span>{detail}</span>
+                      {isMatched ? (
+                        <Check className="w-4 h-4 text-green-500 ml-2" />
+                      ) : (
+                        <X className="w-4 h-4 text-red-500 ml-2" />
+                      )}
+                    </div>
+                  );
+                })}
               </div>
 
               <div className="space-y-2 mt-4">
