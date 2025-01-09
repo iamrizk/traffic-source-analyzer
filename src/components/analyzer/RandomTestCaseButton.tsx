@@ -16,53 +16,30 @@ export const RandomTestCaseButton = ({
   onAnalyze,
   onClear,
 }: RandomTestCaseButtonProps) => {
-  const handleRandomize = () => {
+  const handleRandomize = async () => {
     const testCases = loadTestCases();
     if (testCases.length === 0) return;
 
-    let attempts = 0;
-    const maxAttempts = 10;
+    // Step 1: Clear all states and results
+    onClear();
 
-    const tryAnalysis = () => {
-      if (attempts >= maxAttempts) {
-        toast.error("Could not find a passing test case", {
-          description: "Tried 10 different test cases without success",
-        });
-        return;
-      }
+    // Step 2: Get a random test case
+    const selectedCase = getRandomTestCase(testCases);
+    
+    // Step 3: Set the new input values
+    onUrlChange(selectedCase.url);
+    onReferralChange(selectedCase.referralSource || "");
 
-      attempts++;
-      
-      // Clear previous state
-      onClear();
-      
-      // Get a random test case
-      const selectedCase = getRandomTestCase(testCases);
-      
-      // Update the input fields
-      onUrlChange(selectedCase.url);
-      onReferralChange(selectedCase.referralSource || "");
-      
-      // Analyze after a short delay to ensure state updates
-      setTimeout(() => {
-        onAnalyze();
-        
-        // Check audit status
-        setTimeout(() => {
-          const auditElement = document.querySelector('[data-audit-status="failed"]');
-          if (auditElement && attempts < maxAttempts) {
-            console.log(`Analysis audit failed, attempt ${attempts} of ${maxAttempts}`);
-            tryAnalysis();
-          } else if (!auditElement) {
-            toast.success("Analysis completed successfully", {
-              description: "Found a test case that passes all conditions",
-            });
-          }
-        }, 100);
-      }, 100);
-    };
+    // Step 4: Wait for state updates to complete
+    await new Promise(resolve => setTimeout(resolve, 100));
 
-    tryAnalysis();
+    // Step 5: Trigger analysis
+    onAnalyze();
+
+    // Step 6: Show success message
+    toast.success("Random test case loaded and analyzed", {
+      description: "A new test case has been loaded and analyzed successfully.",
+    });
   };
 
   return (
