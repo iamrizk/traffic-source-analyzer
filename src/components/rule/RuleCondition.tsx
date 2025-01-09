@@ -17,9 +17,15 @@ export const RuleCondition = ({
   return (
     <div className="flex space-x-4">
       <div className="flex-1">
-        <Label>Type</Label>
+        <Label>Condition Type</Label>
         <Select
-          value={condition.type}
+          value={
+            condition.operator === "not_present"
+              ? condition.type === "parameter"
+                ? "no_parameter"
+                : "no_referral"
+              : condition.type
+          }
           onValueChange={(value) => updateCondition(conditionIndex, "type", value)}
         >
           <SelectTrigger>
@@ -28,11 +34,13 @@ export const RuleCondition = ({
           <SelectContent>
             <SelectItem value="parameter">Parameter</SelectItem>
             <SelectItem value="referral">Referral</SelectItem>
+            <SelectItem value="no_parameter">No Parameters</SelectItem>
+            <SelectItem value="no_referral">No Referral</SelectItem>
           </SelectContent>
         </Select>
       </div>
 
-      {condition.type === "parameter" && (
+      {condition.type === "parameter" && condition.operator !== "not_present" && (
         <>
           <div className="flex-1">
             <Label>Parameter Name</Label>
@@ -54,7 +62,6 @@ export const RuleCondition = ({
               <SelectContent>
                 <SelectItem value="exists">Exists</SelectItem>
                 <SelectItem value="not_exists">Does not exist</SelectItem>
-                <SelectItem value="not_present">Not present</SelectItem>
                 <SelectItem value="equals">Equals</SelectItem>
                 <SelectItem value="not_equals">Does not equal</SelectItem>
               </SelectContent>
@@ -73,7 +80,7 @@ export const RuleCondition = ({
         </>
       )}
 
-      {condition.type === "referral" && (
+      {condition.type === "referral" && condition.operator !== "not_present" && (
         <>
           <div className="flex-1">
             <Label>Operator</Label>
@@ -87,20 +94,17 @@ export const RuleCondition = ({
               <SelectContent>
                 <SelectItem value="equals">Equals</SelectItem>
                 <SelectItem value="contains">Contains</SelectItem>
-                <SelectItem value="not_present">Not present</SelectItem>
               </SelectContent>
             </Select>
           </div>
-          {condition.operator !== "not_present" && (
-            <div className="flex-1">
-              <Label>Value</Label>
-              <Input
-                value={condition.value || ""}
-                onChange={(e) => updateCondition(conditionIndex, "value", e.target.value)}
-                placeholder="Referral source"
-              />
-            </div>
-          )}
+          <div className="flex-1">
+            <Label>Value</Label>
+            <Input
+              value={condition.value || ""}
+              onChange={(e) => updateCondition(conditionIndex, "value", e.target.value)}
+              placeholder="Referral source"
+            />
+          </div>
         </>
       )}
     </div>
