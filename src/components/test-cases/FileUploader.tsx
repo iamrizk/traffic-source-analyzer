@@ -15,6 +15,7 @@ const MAX_STORAGE_SIZE = 4 * 1024 * 1024; // 4MB limit to be safe
 export const FileUploader = ({ onUploadSuccess, onClear }: FileUploaderProps) => {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isUploading, setIsUploading] = useState(false);
+  const [fileName, setFileName] = useState("");
 
   const isValidUrl = (urlString: string): boolean => {
     try {
@@ -35,6 +36,7 @@ export const FileUploader = ({ onUploadSuccess, onClear }: FileUploaderProps) =>
       return;
     }
 
+    setFileName(file.name);
     setIsUploading(true);
     setUploadProgress(0);
 
@@ -101,11 +103,14 @@ export const FileUploader = ({ onUploadSuccess, onClear }: FileUploaderProps) =>
           setUploadProgress(0);
         }, 500);
       });
-      
-      event.target.value = '';
     };
 
     reader.readAsText(file);
+  };
+
+  const handleClear = () => {
+    setFileName("");
+    onClear();
   };
 
   return (
@@ -116,12 +121,14 @@ export const FileUploader = ({ onUploadSuccess, onClear }: FileUploaderProps) =>
           accept=".csv"
           onChange={handleFileUpload}
           className="max-w-md"
+          value={fileName ? "" : undefined}
+          key={fileName} // Force re-render when cleared
         />
         <Button disabled={isUploading}>
           <Upload className="w-4 h-4 mr-2" />
           Upload CSV
         </Button>
-        <Button variant="destructive" onClick={onClear}>
+        <Button variant="destructive" onClick={handleClear}>
           <Trash2 className="w-4 h-4 mr-2" />
           Clear
         </Button>

@@ -46,12 +46,12 @@ export const TestCasesTable = ({ testCases }: TestCasesTableProps) => {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between gap-4">
+      <div className="flex items-center justify-between gap-8">
         <h3 className="text-xl font-semibold whitespace-nowrap">Uploaded Test Cases</h3>
         {totalPages > 1 && (
           <div className="flex-shrink-0">
             <Pagination>
-              <PaginationContent className="gap-2">
+              <PaginationContent className="gap-4">
                 <PaginationItem>
                   <PaginationPrevious
                     onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
@@ -59,8 +59,8 @@ export const TestCasesTable = ({ testCases }: TestCasesTableProps) => {
                   />
                 </PaginationItem>
                 <PaginationItem>
-                  <PaginationLink className="cursor-default whitespace-nowrap">
-                    Page {currentPage} of {totalPages}
+                  <PaginationLink className="cursor-default whitespace-nowrap min-w-[100px] text-center">
+                    {currentPage} of {totalPages}
                   </PaginationLink>
                 </PaginationItem>
                 <PaginationItem>
