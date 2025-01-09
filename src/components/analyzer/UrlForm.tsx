@@ -22,7 +22,7 @@ export const UrlForm = ({
   onAnalyze,
   onClear,
 }: UrlFormProps) => {
-  const handleRandomize = () => {
+  const handleRandomize = async () => {
     const savedTestCases = localStorage.getItem('testCases');
     if (!savedTestCases) {
       toast("No test cases available", {
@@ -42,15 +42,17 @@ export const UrlForm = ({
     const randomIndex = Math.floor(Math.random() * testCases.length);
     const selectedCase = testCases[randomIndex];
     
+    // Update the state synchronously
     onUrlChange(selectedCase.url);
     onReferralChange(selectedCase.referralSource || "");
+
+    // Wait for the next frame to ensure state is updated
+    await new Promise(resolve => requestAnimationFrame(resolve));
+    // Wait one more frame to be extra sure
+    await new Promise(resolve => requestAnimationFrame(resolve));
     
-    // Use requestAnimationFrame to ensure state updates are processed
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        onAnalyze();
-      });
-    });
+    // Now analyze with the updated values
+    onAnalyze();
   };
 
   return (
