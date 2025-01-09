@@ -9,6 +9,7 @@ import {
 import { useMemo, useState } from "react";
 import { TestCaseRow } from "./TestCaseRow";
 import { TablePagination } from "./TablePagination";
+import { ITEMS_PER_PAGE } from "./utils/constants";
 
 interface TestCase {
   url: string;
@@ -18,8 +19,6 @@ interface TestCase {
 interface TestCasesTableProps {
   testCases: TestCase[];
 }
-
-const ITEMS_PER_PAGE = 10;
 
 export const TestCasesTable = ({ testCases }: TestCasesTableProps) => {
   const [currentPage, setCurrentPage] = useState(1);

@@ -1,18 +1,14 @@
 import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Upload, Trash2 } from "lucide-react";
 import { toast } from "sonner";
-import { FileInput } from "./FileInput";
+import { UploadControls } from "./UploadControls";
 import { UploadProgress } from "./UploadProgress";
 import { parseCSVData, saveTestCases } from "./utils/fileHandling";
+import { MAX_FILE_SIZE, MAX_ROWS } from "./utils/constants";
 
 interface FileUploaderProps {
   onUploadSuccess: (testCases: { url: string; referralSource: string }[]) => void;
   onClear: () => void;
 }
-
-const MAX_FILE_SIZE = 4 * 1024 * 1024; // 4MB limit
-const MAX_ROWS = 9001; // Maximum number of rows to process
 
 export const FileUploader = ({ onUploadSuccess, onClear }: FileUploaderProps) => {
   const [uploadProgress, setUploadProgress] = useState(0);
@@ -102,17 +98,12 @@ export const FileUploader = ({ onUploadSuccess, onClear }: FileUploaderProps) =>
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center gap-4">
-        <FileInput fileName={fileName} onFileChange={handleFileUpload} />
-        <Button disabled={isUploading}>
-          <Upload className="w-4 h-4 mr-2" />
-          Upload CSV
-        </Button>
-        <Button variant="destructive" onClick={handleClear}>
-          <Trash2 className="w-4 h-4 mr-2" />
-          Clear
-        </Button>
-      </div>
+      <UploadControls
+        fileName={fileName}
+        isUploading={isUploading}
+        onFileChange={handleFileUpload}
+        onClear={handleClear}
+      />
       <UploadProgress isUploading={isUploading} progress={uploadProgress} />
     </div>
   );
