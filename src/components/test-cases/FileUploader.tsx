@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -16,6 +16,14 @@ export const FileUploader = ({ onUploadSuccess, onClear }: FileUploaderProps) =>
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isUploading, setIsUploading] = useState(false);
   const [fileName, setFileName] = useState("");
+
+  // Load filename from localStorage on component mount
+  useEffect(() => {
+    const savedFileName = localStorage.getItem('uploadedFileName');
+    if (savedFileName) {
+      setFileName(savedFileName);
+    }
+  }, []);
 
   const isValidUrl = (urlString: string): boolean => {
     try {
@@ -37,6 +45,9 @@ export const FileUploader = ({ onUploadSuccess, onClear }: FileUploaderProps) =>
     }
 
     setFileName(file.name);
+    // Save filename to localStorage
+    localStorage.setItem('uploadedFileName', file.name);
+    
     setIsUploading(true);
     setUploadProgress(0);
 
@@ -110,6 +121,8 @@ export const FileUploader = ({ onUploadSuccess, onClear }: FileUploaderProps) =>
 
   const handleClear = () => {
     setFileName("");
+    // Clear filename from localStorage
+    localStorage.removeItem('uploadedFileName');
     onClear();
   };
 
