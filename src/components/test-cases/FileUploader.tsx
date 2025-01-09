@@ -129,13 +129,20 @@ export const FileUploader = ({ onUploadSuccess, onClear }: FileUploaderProps) =>
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-4">
-        <Input
-          type="file"
-          accept=".csv"
-          onChange={handleFileUpload}
-          className="max-w-md"
-          placeholder={fileName || "Choose a file..."}
-        />
+        <div className="relative flex-1 max-w-md">
+          <Input
+            type="file"
+            accept=".csv"
+            onChange={handleFileUpload}
+            className="max-w-md"
+            value=""
+          />
+          {fileName && (
+            <div className="absolute inset-0 pointer-events-none flex items-center px-3 text-sm text-muted-foreground">
+              {fileName}
+            </div>
+          )}
+        </div>
         <Button disabled={isUploading}>
           <Upload className="w-4 h-4 mr-2" />
           Upload CSV
