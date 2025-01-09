@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useRules } from "@/hooks/useRules";
 import { RuleDisplay } from "@/components/rule/RuleDisplay";
+import { UrlForm } from "@/components/analyzer/UrlForm";
 
 interface AnalysisResult {
   url: string;
@@ -19,6 +20,7 @@ interface AnalysisResult {
 const UrlAnalyzer = () => {
   const { rules } = useRules();
   const [url, setUrl] = useState("");
+  const [referralSource, setReferralSource] = useState("");
   const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
 
   const parseUrl = (urlString: string) => {
@@ -30,12 +32,12 @@ const UrlAnalyzer = () => {
       });
       return {
         parameters,
-        referral: document.referrer || null,
+        referral: referralSource || null,
       };
     } catch (error) {
       return {
         parameters: {},
-        referral: document.referrer || null,
+        referral: referralSource || null,
       };
     }
   };
@@ -82,7 +84,6 @@ const UrlAnalyzer = () => {
           return false;
         });
       } else {
-        // OR operator
         conditionsMet = rule.conditions.some((condition) => {
           if (condition.type === "parameter") {
             const paramExists = condition.parameter in parameters;
@@ -153,20 +154,13 @@ const UrlAnalyzer = () => {
 
   return (
     <div className="space-y-8">
-      <Card className="p-6">
-        <h2 className="text-2xl font-semibold mb-6">URL Analyzer</h2>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="flex gap-4">
-            <Input
-              value={url}
-              onChange={(e) => setUrl(e.target.value)}
-              placeholder="Enter URL to analyze"
-              className="flex-1"
-            />
-            <Button type="submit">Analyze</Button>
-          </div>
-        </form>
-      </Card>
+      <UrlForm
+        url={url}
+        referralSource={referralSource}
+        onUrlChange={setUrl}
+        onReferralChange={setReferralSource}
+        onAnalyze={() => analyzeUrl(url)}
+      />
 
       {analysisResult && (
         <Card className="p-6">
