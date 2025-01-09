@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
 import { Upload, Trash2 } from "lucide-react";
 import { toast } from "sonner";
+import { FileInput } from "./FileInput";
+import { UploadProgress } from "./UploadProgress";
+import { parseCSVData } from "./utils/fileHandling";
 
 interface FileUploaderProps {
   onUploadSuccess: (testCases: { url: string; referralSource: string }[]) => void;
@@ -17,21 +18,12 @@ export const FileUploader = ({ onUploadSuccess, onClear }: FileUploaderProps) =>
   const [isUploading, setIsUploading] = useState(false);
   const [fileName, setFileName] = useState("");
 
-  // Load filename from localStorage on component mount
   useEffect(() => {
     const savedFileName = localStorage.getItem('uploadedFileName');
     if (savedFileName) {
       setFileName(savedFileName);
     }
   }, []);
-
-  const isValidUrl = (urlString: string): boolean => {
-    try {
-      return Boolean(new URL(urlString.startsWith('http') ? urlString : `https://${urlString}`));
-    } catch (e) {
-      return false;
-    }
-  };
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -45,7 +37,6 @@ export const FileUploader = ({ onUploadSuccess, onClear }: FileUploaderProps) =>
     }
 
     setFileName(file.name);
-    // Save filename to localStorage
     localStorage.setItem('uploadedFileName', file.name);
     
     setIsUploading(true);
@@ -67,22 +58,7 @@ export const FileUploader = ({ onUploadSuccess, onClear }: FileUploaderProps) =>
     const reader = new FileReader();
     reader.onload = (e) => {
       const text = e.target?.result as string;
-      const lines = text.split("\n");
-      
-      const startIndex = isValidUrl(lines[0].split(",")[0].trim()) ? 0 : 1;
-      
-      const parsedData: { url: string; referralSource: string }[] = [];
-      
-      for (let i = startIndex; i < lines.length; i++) {
-        const line = lines[i].trim();
-        if (line === "") continue;
-
-        const [url, referralSource] = line.split(",").map(item => item.trim());
-        
-        if (isValidUrl(url)) {
-          parsedData.push({ url, referralSource });
-        }
-      }
+      const parsedData = parseCSVData(text);
 
       if (progressInterval) {
         clearInterval(progressInterval);
@@ -121,7 +97,6 @@ export const FileUploader = ({ onUploadSuccess, onClear }: FileUploaderProps) =>
 
   const handleClear = () => {
     setFileName("");
-    // Clear filename from localStorage
     localStorage.removeItem('uploadedFileName');
     onClear();
   };
@@ -129,20 +104,7 @@ export const FileUploader = ({ onUploadSuccess, onClear }: FileUploaderProps) =>
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-4">
-        <div className="relative flex-1 max-w-md">
-          <Input
-            type="file"
-            accept=".csv"
-            onChange={handleFileUpload}
-            className="max-w-md"
-            value=""
-          />
-          {fileName && (
-            <div className="absolute inset-0 pointer-events-none flex items-center px-3 text-sm text-muted-foreground">
-              {fileName}
-            </div>
-          )}
-        </div>
+        <FileInput fileName={fileName} onFileChange={handleFileUpload} />
         <Button disabled={isUploading}>
           <Upload className="w-4 h-4 mr-2" />
           Upload CSV
@@ -152,14 +114,7 @@ export const FileUploader = ({ onUploadSuccess, onClear }: FileUploaderProps) =>
           Clear
         </Button>
       </div>
-      {isUploading && (
-        <div className="space-y-2">
-          <Progress 
-            value={uploadProgress} 
-            className="w-[60%] transition-all duration-500 ease-in-out" 
-          />
-        </div>
-      )}
+      <UploadProgress isUploading={isUploading} progress={uploadProgress} />
     </div>
   );
 };
