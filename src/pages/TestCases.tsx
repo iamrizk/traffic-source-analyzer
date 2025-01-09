@@ -60,7 +60,8 @@ const TestCases = () => {
     const savedTestCases = localStorage.getItem('testCases');
     if (savedTestCases) {
       try {
-        setTestCases(JSON.parse(savedTestCases));
+        const decompressed = JSON.parse(atob(savedTestCases));
+        setTestCases(decompressed);
       } catch (error) {
         console.error('Error loading saved test cases:', error);
         toast.error("Error loading saved test cases");

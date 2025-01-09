@@ -1,4 +1,5 @@
 import { toast } from "sonner";
+import { MAX_ROWS } from "./constants";
 
 export const isValidUrl = (urlString: string): boolean => {
   try {
@@ -69,6 +70,15 @@ export const parseCSVData = (text: string): { url: string; referralSource: strin
     toast.warning(`${droppedRowCount} invalid rows were skipped`, {
       description: "These rows had invalid URLs or missing data",
     });
+  }
+
+  // Enforce MAX_ROWS limit
+  if (parsedData.length > MAX_ROWS) {
+    const removedRows = parsedData.length - MAX_ROWS;
+    toast.warning(`File exceeds maximum row limit`, {
+      description: `Only the first ${MAX_ROWS} rows will be processed. ${removedRows} rows were removed.`,
+    });
+    return parsedData.slice(0, MAX_ROWS);
   }
 
   return parsedData;
