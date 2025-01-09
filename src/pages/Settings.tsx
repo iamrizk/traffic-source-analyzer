@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useRules, Rule } from "@/hooks/useRules";
@@ -31,7 +31,6 @@ const Settings = () => {
     const dataStr = JSON.stringify(rules, null, 2);
     const dataUri = "data:application/json;charset=utf-8," + encodeURIComponent(dataStr);
     
-    // Create filename with current date and time
     const now = new Date();
     const year = now.getFullYear().toString().slice(-2);
     const month = String(now.getMonth() + 1).padStart(2, '0');
@@ -55,7 +54,6 @@ const Settings = () => {
       reader.onload = (e) => {
         try {
           const importedRules = JSON.parse(e.target?.result as string);
-          // Ensure all imported rules have conditionsOperator
           const validatedRules = importedRules.map((rule: Rule) => ({
             ...rule,
             conditionsOperator: rule.conditionsOperator || "and",
@@ -73,12 +71,18 @@ const Settings = () => {
   const loadStarterConfig = async () => {
     try {
       const response = await fetch('/starter-config.json');
-      if (!response.ok) throw new Error('Failed to load starter config');
+      if (!response.ok) {
+        console.error('Failed to load starter config:', response.status, response.statusText);
+        throw new Error('Failed to load starter config');
+      }
       const starterConfig = await response.json();
       setRules(starterConfig);
       toast.success("Starter configuration loaded successfully!");
     } catch (error) {
-      toast.error("Error loading starter configuration");
+      console.error('Error loading starter configuration:', error);
+      toast.error("Error loading starter configuration", {
+        description: "Please try again later or contact support if the issue persists.",
+      });
     }
   };
 

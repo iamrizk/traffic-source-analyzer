@@ -4,16 +4,48 @@ import { Download, FileText, Database, Info } from "lucide-react";
 import { toast } from "sonner";
 
 const GettingStarted = () => {
-  const handleDownloadConfig = () => {
-    const configUrl = "/starter-config.json";
-    window.open(configUrl, "_blank");
-    toast.success("Starting configuration download");
+  const handleDownloadConfig = async () => {
+    try {
+      const response = await fetch('/starter-config.json');
+      if (!response.ok) {
+        throw new Error('Failed to fetch configuration file');
+      }
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'starter-config.json';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+      toast.success("Starting configuration download");
+    } catch (error) {
+      console.error('Error downloading config:', error);
+      toast.error("Failed to download configuration");
+    }
   };
 
-  const handleDownloadTestCases = (fileNumber: number) => {
-    const testCaseUrl = `/test-case-${fileNumber}.csv`;
-    window.open(testCaseUrl, "_blank");
-    toast.success(`Test case #${fileNumber} download started`);
+  const handleDownloadTestCases = async (fileNumber: number) => {
+    try {
+      const response = await fetch(`/test-case-${fileNumber}.csv`);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch test case ${fileNumber}`);
+      }
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `test-case-${fileNumber}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+      toast.success(`Test case #${fileNumber} download started`);
+    } catch (error) {
+      console.error('Error downloading test case:', error);
+      toast.error(`Failed to download test case ${fileNumber}`);
+    }
   };
 
   return (
