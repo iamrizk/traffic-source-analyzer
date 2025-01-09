@@ -48,33 +48,33 @@ export const UrlForm = ({
     if (testCases.length === 0) return;
 
     const tryAnalysis = () => {
-      // Step 1: Clear all inputs and outputs
+      // Clear everything first
       onClear();
-      onUrlChange("");
-      onReferralChange("");
-
-      // Step 2: Select a random test case and populate fields
+      
+      // Get a random test case
       const selectedCase = getRandomTestCase(testCases);
+      
+      // Update the input fields
       onUrlChange(selectedCase.url);
       onReferralChange(selectedCase.referralSource || "");
-
-      // Step 3: Parse, compare, and display analysis
-      setTimeout(() => {
+      
+      // Wait for state updates to complete before analyzing
+      requestAnimationFrame(() => {
         onAnalyze();
         
-        // Step 4: Check parameter audit
-        setTimeout(() => {
+        // Check audit status after analysis
+        requestAnimationFrame(() => {
           const auditElement = document.querySelector('[data-audit-status="failed"]');
           if (auditElement) {
             console.log("Analysis audit failed, trying another test case");
-            tryAnalysis(); // Recursively try another test case if audit fails
+            tryAnalysis();
           } else {
             toast.success("Analysis completed successfully", {
               description: "Found a test case that passes all conditions",
             });
           }
-        }, 100); // Give DOM time to update
-      }, 100);
+        });
+      });
     };
 
     tryAnalysis();
