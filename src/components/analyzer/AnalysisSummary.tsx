@@ -8,7 +8,7 @@ export const AnalysisSummary = ({ matches }: AnalysisSummaryProps) => {
   if (matches.length === 0) {
     return (
       <div className="p-4 bg-yellow-50 text-yellow-700 rounded">
-        No rules matched the analyzed URL.
+        No rules matched the analyzed URL. Please check your rules configuration or try a different URL.
       </div>
     );
   }
