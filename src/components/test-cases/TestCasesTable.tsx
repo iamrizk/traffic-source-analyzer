@@ -46,7 +46,32 @@ export const TestCasesTable = ({ testCases }: TestCasesTableProps) => {
 
   return (
     <div className="space-y-4">
-      <h3 className="text-xl font-semibold">Uploaded Test Cases</h3>
+      <div className="flex items-center justify-between">
+        <h3 className="text-xl font-semibold">Uploaded Test Cases</h3>
+        {totalPages > 1 && (
+          <Pagination className="mb-4">
+            <PaginationContent>
+              <PaginationItem>
+                <PaginationPrevious
+                  onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
+                  className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                />
+              </PaginationItem>
+              <PaginationItem>
+                <PaginationLink className="cursor-default">
+                  Page {currentPage} of {totalPages}
+                </PaginationLink>
+              </PaginationItem>
+              <PaginationItem>
+                <PaginationNext
+                  onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
+                  className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                />
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
+        )}
+      </div>
       <div className="border rounded-lg">
         <Table>
           <TableHeader>
@@ -69,35 +94,6 @@ export const TestCasesTable = ({ testCases }: TestCasesTableProps) => {
           </TableBody>
         </Table>
       </div>
-      {totalPages > 1 && (
-        <Pagination>
-          <PaginationContent>
-            <PaginationItem>
-              <PaginationPrevious
-                onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
-                className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
-              />
-            </PaginationItem>
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-              <PaginationItem key={page}>
-                <PaginationLink
-                  onClick={() => handlePageChange(page)}
-                  isActive={currentPage === page}
-                  className="cursor-pointer"
-                >
-                  {page}
-                </PaginationLink>
-              </PaginationItem>
-            ))}
-            <PaginationItem>
-              <PaginationNext
-                onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
-                className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
-              />
-            </PaginationItem>
-          </PaginationContent>
-        </Pagination>
-      )}
     </div>
   );
 };
