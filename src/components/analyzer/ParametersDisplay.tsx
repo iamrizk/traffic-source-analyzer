@@ -46,13 +46,19 @@ export const ParametersDisplay = ({ parameters, matches }: ParametersDisplayProp
         Parameters ({paramCount})
       </h3>
       <div className="space-y-2">
-        {Object.entries(parameters).map(([key, value]) => {
+        {Object.entries(parameters).map(([key, value], index) => {
           const isMatched = isParameterMatched(key, value);
           return (
             <div 
               key={key} 
-              className="grid grid-cols-[1fr,2fr,auto] gap-4 items-center p-2 bg-gray-50 rounded hover:bg-gray-100 transition-colors"
+              className="grid grid-cols-[auto,auto,1fr,2fr] gap-4 items-center p-2 bg-gray-50 rounded hover:bg-gray-100 transition-colors"
             >
+              <span className="text-sm text-gray-500 font-medium w-6">{index + 1}.</span>
+              {isMatched ? (
+                <Check className="w-4 h-4 text-green-500" />
+              ) : (
+                <X className="w-4 h-4 text-red-500" />
+              )}
               <span className="font-medium truncate">{key}</span>
               <span 
                 className="text-gray-600 truncate cursor-pointer"
@@ -61,11 +67,6 @@ export const ParametersDisplay = ({ parameters, matches }: ParametersDisplayProp
               >
                 {value}
               </span>
-              {isMatched ? (
-                <Check className="w-4 h-4 text-green-500" />
-              ) : (
-                <X className="w-4 h-4 text-red-500" />
-              )}
             </div>
           );
         })}
