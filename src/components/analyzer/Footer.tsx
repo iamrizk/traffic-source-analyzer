@@ -1,5 +1,5 @@
 export const Footer = () => {
-  const buildNumber = process.env.BUILD_NUMBER || '1';
+  const buildNumber = import.meta.env.VITE_BUILD_NUMBER || '1';
   const buildDate = new Date().toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'long',
