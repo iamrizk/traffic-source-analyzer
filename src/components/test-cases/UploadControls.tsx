@@ -15,6 +15,11 @@ export const UploadControls = ({
   onFileChange,
   onClear,
 }: UploadControlsProps) => {
+  const handleClear = () => {
+    localStorage.clear(); // Clear all local storage
+    onClear(); // Call the original onClear function
+  };
+
   return (
     <div className="flex items-center gap-4">
       <FileInput fileName={fileName} onFileChange={onFileChange} />
@@ -22,9 +27,9 @@ export const UploadControls = ({
         <Upload className="w-4 h-4 mr-2" />
         Upload CSV
       </Button>
-      <Button variant="destructive" onClick={onClear}>
+      <Button variant="destructive" onClick={handleClear}>
         <Trash2 className="w-4 h-4 mr-2" />
-        Clear
+        Clear All Test Cases
       </Button>
     </div>
   );
