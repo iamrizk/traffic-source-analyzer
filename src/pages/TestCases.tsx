@@ -20,10 +20,10 @@ interface TestCase {
 }
 
 const TEST_CASE_FILES = [
-  'test-cases/test-case-1.csv',
-  'test-cases/test-case-2.csv',
-  'test-cases/test-case-3.csv',
-  'test-cases/test-case-4.csv'
+  '/test-case-1.csv',
+  '/test-case-2.csv',
+  '/test-case-3.csv',
+  '/test-case-4.csv'
 ];
 
 const TestCases = () => {
