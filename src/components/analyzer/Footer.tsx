@@ -13,7 +13,7 @@ export const Footer = () => {
   return (
     <footer className="m-0 pb-8 text-center">
       <div className="mb-2 text-sm text-muted-foreground">
-        <span>#v{buildNumber}</span>
+        <span>v{buildNumber}</span>
         <span className="mx-2">•</span>
         <span>{buildDate}</span>
       </div>
