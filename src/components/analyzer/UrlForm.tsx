@@ -45,10 +45,10 @@ export const UrlForm = ({
     onUrlChange(selectedCase.url);
     onReferralChange(selectedCase.referralSource || "");
     
-    // Use setTimeout to ensure state updates are processed before analysis
-    setTimeout(() => {
+    // Ensure state updates are processed before analysis
+    requestAnimationFrame(() => {
       onAnalyze();
-    }, 0);
+    });
   };
 
   return (

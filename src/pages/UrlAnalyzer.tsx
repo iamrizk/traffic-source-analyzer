@@ -7,6 +7,7 @@ import { RuleMatch } from "@/types/analyzer";
 import { UrlForm } from "@/components/analyzer/UrlForm";
 import { ParametersDisplay } from "@/components/analyzer/ParametersDisplay";
 import { AnalysisResults } from "@/components/analyzer/AnalysisResults";
+import { ParametersAudit } from "@/components/analyzer/ParametersAudit";
 
 const UrlAnalyzer = () => {
   const [url, setUrl] = useState(() => localStorage.getItem("analyzer_url") || "");
@@ -34,7 +35,6 @@ const UrlAnalyzer = () => {
   };
 
   const parseUrl = () => {
-    // Clear previous results first
     setParameters({});
     setMatches([]);
     
@@ -47,7 +47,6 @@ const UrlAnalyzer = () => {
       const urlObj = new URL(urlToParse);
       const params: Record<string, string> = {};
       urlObj.searchParams.forEach((value, key) => {
-        // Convert parameter values to lowercase
         params[key] = value.toLowerCase();
       });
       setParameters(params);
@@ -152,6 +151,8 @@ const UrlAnalyzer = () => {
       <AnalysisResults matches={matches} />
 
       <ParametersDisplay parameters={parameters} matches={matches} />
+
+      <ParametersAudit url={url} parameters={parameters} />
     </div>
   );
 };
