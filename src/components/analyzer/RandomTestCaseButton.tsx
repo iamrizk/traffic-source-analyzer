@@ -17,29 +17,39 @@ export const RandomTestCaseButton = ({
   onClear,
 }: RandomTestCaseButtonProps) => {
   const handleRandomize = async () => {
-    const testCases = loadTestCases();
-    if (testCases.length === 0) return;
+    try {
+      const testCases = loadTestCases();
+      if (testCases.length === 0) return;
 
-    // Step 1: Clear all states and results
-    onClear();
+      // Step 1: Clear all states and results
+      onClear();
 
-    // Step 2: Get a random test case with normalized URL
-    const selectedCase = getRandomTestCase(testCases);
-    
-    // Step 3: Set the new input values
-    onUrlChange(selectedCase.url);
-    onReferralChange(selectedCase.referralSource || "");
+      // Step 2: Wait for clear to complete
+      await new Promise(resolve => setTimeout(resolve, 100));
 
-    // Step 4: Wait for state updates to complete
-    await new Promise(resolve => setTimeout(resolve, 100));
+      // Step 3: Get a random test case with normalized URL
+      const selectedCase = getRandomTestCase(testCases);
+      
+      // Step 4: Set the new input values
+      onUrlChange(selectedCase.url);
+      onReferralChange(selectedCase.referralSource || "");
 
-    // Step 5: Trigger analysis
-    onAnalyze();
+      // Step 5: Wait for state updates to complete
+      await new Promise(resolve => setTimeout(resolve, 100));
 
-    // Step 6: Show success message
-    toast.success("Random test case loaded and analyzed", {
-      description: "A new test case has been loaded and analyzed successfully.",
-    });
+      // Step 6: Trigger analysis
+      onAnalyze();
+
+      // Step 7: Show success message
+      toast.success("Random test case loaded and analyzed", {
+        description: "A new test case has been loaded and analyzed successfully.",
+      });
+    } catch (error) {
+      console.error('Error in handleRandomize:', error);
+      toast.error("Failed to load random test case", {
+        description: "An error occurred while loading the test case.",
+      });
+    }
   };
 
   return (

@@ -39,20 +39,31 @@ export const loadTestCases = (): TestCase[] => {
 };
 
 export const normalizeUrl = (url: string): string => {
+  if (!url) return '';
+  
   try {
-    // If URL doesn't start with protocol, add https://
-    const urlWithProtocol = url.startsWith('http') ? url : `https://${url}`;
+    // Remove any existing protocol and add https://
+    const cleanUrl = url.replace(/^https?:\/\//, '');
+    const urlWithProtocol = `https://${cleanUrl}`;
     const urlObj = new URL(urlWithProtocol);
     
-    // Sort parameters alphabetically to ensure consistent order
+    // Sort parameters alphabetically and ensure they're lowercase
     const params = new URLSearchParams(urlObj.search);
-    const sortedParams = new URLSearchParams([...params.entries()].sort());
+    const sortedParams = new URLSearchParams();
+    
+    // Convert all parameter values to lowercase and sort them
+    Array.from(params.entries())
+      .sort(([keyA], [keyB]) => keyA.localeCompare(keyB))
+      .forEach(([key, value]) => {
+        sortedParams.append(key, value.toLowerCase());
+      });
     
     // Reconstruct URL with sorted parameters
     urlObj.search = sortedParams.toString();
     return urlObj.toString();
   } catch (error) {
-    return url; // Return original URL if parsing fails
+    console.error('Error normalizing URL:', error);
+    return url;
   }
 };
 
