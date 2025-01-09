@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
 import { useRules } from "@/hooks/useRules";
 import { toast } from "sonner";
 import { AnalysisSummary } from "@/components/analyzer/AnalysisSummary";
 import { RuleMatch } from "@/types/analyzer";
+import { UrlForm } from "@/components/analyzer/UrlForm";
+import { ParametersDisplay } from "@/components/analyzer/ParametersDisplay";
+import { AnalysisResults } from "@/components/analyzer/AnalysisResults";
 
 const UrlAnalyzer = () => {
   const [url, setUrl] = useState(() => localStorage.getItem("analyzer_url") || "");
@@ -23,7 +23,6 @@ const UrlAnalyzer = () => {
 
   const parseUrl = () => {
     try {
-      // Add protocol if missing
       let urlToParse = url;
       if (!url.startsWith('http://') && !url.startsWith('https://')) {
         urlToParse = `https://${url}`;
@@ -36,7 +35,6 @@ const UrlAnalyzer = () => {
       });
       setParameters(params);
 
-      // Analyze based on rules
       const newMatches: RuleMatch[] = [];
 
       rules.forEach((rule, ruleIndex) => {
@@ -114,46 +112,15 @@ const UrlAnalyzer = () => {
 
   return (
     <div className="space-y-8">
-      <Card className="p-6">
-        <h2 className="text-2xl font-semibold mb-6">URL Analyzer</h2>
-        <div className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="url">URL</Label>
-            <Input
-              id="url"
-              value={url}
-              onChange={(e) => setUrl(e.target.value)}
-              placeholder="Enter URL to analyze"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="referral">Referral Source</Label>
-            <Input
-              id="referral"
-              value={referralSource}
-              onChange={(e) => setReferralSource(e.target.value)}
-              placeholder="Enter referral source"
-            />
-          </div>
-          <Button onClick={parseUrl} className="w-full">
-            Analyze URL
-          </Button>
-        </div>
-      </Card>
+      <UrlForm
+        url={url}
+        referralSource={referralSource}
+        onUrlChange={setUrl}
+        onReferralChange={setReferralSource}
+        onAnalyze={parseUrl}
+      />
 
-      {Object.keys(parameters).length > 0 && (
-        <Card className="p-6">
-          <h3 className="text-xl font-semibold mb-4">Parameters</h3>
-          <div className="space-y-2">
-            {Object.entries(parameters).map(([key, value]) => (
-              <div key={key} className="flex justify-between items-center p-2 bg-gray-50 rounded">
-                <span className="font-medium">{key}</span>
-                <span className="text-gray-600">{value}</span>
-              </div>
-            ))}
-          </div>
-        </Card>
-      )}
+      <ParametersDisplay parameters={parameters} />
 
       {(matches.length > 0 || Object.keys(parameters).length > 0) && (
         <Card className="p-6">
@@ -162,49 +129,7 @@ const UrlAnalyzer = () => {
         </Card>
       )}
 
-      {matches.length > 0 && (
-        <Card className="p-6">
-          <h3 className="text-xl font-semibold mb-4">Analysis Results</h3>
-          <div className="space-y-6">
-            {matches.map((match, index) => (
-              <div key={index} className="space-y-4 border-b pb-4 last:border-b-0">
-                <div className="p-2 bg-green-50 text-green-700 rounded">
-                  Matched Rule #{match.ruleIndex + 1}
-                </div>
-                
-                <div className="space-y-2">
-                  {match.matchDetails.map((detail, detailIndex) => (
-                    <div key={detailIndex} className="p-2 bg-gray-50 rounded text-sm">
-                      {detail}
-                    </div>
-                  ))}
-                </div>
-
-                <div className="space-y-2">
-                  {match.output.type && (
-                    <div className="flex justify-between items-center p-2 bg-gray-50 rounded">
-                      <span className="font-medium">Visit nature</span>
-                      <span className="text-gray-600">{match.output.type}</span>
-                    </div>
-                  )}
-                  {match.output.platform && (
-                    <div className="flex justify-between items-center p-2 bg-gray-50 rounded">
-                      <span className="font-medium">Platform</span>
-                      <span className="text-gray-600">{match.output.platform}</span>
-                    </div>
-                  )}
-                  {match.output.channel && (
-                    <div className="flex justify-between items-center p-2 bg-gray-50 rounded">
-                      <span className="font-medium">Channel</span>
-                      <span className="text-gray-600">{match.output.channel}</span>
-                    </div>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-        </Card>
-      )}
+      <AnalysisResults matches={matches} />
     </div>
   );
 };

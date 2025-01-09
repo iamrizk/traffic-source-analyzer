@@ -11,7 +11,7 @@ export const Navbar = () => {
   ];
 
   return (
-    <nav className="container mx-auto px-4 py-8">
+    <nav className="container mx-auto px-4">
       <div className="bg-white border rounded-lg shadow-sm">
         <div className="px-4">
           <PageHeader />
