@@ -12,6 +12,8 @@ interface TestCase {
   referralSource: string;
 }
 
+const MAX_STORAGE_SIZE = 4 * 1024 * 1024; // 4MB limit to be safe
+
 const TestCases = () => {
   const [testCases, setTestCases] = useState<TestCase[]>([]);
   const [uploadProgress, setUploadProgress] = useState(0);
@@ -19,15 +21,43 @@ const TestCases = () => {
 
   // Load test cases from localStorage on component mount
   useEffect(() => {
-    const savedTestCases = localStorage.getItem('testCases');
-    if (savedTestCases) {
-      setTestCases(JSON.parse(savedTestCases));
+    try {
+      const savedTestCases = localStorage.getItem('testCases');
+      if (savedTestCases) {
+        setTestCases(JSON.parse(savedTestCases));
+      }
+    } catch (error) {
+      console.error('Error loading test cases:', error);
+      toast.error("Error loading saved test cases");
     }
   }, []);
 
   // Save test cases to localStorage whenever they change
   useEffect(() => {
-    localStorage.setItem('testCases', JSON.stringify(testCases));
+    try {
+      const testCasesString = JSON.stringify(testCases);
+      const testCasesSize = new Blob([testCasesString]).size;
+
+      if (testCasesSize > MAX_STORAGE_SIZE) {
+        toast.error("Storage limit exceeded", {
+          description: "The test cases data is too large to store locally. Consider reducing the number of test cases.",
+        });
+        return;
+      }
+
+      localStorage.setItem('testCases', testCasesString);
+    } catch (error) {
+      console.error('Error saving test cases:', error);
+      if (error instanceof DOMException && error.name === 'QuotaExceededError') {
+        toast.error("Storage limit exceeded", {
+          description: "Unable to save test cases. Please reduce the number of test cases.",
+        });
+      } else {
+        toast.error("Error saving test cases", {
+          description: "An unexpected error occurred while saving test cases.",
+        });
+      }
+    }
   }, [testCases]);
 
   const isValidUrl = (urlString: string): boolean => {
@@ -85,10 +115,18 @@ const TestCases = () => {
           description: "No valid URLs found in the file",
         });
       } else {
-        setTestCases(parsedData);
-        toast.success("File uploaded successfully", {
-          description: `Loaded ${parsedData.length} test cases`,
-        });
+        // Check size before setting
+        const newDataSize = new Blob([JSON.stringify(parsedData)]).size;
+        if (newDataSize > MAX_STORAGE_SIZE) {
+          toast.error("File too large", {
+            description: "The uploaded file exceeds the storage limit. Please use a smaller file.",
+          });
+        } else {
+          setTestCases(parsedData);
+          toast.success("File uploaded successfully", {
+            description: `Loaded ${parsedData.length} test cases`,
+          });
+        }
       }
 
       setIsUploading(false);
