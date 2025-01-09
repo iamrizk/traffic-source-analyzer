@@ -44,11 +44,7 @@ export const UrlForm = ({
     
     onUrlChange(selectedCase.url);
     onReferralChange(selectedCase.referralSource || "");
-    
-    // Ensure state updates are processed before analysis
-    requestAnimationFrame(() => {
-      onAnalyze();
-    });
+    onAnalyze(); // Immediately analyze after setting the values
   };
 
   return (
