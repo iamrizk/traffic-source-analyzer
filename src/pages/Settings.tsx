@@ -6,7 +6,6 @@ import { toast } from "sonner";
 import { Download, Upload } from "lucide-react";
 import { RuleItem } from "@/components/RuleItem";
 import { NewRuleForm } from "@/components/rule/NewRuleForm";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
 const Settings = () => {
   const { rules, setRules, updateRule, deleteRule, moveRuleUp, moveRuleDown } = useRules();
@@ -104,30 +103,22 @@ const Settings = () => {
 
       {rules.length > 0 && (
         <Card className="p-6">
-          <Accordion type="single" collapsible>
-            <AccordionItem value="existing-rules">
-              <AccordionTrigger>
-                <h3 className="text-xl font-semibold">Existing Rules</h3>
-              </AccordionTrigger>
-              <AccordionContent>
-                <div className="space-y-4">
-                  {rules.map((rule, index) => (
-                    <RuleItem
-                      key={index}
-                      rule={rule}
-                      index={index}
-                      onUpdate={updateRule}
-                      onDelete={deleteRule}
-                      onMoveUp={moveRuleUp}
-                      onMoveDown={moveRuleDown}
-                      isFirst={index === 0}
-                      isLast={index === rules.length - 1}
-                    />
-                  ))}
-                </div>
-              </AccordionContent>
-            </AccordionItem>
-          </Accordion>
+          <h3 className="text-xl font-semibold mb-4">Existing Rules</h3>
+          <div className="space-y-4">
+            {rules.map((rule, index) => (
+              <RuleItem
+                key={index}
+                rule={rule}
+                index={index}
+                onUpdate={updateRule}
+                onDelete={deleteRule}
+                onMoveUp={moveRuleUp}
+                onMoveDown={moveRuleDown}
+                isFirst={index === 0}
+                isLast={index === rules.length - 1}
+              />
+            ))}
+          </div>
         </Card>
       )}
     </div>
