@@ -11,9 +11,9 @@ export const Navbar = () => {
   ];
 
   return (
-    <nav className="container mx-auto px-4">
+    <nav className="container mx-auto pt-8">
       <div className="bg-white border rounded-lg shadow-sm">
-        <div className="px-4">
+        <div>
           <PageHeader />
           <div className="flex h-16 items-center justify-between border-t">
             <div className="flex items-center space-x-8">
