@@ -48,7 +48,7 @@ export const parseCSVData = (text: string): { url: string; referralSource: strin
   let droppedRowCount = 0;
   
   // Parse data rows
-  for (let i = startIndex; i < lines.length; i++) {
+  for (let i = startIndex; i < Math.min(lines.length, MAX_ROWS + startIndex); i++) {
     const columns = lines[i].split(',').map(col => col.trim());
     
     if (columns.length >= 2) {
@@ -72,13 +72,12 @@ export const parseCSVData = (text: string): { url: string; referralSource: strin
     });
   }
 
-  // Enforce MAX_ROWS limit
-  if (parsedData.length > MAX_ROWS) {
-    const removedRows = parsedData.length - MAX_ROWS;
+  // Show warning if file exceeds row limit
+  if (lines.length > MAX_ROWS + startIndex) {
+    const removedRows = lines.length - MAX_ROWS - startIndex;
     toast.warning(`File exceeds maximum row limit`, {
       description: `Only the first ${MAX_ROWS} rows will be processed. ${removedRows} rows were removed.`,
     });
-    return parsedData.slice(0, MAX_ROWS);
   }
 
   return parsedData;
@@ -87,7 +86,15 @@ export const parseCSVData = (text: string): { url: string; referralSource: strin
 // Save test cases with compression
 export const saveTestCases = (testCases: { url: string; referralSource: string }[]): boolean => {
   try {
-    const compressed = compressData(testCases);
+    // Ensure we don't exceed MAX_ROWS when saving
+    const truncatedTestCases = testCases.slice(0, MAX_ROWS);
+    if (testCases.length > MAX_ROWS) {
+      toast.warning(`Test cases exceed maximum limit`, {
+        description: `Only the first ${MAX_ROWS} test cases will be saved.`,
+      });
+    }
+    
+    const compressed = compressData(truncatedTestCases);
     localStorage.setItem('testCases', compressed);
     return true;
   } catch (error) {
@@ -104,7 +111,9 @@ export const loadTestCases = (): { url: string; referralSource: string }[] => {
   try {
     const compressed = localStorage.getItem('testCases');
     if (!compressed) return [];
-    return decompressData(compressed);
+    const decompressed = decompressData(compressed);
+    // Ensure we don't exceed MAX_ROWS when loading
+    return decompressed.slice(0, MAX_ROWS);
   } catch (error) {
     console.error('Error loading test cases:', error);
     return [];
