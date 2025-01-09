@@ -11,6 +11,7 @@ const Settings = () => {
   const { rules, setRules, updateRule, deleteRule, moveRuleUp, moveRuleDown } = useRules();
   const [newRule, setNewRule] = useState<Rule>({
     conditions: [{ type: "parameter", parameter: "", operator: "exists" as const }],
+    conditionsOperator: "and",
     output: { type: "", platform: "", channel: "" },
   });
 

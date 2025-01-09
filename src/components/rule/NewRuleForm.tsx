@@ -51,7 +51,7 @@ export const NewRuleForm = ({ newRule, setNewRule, addRule }: NewRuleFormProps) 
         if (field === "value") {
           condition.value = value;
         } else if (field === "operator") {
-          (condition as any).operator = value;
+          condition.operator = value as "equals" | "contains";
         }
       }
     }
@@ -61,6 +61,25 @@ export const NewRuleForm = ({ newRule, setNewRule, addRule }: NewRuleFormProps) 
   return (
     <div className="space-y-4">
       <h3 className="text-lg font-medium">Add New Rule</h3>
+
+      <div className="space-y-2">
+        <Label>Conditions Operator</Label>
+        <Select
+          value={newRule.conditionsOperator}
+          onValueChange={(value: "and" | "or") =>
+            setNewRule({ ...newRule, conditionsOperator: value })
+          }
+        >
+          <SelectTrigger>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="and">AND</SelectItem>
+            <SelectItem value="or">OR</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
       {newRule.conditions.map((condition, index) => (
         <div key={index} className="flex items-end space-x-4">
           <div className="flex-1 space-y-2">
@@ -126,7 +145,7 @@ export const NewRuleForm = ({ newRule, setNewRule, addRule }: NewRuleFormProps) 
               <div className="flex-1 space-y-2">
                 <Label>Operator</Label>
                 <Select
-                  value={(condition as any).operator || "equals"}
+                  value={condition.operator}
                   onValueChange={(value) => updateCondition(index, "operator", value)}
                 >
                   <SelectTrigger>

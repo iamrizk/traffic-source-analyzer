@@ -21,6 +21,7 @@ export type Condition = ParameterCondition | ReferralCondition;
 
 export interface Rule {
   conditions: Condition[];
+  conditionsOperator: "and" | "or";
   output: {
     type: string;
     platform: string;

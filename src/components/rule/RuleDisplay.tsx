@@ -8,7 +8,7 @@ export const RuleDisplay = ({ rule }: RuleDisplayProps) => {
   return (
     <div className="space-y-2">
       <div>
-        <span className="font-medium">Conditions:</span>
+        <span className="font-medium">Conditions ({rule.conditionsOperator.toUpperCase()}):</span>
         <ul className="list-disc list-inside pl-4">
           {rule.conditions.map((condition, idx) => (
             <li key={idx}>
@@ -18,7 +18,7 @@ export const RuleDisplay = ({ rule }: RuleDisplayProps) => {
                       ? ` value "${condition.value}"` 
                       : ""
                   }`
-                : `Referral source ${(condition as any).operator || "equals"} "${condition.value}"`}
+                : `Referral source ${condition.operator} "${condition.value}"`}
             </li>
           ))}
         </ul>

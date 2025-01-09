@@ -6,6 +6,8 @@ import { useState } from "react";
 import { RuleCondition } from "./rule/RuleCondition";
 import { RuleOutput } from "./rule/RuleOutput";
 import { RuleDisplay } from "./rule/RuleDisplay";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
+import { Label } from "./ui/label";
 
 interface RuleItemProps {
   rule: Rule;
@@ -107,6 +109,24 @@ export const RuleItem = ({
 
       {isEditing ? (
         <div className="space-y-4">
+          <div className="space-y-2">
+            <Label>Conditions Operator</Label>
+            <Select
+              value={editedRule.conditionsOperator}
+              onValueChange={(value: "and" | "or") =>
+                setEditedRule({ ...editedRule, conditionsOperator: value })
+              }
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="and">AND</SelectItem>
+                <SelectItem value="or">OR</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
           <div className="space-y-4">
             {editedRule.conditions.map((condition, condIndex) => (
               <RuleCondition
