@@ -18,6 +18,8 @@ export const RuleDisplay = ({ rule }: RuleDisplayProps) => {
                       ? ` value "${condition.value}"` 
                       : ""
                   }`
+                : condition.operator === "not_present"
+                ? "No referral source present"
                 : `Referral source ${condition.operator} "${condition.value}"`}
             </li>
           ))}
@@ -26,7 +28,7 @@ export const RuleDisplay = ({ rule }: RuleDisplayProps) => {
       <div>
         <span className="font-medium">Output:</span>
         <div className="pl-4">
-          <div>Type: {rule.output.type}</div>
+          <div>Visit nature: {rule.output.type}</div>
           <div>Platform: {rule.output.platform}</div>
           <div>Channel: {rule.output.channel}</div>
         </div>

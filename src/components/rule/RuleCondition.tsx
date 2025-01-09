@@ -91,14 +91,16 @@ export const RuleCondition = ({
               </SelectContent>
             </Select>
           </div>
-          <div className="flex-1">
-            <Label>Value</Label>
-            <Input
-              value={condition.value || ""}
-              onChange={(e) => updateCondition(conditionIndex, "value", e.target.value)}
-              placeholder="Referral source"
-            />
-          </div>
+          {condition.operator !== "not_present" && (
+            <div className="flex-1">
+              <Label>Value</Label>
+              <Input
+                value={condition.value || ""}
+                onChange={(e) => updateCondition(conditionIndex, "value", e.target.value)}
+                placeholder="Referral source"
+              />
+            </div>
+          )}
         </>
       )}
     </div>
