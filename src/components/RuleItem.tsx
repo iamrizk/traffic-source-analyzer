@@ -9,6 +9,7 @@ import { RuleDisplay } from "./rule/RuleDisplay";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import { Label } from "./ui/label";
 import { Input } from "./ui/input";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "./ui/accordion";
 
 interface RuleItemProps {
   rule: Rule;
@@ -111,56 +112,65 @@ export const RuleItem = ({
         </div>
       </div>
 
-      {isEditing ? (
-        <div className="space-y-4">
-          <div className="space-y-2">
-            <Label>Rule Name</Label>
-            <Input
-              value={editedRule.name}
-              onChange={(e) => setEditedRule({ ...editedRule, name: e.target.value })}
-              placeholder="Enter rule name"
-            />
-          </div>
+      <Accordion type="single" collapsible>
+        <AccordionItem value="rule-content">
+          <AccordionTrigger>
+            <span className="text-sm font-medium">View Rule Details</span>
+          </AccordionTrigger>
+          <AccordionContent>
+            {isEditing ? (
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label>Rule Name</Label>
+                  <Input
+                    value={editedRule.name}
+                    onChange={(e) => setEditedRule({ ...editedRule, name: e.target.value })}
+                    placeholder="Enter rule name"
+                  />
+                </div>
 
-          <div className="space-y-2">
-            <Label>Conditions Operator</Label>
-            <Select
-              value={editedRule.conditionsOperator}
-              onValueChange={(value: "and" | "or") =>
-                setEditedRule({ ...editedRule, conditionsOperator: value })
-              }
-            >
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="and">AND</SelectItem>
-                <SelectItem value="or">OR</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+                <div className="space-y-2">
+                  <Label>Conditions Operator</Label>
+                  <Select
+                    value={editedRule.conditionsOperator}
+                    onValueChange={(value: "and" | "or") =>
+                      setEditedRule({ ...editedRule, conditionsOperator: value })
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="and">AND</SelectItem>
+                      <SelectItem value="or">OR</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
 
-          <div className="space-y-4">
-            {editedRule.conditions.map((condition, condIndex) => (
-              <RuleCondition
-                key={condIndex}
-                condition={condition}
-                conditionIndex={condIndex}
-                updateCondition={updateCondition}
-              />
-            ))}
-          </div>
+                <div className="space-y-4">
+                  {editedRule.conditions.map((condition, condIndex) => (
+                    <RuleCondition
+                      key={condIndex}
+                      condition={condition}
+                      conditionIndex={condIndex}
+                      updateCondition={updateCondition}
+                    />
+                  ))}
+                </div>
 
-          <RuleOutput
-            type={editedRule.output.type}
-            platform={editedRule.output.platform}
-            channel={editedRule.output.channel}
-            onChange={updateOutput}
-          />
-        </div>
-      ) : (
-        <RuleDisplay rule={rule} />
-      )}
+                <RuleOutput
+                  type={editedRule.output.type}
+                  platform={editedRule.output.platform}
+                  channel={editedRule.output.channel}
+                  onChange={updateOutput}
+                />
+              </div>
+            ) : (
+              <RuleDisplay rule={rule} />
+            )}
+          </AccordionContent>
+        </AccordionItem>
+      </Accordion>
     </Card>
   );
 };
