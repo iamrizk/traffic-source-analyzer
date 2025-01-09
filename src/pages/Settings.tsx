@@ -1,13 +1,11 @@
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useRules, Rule } from "@/hooks/useRules";
 import { toast } from "sonner";
-import { Plus, Download, Upload, X } from "lucide-react";
+import { Download, Upload } from "lucide-react";
 import { RuleItem } from "@/components/RuleItem";
+import { NewRuleForm } from "@/components/rule/NewRuleForm";
 
 const Settings = () => {
   const { rules, setRules, updateRule, deleteRule, moveRuleUp, moveRuleDown } = useRules();
@@ -15,41 +13,6 @@ const Settings = () => {
     conditions: [{ type: "parameter", parameter: "", operator: "exists" as const }],
     output: { type: "", platform: "", channel: "" },
   });
-
-  const addCondition = () => {
-    setNewRule({
-      ...newRule,
-      conditions: [...newRule.conditions, { type: "parameter" as const, parameter: "", operator: "exists" as const }],
-    });
-  };
-
-  const removeCondition = (index: number) => {
-    setNewRule({
-      ...newRule,
-      conditions: newRule.conditions.filter((_, i) => i !== index),
-    });
-  };
-
-  const updateCondition = (conditionIndex: number, field: string, value: string) => {
-    const updatedConditions = [...newRule.conditions];
-    if (field === "type") {
-      // Reset condition when type changes
-      updatedConditions[conditionIndex] = value === "parameter"
-        ? { type: "parameter", parameter: "", operator: "exists" as const }
-        : { type: "referral", value: "" };
-    } else {
-      // Type guard to ensure type safety
-      const condition = updatedConditions[conditionIndex];
-      if (condition.type === "parameter" && field === "parameter") {
-        condition.parameter = value;
-      } else if (condition.type === "parameter" && field === "operator") {
-        condition.operator = value as "exists" | "not_exists";
-      } else if (condition.type === "referral" && field === "value") {
-        condition.value = value;
-      }
-    }
-    setNewRule({ ...newRule, conditions: updatedConditions });
-  };
 
   const addRule = () => {
     setRules([...rules, newRule]);
@@ -112,137 +75,11 @@ const Settings = () => {
           </div>
         </div>
 
-        <div className="space-y-6">
-          {/* Add New Rule Form */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-medium">Add New Rule</h3>
-            {newRule.conditions.map((condition, index) => (
-              <div key={index} className="flex items-end space-x-4">
-                <div className="flex-1 space-y-2">
-                  <Label>Condition Type</Label>
-                  <Select
-                    value={condition.type}
-                    onValueChange={(value: "parameter" | "referral") =>
-                      updateCondition(index, "type", value)
-                    }
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select type" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="parameter">Parameter</SelectItem>
-                      <SelectItem value="referral">Referral</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                {condition.type === "parameter" && (
-                  <>
-                    <div className="flex-1 space-y-2">
-                      <Label>Parameter</Label>
-                      <Input
-                        value={condition.parameter}
-                        onChange={(e) => updateCondition(index, "parameter", e.target.value)}
-                        placeholder="Parameter name"
-                      />
-                    </div>
-                    <div className="flex-1 space-y-2">
-                      <Label>Operator</Label>
-                      <Select
-                        value={condition.operator}
-                        onValueChange={(value: "exists" | "not_exists") =>
-                          updateCondition(index, "operator", value)
-                        }
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select operator" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="exists">Exists</SelectItem>
-                          <SelectItem value="not_exists">Does not exist</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </>
-                )}
-
-                {condition.type === "referral" && (
-                  <div className="flex-1 space-y-2">
-                    <Label>Value</Label>
-                    <Input
-                      value={condition.value || ""}
-                      onChange={(e) => updateCondition(index, "value", e.target.value)}
-                      placeholder="Referral source"
-                    />
-                  </div>
-                )}
-
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => removeCondition(index)}
-                  className="mb-2"
-                >
-                  <X className="w-4 h-4" />
-                </Button>
-              </div>
-            ))}
-
-            <Button onClick={addCondition} variant="outline" className="w-full">
-              <Plus className="w-4 h-4 mr-2" />
-              Add Condition
-            </Button>
-          </div>
-
-          <div className="space-y-4">
-            <h3 className="text-lg font-medium">Output Configuration</h3>
-            <div className="grid grid-cols-3 gap-4">
-              <div className="space-y-2">
-                <Label>Type</Label>
-                <Input
-                  value={newRule.output.type}
-                  onChange={(e) =>
-                    setNewRule({
-                      ...newRule,
-                      output: { ...newRule.output, type: e.target.value },
-                    })
-                  }
-                  placeholder="e.g., Paid/Organic"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>Platform</Label>
-                <Input
-                  value={newRule.output.platform}
-                  onChange={(e) =>
-                    setNewRule({
-                      ...newRule,
-                      output: { ...newRule.output, platform: e.target.value },
-                    })
-                  }
-                  placeholder="e.g., Google/Meta"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>Channel</Label>
-                <Input
-                  value={newRule.output.channel}
-                  onChange={(e) =>
-                    setNewRule({
-                      ...newRule,
-                      output: { ...newRule.output, channel: e.target.value },
-                    })
-                  }
-                  placeholder="e.g., Instagram/MSN"
-                />
-              </div>
-            </div>
-          </div>
-
-          <Button onClick={addRule} className="w-full">
-            Save Rule
-          </Button>
-        </div>
+        <NewRuleForm
+          newRule={newRule}
+          setNewRule={setNewRule}
+          addRule={addRule}
+        />
       </Card>
 
       {rules.length > 0 && (
