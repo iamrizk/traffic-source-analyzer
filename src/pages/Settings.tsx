@@ -3,12 +3,12 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useRules, Rule } from "@/hooks/useRules";
 import { toast } from "sonner";
-import { Download, Upload } from "lucide-react";
+import { Download, Upload, Trash2 } from "lucide-react";
 import { RuleItem } from "@/components/RuleItem";
 import { NewRuleForm } from "@/components/rule/NewRuleForm";
 
 const Settings = () => {
-  const { rules, setRules, updateRule, deleteRule, moveRuleUp, moveRuleDown } = useRules();
+  const { rules, setRules, updateRule, deleteRule, moveRuleUp, moveRoveDown } = useRules();
   const [newRule, setNewRule] = useState<Rule>({
     name: "",
     conditions: [{ type: "parameter", parameter: "", operator: "exists" as const }],
@@ -70,12 +70,37 @@ const Settings = () => {
     }
   };
 
+  const loadStarterConfig = async () => {
+    try {
+      const response = await fetch('/config/starter-config.json');
+      if (!response.ok) throw new Error('Failed to load starter config');
+      const starterConfig = await response.json();
+      setRules(starterConfig);
+      toast.success("Starter configuration loaded successfully!");
+    } catch (error) {
+      toast.error("Error loading starter configuration");
+    }
+  };
+
+  const clearAllRules = () => {
+    setRules([]);
+    toast.success("All rules cleared successfully!");
+  };
+
   return (
     <div className="space-y-8">
       <Card className="p-6">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-semibold">Rules Configuration</h2>
           <div className="flex space-x-4">
+            <Button onClick={loadStarterConfig} variant="outline">
+              <Download className="w-4 h-4 mr-2" />
+              Load Starter Config
+            </Button>
+            <Button onClick={clearAllRules} variant="outline" className="text-destructive">
+              <Trash2 className="w-4 h-4 mr-2" />
+              Clear All Rules
+            </Button>
             <Button onClick={exportRules} variant="outline">
               <Download className="w-4 h-4 mr-2" />
               Export Rules
@@ -115,7 +140,7 @@ const Settings = () => {
                 onUpdate={updateRule}
                 onDelete={deleteRule}
                 onMoveUp={moveRuleUp}
-                onMoveDown={moveRuleDown}
+                onMoveDown={moveRoveDown}
                 isFirst={index === 0}
                 isLast={index === rules.length - 1}
               />
