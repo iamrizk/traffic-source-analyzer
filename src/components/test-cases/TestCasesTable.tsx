@@ -6,15 +6,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination";
 import { useMemo, useState } from "react";
+import { TestCaseRow } from "./TestCaseRow";
+import { TablePagination } from "./TablePagination";
 
 interface TestCase {
   url: string;
@@ -40,41 +34,17 @@ export const TestCasesTable = ({ testCases }: TestCasesTableProps) => {
 
   if (testCases.length === 0) return null;
 
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-  };
-
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between gap-8">
         <h3 className="text-xl font-semibold whitespace-nowrap">
           Uploaded Test Cases ({testCases.length})
         </h3>
-        {totalPages > 1 && (
-          <div className="flex-shrink-0">
-            <Pagination>
-              <PaginationContent className="gap-4">
-                <PaginationItem>
-                  <PaginationPrevious
-                    onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
-                    className={`${currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"} whitespace-nowrap`}
-                  />
-                </PaginationItem>
-                <PaginationItem>
-                  <PaginationLink className="cursor-default whitespace-nowrap min-w-[100px] text-center">
-                    {currentPage} of {totalPages}
-                  </PaginationLink>
-                </PaginationItem>
-                <PaginationItem>
-                  <PaginationNext
-                    onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
-                    className={`${currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"} whitespace-nowrap`}
-                  />
-                </PaginationItem>
-              </PaginationContent>
-            </Pagination>
-          </div>
-        )}
+        <TablePagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
+        />
       </div>
       <div className="border rounded-lg">
         <Table>
@@ -87,21 +57,13 @@ export const TestCasesTable = ({ testCases }: TestCasesTableProps) => {
           </TableHeader>
           <TableBody>
             {paginatedData.map((testCase, index) => (
-              <TableRow key={index}>
-                <TableCell className="font-medium">
-                  {(currentPage - 1) * ITEMS_PER_PAGE + index + 1}
-                </TableCell>
-                <TableCell className="truncate max-w-[300px]">
-                  <div className="select-text cursor-text">
-                    {testCase.url}
-                  </div>
-                </TableCell>
-                <TableCell className="truncate max-w-[300px]">
-                  <div className="select-text cursor-text">
-                    {testCase.referralSource || "-"}
-                  </div>
-                </TableCell>
-              </TableRow>
+              <TestCaseRow
+                key={index}
+                testCase={testCase}
+                index={index}
+                currentPage={currentPage}
+                itemsPerPage={ITEMS_PER_PAGE}
+              />
             ))}
           </TableBody>
         </Table>
