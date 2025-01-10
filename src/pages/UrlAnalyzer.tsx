@@ -9,6 +9,10 @@ import { ParametersDisplay } from "@/components/analyzer/ParametersDisplay";
 import { AnalysisResults } from "@/components/analyzer/AnalysisResults";
 import { ParametersAudit } from "@/components/analyzer/ParametersAudit";
 import { ConsolidatedSummary } from "@/components/analyzer/ConsolidatedSummary";
+import { Button } from "@/components/ui/button";
+import { Printer } from "lucide-react";
+import { pdf } from "@react-pdf/renderer";
+import AnalysisPDF from "@/components/analyzer/AnalysisPDF";
 
 const UrlAnalyzer = () => {
   const [url, setUrl] = useState(() => localStorage.getItem("analyzer_url") || "");
@@ -143,16 +147,63 @@ const UrlAnalyzer = () => {
     }
   };
 
+  const handlePrintReport = async () => {
+    if (!url) {
+      toast.error("No URL provided", {
+        description: "Please enter a URL before generating a report.",
+      });
+      return;
+    }
+
+    try {
+      const blob = await pdf(
+        <AnalysisPDF
+          url={url}
+          referralSource={referralSource}
+          matches={matches}
+          parameters={parameters}
+        />
+      ).toBlob();
+      
+      const pdfUrl = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = pdfUrl;
+      link.download = `url-analysis-report-${new Date().toISOString().split('T')[0]}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(pdfUrl);
+
+      toast.success("Report generated", {
+        description: "Your analysis report has been downloaded.",
+      });
+    } catch (error) {
+      toast.error("Failed to generate report", {
+        description: "An error occurred while generating the PDF report.",
+      });
+    }
+  };
+
   return (
     <div className="space-y-8">
-      <UrlForm
-        url={url}
-        referralSource={referralSource}
-        onUrlChange={setUrl}
-        onReferralChange={setReferralSource}
-        onAnalyze={parseUrl}
-        onClear={handleClear}
-      />
+      <div className="flex justify-between items-start">
+        <UrlForm
+          url={url}
+          referralSource={referralSource}
+          onUrlChange={setUrl}
+          onReferralChange={setReferralSource}
+          onAnalyze={parseUrl}
+          onClear={handleClear}
+        />
+        <Button
+          onClick={handlePrintReport}
+          className="flex items-center gap-2"
+          variant="outline"
+        >
+          <Printer className="w-4 h-4" />
+          Print Report
+        </Button>
+      </div>
 
       <ConsolidatedSummary matches={matches} />
 
