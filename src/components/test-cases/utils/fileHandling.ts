@@ -16,16 +16,6 @@ const isValidUrl = (urlString: string): boolean => {
   }
 };
 
-// Extract domain from URL
-const extractDomain = (url: string): string => {
-  try {
-    const urlObj = new URL(url.startsWith('http') ? url : `https://${url}`);
-    return urlObj.hostname;
-  } catch {
-    return '';
-  }
-};
-
 // Compress data before storing - with better compression ratio
 const compressData = (data: any[]): string => {
   try {
@@ -98,8 +88,7 @@ export const parseCSVData = (text: string): TestCase[] => {
     
     if (columns.length >= Math.max(urlIndex, sourceIndex) + 1) {
       const url = columns[urlIndex];
-      // If no referral source is provided, extract it from the URL domain
-      let referralSource = columns[sourceIndex] || extractDomain(url);
+      const referralSource = columns[sourceIndex] || 'direct';
       
       if (isValidUrl(url)) {
         parsedData.push({ url, referralSource });
@@ -171,9 +160,10 @@ export const getRandomTestCase = (testCases: TestCase[]): TestCase => {
 
 export const saveTestCases = (testCases: TestCase[]): boolean => {
   try {
-    // Only clear test cases related items, not settings
-    localStorage.removeItem('testCases');
-    localStorage.removeItem('uploadedFileName');
+    // Clear storage completely
+    for (const key of Object.keys(localStorage)) {
+      localStorage.removeItem(key);
+    }
     
     // Wait a brief moment to ensure clearing is complete
     setTimeout(() => {}, 100);
