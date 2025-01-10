@@ -49,48 +49,23 @@ export const parseCSVData = (text: string): TestCase[] => {
   const lines = text.split(/\r?\n/).map(line => line.trim()).filter(Boolean);
   if (lines.length === 0) return [];
 
-  let startIndex = 0;
-  let urlIndex = -1;
-  let sourceIndex = -1;
-
-  // Try to detect headers
-  const possibleHeaders = lines[0].toLowerCase().split(',').map(h => h.trim());
-  
-  // Look for URL column
-  urlIndex = possibleHeaders.findIndex(h => 
-    h.includes('url') || 
-    h.includes('link') || 
-    h.includes('website')
-  );
-
-  // Look for referral/source column
-  sourceIndex = possibleHeaders.findIndex(h => 
-    h.includes('source') || 
-    h.includes('referral') || 
-    h.includes('referrer') || 
-    h.includes('ref')
-  );
-
-  // If headers were not found, use default indices
-  if (urlIndex === -1) urlIndex = 0;
-  if (sourceIndex === -1) sourceIndex = 1;
-
-  // Skip header row if headers were detected
-  startIndex = (urlIndex !== 0 || sourceIndex !== 1) ? 1 : 0;
-
   const parsedData: TestCase[] = [];
   let droppedRowCount = 0;
   
-  // Parse data rows
-  for (let i = startIndex; i < lines.length; i++) {
+  // Parse each line
+  for (let i = 0; i < lines.length; i++) {
     const columns = lines[i].split(',').map(col => col.trim());
     
-    if (columns.length >= Math.max(urlIndex, sourceIndex) + 1) {
-      const url = columns[urlIndex];
-      const referralSource = columns[sourceIndex] || 'direct';
+    // Ensure we have at least 2 columns
+    if (columns.length >= 2) {
+      const url = columns[0];
+      const referralSource = columns[1];
       
       if (isValidUrl(url)) {
-        parsedData.push({ url, referralSource });
+        parsedData.push({ 
+          url, 
+          referralSource: referralSource || 'direct' 
+        });
       } else {
         droppedRowCount++;
       }
@@ -100,7 +75,7 @@ export const parseCSVData = (text: string): TestCase[] => {
 
     // Check if we've reached the maximum number of rows
     if (parsedData.length >= MAX_ROWS) {
-      if (lines.length > MAX_ROWS + startIndex) {
+      if (lines.length > MAX_ROWS) {
         toast.warning(`File exceeds maximum row limit`, {
           description: `Only the first ${MAX_ROWS} rows will be processed.`,
         });
