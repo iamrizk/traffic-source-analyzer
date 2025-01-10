@@ -35,7 +35,6 @@ const TestCases = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [loadingProgress, setLoadingProgress] = useState(0);
 
-  // Load saved test cases when component mounts
   useEffect(() => {
     const savedTestCases = loadTestCases();
     if (savedTestCases.length > 0) {
@@ -44,19 +43,19 @@ const TestCases = () => {
   }, []);
 
   const loadSampleTestCases = async (filename: string) => {
-    if (isLoading) return; // Prevent multiple simultaneous loads
+    if (isLoading) return;
     
     try {
       setIsLoading(true);
       setLoadingProgress(10);
       
-      // Step 1: Clear all storage and state
-      localStorage.clear();
+      // Only clear test case related items
+      localStorage.removeItem('testCases');
+      localStorage.removeItem('uploadedFileName');
       setTestCases([]);
-      await new Promise(resolve => setTimeout(resolve, 200)); // Ensure clearing is complete
+      await new Promise(resolve => setTimeout(resolve, 200));
       setLoadingProgress(30);
       
-      // Step 2: Fetch new data
       const response = await fetch(filename);
       if (!response.ok) {
         throw new Error(`Failed to fetch ${filename}: ${response.status} ${response.statusText}`);
@@ -72,7 +71,6 @@ const TestCases = () => {
       }
       setLoadingProgress(85);
 
-      // Step 3: Save new data
       if (saveTestCases(parsedData)) {
         setTestCases(parsedData);
         toast.success("Sample test cases loaded", {
@@ -83,12 +81,11 @@ const TestCases = () => {
       setLoadingProgress(100);
     } catch (error) {
       console.error('Error loading sample test cases:', error);
-      setTestCases([]); // Reset state on error
+      setTestCases([]);
       toast.error("Error loading sample test cases", {
         description: error instanceof Error ? error.message : "Failed to load sample test cases",
       });
     } finally {
-      // Reset loading state after a brief delay to show 100% completion
       setTimeout(() => {
         setIsLoading(false);
         setLoadingProgress(0);
