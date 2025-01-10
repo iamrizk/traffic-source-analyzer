@@ -6,7 +6,6 @@ export interface TestCase {
   referralSource: string;
 }
 
-// Utility function to validate URLs
 const isValidUrl = (urlString: string): boolean => {
   try {
     const url = new URL(urlString.startsWith('http') ? urlString : `https://${urlString}`);
@@ -160,10 +159,9 @@ export const getRandomTestCase = (testCases: TestCase[]): TestCase => {
 
 export const saveTestCases = (testCases: TestCase[]): boolean => {
   try {
-    // Clear storage completely
-    for (const key of Object.keys(localStorage)) {
-      localStorage.removeItem(key);
-    }
+    // Only remove test cases related items
+    localStorage.removeItem('testCases');
+    localStorage.removeItem('uploadedFileName');
     
     // Wait a brief moment to ensure clearing is complete
     setTimeout(() => {}, 100);
