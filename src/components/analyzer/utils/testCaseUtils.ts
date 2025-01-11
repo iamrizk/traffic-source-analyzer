@@ -1,5 +1,5 @@
 import { toast } from "sonner";
-import { decompressData } from "@/components/test-cases/utils/fileHandling";
+import { decompressData, compressData } from "@/components/test-cases/utils/fileHandling";
 
 export interface TestCase {
   url: string;
@@ -105,7 +105,9 @@ export const markTestCaseAsViewed = (index: number): void => {
     const testCases = loadTestCases();
     if (testCases[index]) {
       testCases[index].viewed = true;
-      localStorage.setItem('testCases', JSON.stringify(testCases));
+      // Use compression when saving back to localStorage
+      const compressed = compressData(testCases);
+      localStorage.setItem('testCases', compressed);
     }
   } catch (error) {
     console.error('Error marking test case as viewed:', error);
