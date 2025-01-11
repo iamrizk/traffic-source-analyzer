@@ -1,10 +1,12 @@
 import { TableCell, TableRow } from "@/components/ui/table";
+import { Eye } from "lucide-react";
 import { toast } from "sonner";
 
 interface TestCaseRowProps {
   testCase: {
     url: string;
     referralSource: string;
+    viewed?: boolean;
   };
   index: number;
   currentPage: number;
@@ -42,6 +44,11 @@ export const TestCaseRow = ({
         <div className="select-text">
           {testCase.referralSource || "-"}
         </div>
+      </TableCell>
+      <TableCell>
+        {testCase.viewed && (
+          <Eye className="w-4 h-4 text-muted-foreground" />
+        )}
       </TableCell>
     </TableRow>
   );
