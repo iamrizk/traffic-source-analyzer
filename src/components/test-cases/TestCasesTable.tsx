@@ -52,8 +52,9 @@ export const TestCasesTable = ({ testCases }: TestCasesTableProps) => {
             <TableRow>
               <TableHead className="w-[80px]">No.</TableHead>
               <TableHead className="w-[50px]">Status</TableHead>
-              <TableHead className="w-1/2">URL</TableHead>
-              <TableHead className="w-1/2">Referral Source</TableHead>
+              <TableHead>URL</TableHead>
+              <TableHead>Referral Source</TableHead>
+              <TableHead className="w-[100px]">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
