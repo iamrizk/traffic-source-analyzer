@@ -16,7 +16,7 @@ const isValidUrl = (urlString: string): boolean => {
 };
 
 // Compress data before storing - with better compression ratio
-const compressData = (data: any[]): string => {
+export const compressData = (data: any[]): string => {
   try {
     // Remove unnecessary whitespace and minimize the JSON string
     const minifiedData = data.map(item => ({
