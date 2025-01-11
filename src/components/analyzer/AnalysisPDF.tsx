@@ -1,4 +1,4 @@
-import { Document, Page, Text, View, StyleSheet, PDFViewer } from "@react-pdf/renderer";
+import { Document, Page, Text, View, StyleSheet } from "@react-pdf/renderer";
 import { RuleMatch } from "@/types/analyzer";
 
 interface AnalysisPDFProps {
@@ -11,35 +11,61 @@ interface AnalysisPDFProps {
 const styles = StyleSheet.create({
   page: {
     padding: 30,
-    fontSize: 12,
+    fontSize: 10,
+    fontFamily: 'Helvetica',
   },
   section: {
-    marginBottom: 10,
+    marginBottom: 15,
   },
   title: {
     fontSize: 16,
-    marginBottom: 10,
+    marginBottom: 15,
     fontWeight: 'bold',
+    textAlign: 'center',
+    color: '#1a365d',
   },
   subtitle: {
-    fontSize: 14,
-    marginBottom: 5,
+    fontSize: 12,
+    marginBottom: 8,
     marginTop: 10,
     fontWeight: 'bold',
+    color: '#2d3748',
+    backgroundColor: '#f7fafc',
+    padding: 4,
   },
   row: {
     flexDirection: 'row',
-    marginBottom: 5,
+    marginBottom: 4,
+    alignItems: 'flex-start',
   },
   label: {
-    width: 120,
+    width: 100,
     fontWeight: 'bold',
+    color: '#4a5568',
   },
   value: {
     flex: 1,
+    paddingRight: 10,
   },
   parameter: {
     marginBottom: 3,
+    fontSize: 9,
+  },
+  ruleMatch: {
+    marginBottom: 8,
+    padding: 4,
+    backgroundColor: '#f7fafc',
+  },
+  noMatches: {
+    color: '#718096',
+    fontStyle: 'italic',
+    textAlign: 'center',
+    marginTop: 10,
+  },
+  divider: {
+    borderBottom: 1,
+    borderBottomColor: '#e2e8f0',
+    marginVertical: 8,
   },
 });
 
@@ -59,10 +85,12 @@ const AnalysisPDF = ({ url, referralSource, matches, parameters }: AnalysisPDFPr
             <Text style={styles.value}>{url}</Text>
           </View>
           <View style={styles.row}>
-            <Text style={styles.label}>Referral Source:</Text>
+            <Text style={styles.label}>Referral:</Text>
             <Text style={styles.value}>{referralSource || 'None'}</Text>
           </View>
         </View>
+
+        <View style={styles.divider} />
 
         {matches.length > 0 ? (
           <>
@@ -88,31 +116,42 @@ const AnalysisPDF = ({ url, referralSource, matches, parameters }: AnalysisPDFPr
               )}
             </View>
 
+            <View style={styles.divider} />
+
             <View style={styles.section}>
               <Text style={styles.subtitle}>Matched Rules</Text>
               {matches.map((match, index) => (
-                <View key={index} style={styles.section}>
+                <View key={index} style={styles.ruleMatch}>
                   <Text>Rule #{match.ruleIndex + 1}: {match.ruleName}</Text>
-                  <Text>Output: {match.output.type} / {match.output.platform} / {match.output.channel}</Text>
+                  <Text style={styles.value}>
+                    {match.output.type && `Type: ${match.output.type}`}
+                    {match.output.platform && ` • Platform: ${match.output.platform}`}
+                    {match.output.channel && ` • Channel: ${match.output.channel}`}
+                  </Text>
                 </View>
               ))}
             </View>
           </>
         ) : (
           <View style={styles.section}>
-            <Text>No rules matched the analyzed URL.</Text>
+            <Text style={styles.noMatches}>No rules matched the analyzed URL.</Text>
           </View>
         )}
 
         {Object.keys(parameters).length > 0 && (
-          <View style={styles.section}>
-            <Text style={styles.subtitle}>Parameters</Text>
-            {Object.entries(parameters).map(([key, value], index) => (
-              <View key={index} style={styles.parameter}>
-                <Text>{key}: {value}</Text>
+          <>
+            <View style={styles.divider} />
+            <View style={styles.section}>
+              <Text style={styles.subtitle}>Parameters</Text>
+              <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
+                {Object.entries(parameters).map(([key, value], index) => (
+                  <View key={index} style={[styles.parameter, { width: '50%' }]}>
+                    <Text>{key}: {value}</Text>
+                  </View>
+                ))}
               </View>
-            ))}
-          </View>
+            </View>
+          </>
         )}
       </Page>
     </Document>

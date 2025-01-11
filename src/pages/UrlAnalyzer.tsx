@@ -186,24 +186,14 @@ const UrlAnalyzer = () => {
 
   return (
     <div className="space-y-8">
-      <div className="flex justify-between items-start">
-        <UrlForm
-          url={url}
-          referralSource={referralSource}
-          onUrlChange={setUrl}
-          onReferralChange={setReferralSource}
-          onAnalyze={parseUrl}
-          onClear={handleClear}
-        />
-        <Button
-          onClick={handlePrintReport}
-          className="flex items-center gap-2"
-          variant="outline"
-        >
-          <Printer className="w-4 h-4" />
-          Print Report
-        </Button>
-      </div>
+      <UrlForm
+        url={url}
+        referralSource={referralSource}
+        onUrlChange={setUrl}
+        onReferralChange={setReferralSource}
+        onAnalyze={parseUrl}
+        onClear={handleClear}
+      />
 
       <ConsolidatedSummary matches={matches} />
 
@@ -217,6 +207,17 @@ const UrlAnalyzer = () => {
       <ParametersDisplay parameters={parameters} matches={matches} />
 
       <ParametersAudit url={url} parameters={parameters} />
+
+      <div className="flex justify-center mt-8">
+        <Button
+          onClick={handlePrintReport}
+          className="flex items-center gap-2 w-full max-w-md"
+          variant="outline"
+        >
+          <Printer className="w-4 h-4" />
+          Print Analysis Report
+        </Button>
+      </div>
     </div>
   );
 };
