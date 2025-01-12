@@ -13,7 +13,6 @@ import { Button } from "@/components/ui/button";
 import { Printer } from "lucide-react";
 import { pdf } from "@react-pdf/renderer";
 import AnalysisPDF from "@/components/analyzer/AnalysisPDF";
-import { markUrlAsViewed } from "@/components/analyzer/utils/testCaseUtils";
 
 const UrlAnalyzer = () => {
   const [url, setUrl] = useState(() => localStorage.getItem("analyzer_url") || "");
@@ -34,11 +33,6 @@ const UrlAnalyzer = () => {
     localStorage.setItem("analyzer_referral", referralSource);
     localStorage.setItem("analyzer_parameters", JSON.stringify(parameters));
     localStorage.setItem("analyzer_matches", JSON.stringify(matches));
-    
-    // Mark URL as viewed when it's analyzed
-    if (url) {
-      markUrlAsViewed(url);
-    }
   }, [url, referralSource, parameters, matches]);
 
   const handleClear = () => {

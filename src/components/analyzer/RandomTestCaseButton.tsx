@@ -1,38 +1,66 @@
 import { Button } from "@/components/ui/button";
 import { Shuffle } from "lucide-react";
-import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import { getRandomTestCase, loadTestCases, markTestCaseAsViewed } from "./utils/testCaseUtils";
+import { loadTestCases, getRandomTestCase, markTestCaseAsViewed } from "./utils/testCaseUtils";
 
-export const RandomTestCaseButton = () => {
-  const navigate = useNavigate();
+interface RandomTestCaseButtonProps {
+  onUrlChange: (value: string) => void;
+  onReferralChange: (value: string) => void;
+  onAnalyze: () => void;
+  onClear: () => void;
+}
 
-  const handleRandomTestCase = () => {
-    const testCases = loadTestCases();
-    if (testCases.length === 0) return;
+export const RandomTestCaseButton = ({
+  onUrlChange,
+  onReferralChange,
+  onAnalyze,
+  onClear,
+}: RandomTestCaseButtonProps) => {
+  const handleRandomize = async () => {
+    try {
+      const testCases = loadTestCases();
+      if (testCases.length === 0) {
+        toast.error("No test cases available", {
+          description: "Please upload test cases first in the Test Cases page.",
+        });
+        return;
+      }
 
-    const { testCase, index } = getRandomTestCase(testCases);
-    
-    localStorage.setItem("analyzer_url", testCase.url);
-    localStorage.setItem("analyzer_referral", testCase.referralSource || "");
-    
-    // Mark the test case as viewed
-    markTestCaseAsViewed(index);
-    
-    navigate("/");
-    toast.success("Random test case loaded", {
-      description: "A random test case has been loaded into the analyzer.",
-    });
+      // Step 1: Clear all states and results
+      onClear();
+
+      // Step 2: Get a random unviewed test case
+      const { testCase: selectedCase, index: randomIndex } = getRandomTestCase(testCases);
+      const serialNumber = randomIndex + 1; // Serial numbers start from 1
+
+      // Step 3: Set URL
+      onUrlChange(selectedCase.url);
+
+      // Step 4: Set referral source
+      onReferralChange(selectedCase.referralSource || "");
+
+      // Step 5: Mark as viewed
+      markTestCaseAsViewed(randomIndex);
+
+      // Step 6: Show success message with serial number
+      toast.success("Random test case loaded", {
+        description: `Test case #${serialNumber} has been loaded. Click 'Analyze URL' to process it.`,
+      });
+    } catch (error) {
+      console.error('Error in handleRandomize:', error);
+      toast.error("Failed to load random test case", {
+        description: "An error occurred while loading the test case.",
+      });
+    }
   };
 
   return (
-    <Button
-      variant="outline"
-      size="sm"
-      className="w-full"
-      onClick={handleRandomTestCase}
+    <Button 
+      variant="outline" 
+      onClick={handleRandomize}
+      className="gap-2"
     >
-      <Shuffle className="w-4 h-4 mr-2" />
+      <Shuffle className="w-4 h-4" />
       Random Test Case
     </Button>
   );
