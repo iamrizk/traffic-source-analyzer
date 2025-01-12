@@ -1,9 +1,8 @@
 import { TableCell, TableRow } from "@/components/ui/table";
-import { Eye, ExternalLink, Minus } from "lucide-react";
+import { Eye, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { normalizeUrl } from "../analyzer/utils/testCaseUtils";
 
 interface TestCaseRowProps {
   testCase: {
@@ -32,28 +31,10 @@ export const TestCaseRow = ({
   const handleAnalyze = () => {
     localStorage.setItem("analyzer_url", testCase.url);
     localStorage.setItem("analyzer_referral", testCase.referralSource || "");
-    navigate("/");
+    navigate("/analyzer");
     toast.success("Test case loaded", {
       description: "The URL and referral source have been loaded into the analyzer.",
     });
-  };
-
-  // Check if this URL has been analyzed by looking at the testCases in localStorage
-  const isAnalyzed = () => {
-    try {
-      const savedTestCases = localStorage.getItem('testCases');
-      if (!savedTestCases) return false;
-      
-      const testCases = JSON.parse(atob(savedTestCases));
-      const normalizedUrl = normalizeUrl(testCase.url);
-      
-      return testCases.some((tc: any) => 
-        normalizeUrl(tc.u) === normalizedUrl && tc.viewed === true
-      );
-    } catch (error) {
-      console.error('Error checking analyzed status:', error);
-      return false;
-    }
   };
 
   return (
@@ -62,10 +43,8 @@ export const TestCaseRow = ({
         {(currentPage - 1) * itemsPerPage + index + 1}
       </TableCell>
       <TableCell>
-        {isAnalyzed() ? (
-          <Eye className="w-4 h-4 text-primary" />
-        ) : (
-          <Minus className="w-4 h-4 text-muted-foreground" />
+        {testCase.viewed && (
+          <Eye className="w-4 h-4 text-muted-foreground" />
         )}
       </TableCell>
       <TableCell 

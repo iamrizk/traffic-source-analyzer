@@ -86,11 +86,6 @@ export const getRandomTestCase = (testCases: TestCase[]): { testCase: TestCase; 
   const randomIndex = Math.floor(Math.random() * testCases.length);
   const selectedCase = testCases[randomIndex];
 
-  // Reset all viewed flags when starting a new cycle
-  testCases.forEach(testCase => testCase.viewed = false);
-  const compressed = compressData(testCases);
-  localStorage.setItem('testCases', compressed);
-  
   // Show a toast notification when starting a new cycle
   toast.info("Starting new analysis cycle", {
     description: "All test cases have been analyzed. Starting a new cycle.",
@@ -116,24 +111,5 @@ export const markTestCaseAsViewed = (index: number): void => {
     }
   } catch (error) {
     console.error('Error marking test case as viewed:', error);
-  }
-};
-
-export const markUrlAsViewed = (url: string): void => {
-  try {
-    const testCases = loadTestCases();
-    const normalizedUrl = normalizeUrl(url);
-    
-    const index = testCases.findIndex(testCase => 
-      normalizeUrl(testCase.url) === normalizedUrl
-    );
-    
-    if (index !== -1) {
-      testCases[index].viewed = true;
-      const compressed = compressData(testCases);
-      localStorage.setItem('testCases', compressed);
-    }
-  } catch (error) {
-    console.error('Error marking URL as viewed:', error);
   }
 };
