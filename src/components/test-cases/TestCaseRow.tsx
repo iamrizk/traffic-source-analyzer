@@ -1,5 +1,5 @@
 import { TableCell, TableRow } from "@/components/ui/table";
-import { Eye, ExternalLink } from "lucide-react";
+import { Eye, ExternalLink, Minus } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
@@ -46,7 +46,7 @@ export const TestCaseRow = ({
         {testCase.viewed ? (
           <Eye className="w-4 h-4 text-primary" />
         ) : (
-          <div className="w-4 h-4" /> // Empty div to maintain spacing
+          <Minus className="w-4 h-4 text-muted-foreground" />
         )}
       </TableCell>
       <TableCell 
