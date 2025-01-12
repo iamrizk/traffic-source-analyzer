@@ -3,6 +3,7 @@ import { Eye, ExternalLink, Minus } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import { normalizeUrl } from "../analyzer/utils/testCaseUtils";
 
 interface TestCaseRowProps {
   testCase: {
@@ -37,13 +38,31 @@ export const TestCaseRow = ({
     });
   };
 
+  // Check if this URL has been analyzed by looking at the testCases in localStorage
+  const isAnalyzed = () => {
+    try {
+      const savedTestCases = localStorage.getItem('testCases');
+      if (!savedTestCases) return false;
+      
+      const testCases = JSON.parse(atob(savedTestCases));
+      const normalizedUrl = normalizeUrl(testCase.url);
+      
+      return testCases.some((tc: any) => 
+        normalizeUrl(tc.u) === normalizedUrl && tc.viewed === true
+      );
+    } catch (error) {
+      console.error('Error checking analyzed status:', error);
+      return false;
+    }
+  };
+
   return (
     <TableRow className="group relative">
       <TableCell className="font-medium">
         {(currentPage - 1) * itemsPerPage + index + 1}
       </TableCell>
       <TableCell>
-        {testCase.viewed ? (
+        {isAnalyzed() ? (
           <Eye className="w-4 h-4 text-primary" />
         ) : (
           <Minus className="w-4 h-4 text-muted-foreground" />
