@@ -43,8 +43,10 @@ export const TestCaseRow = ({
         {(currentPage - 1) * itemsPerPage + index + 1}
       </TableCell>
       <TableCell>
-        {testCase.viewed && (
-          <Eye className="w-4 h-4 text-muted-foreground" />
+        {testCase.viewed ? (
+          <Eye className="w-4 h-4 text-primary" />
+        ) : (
+          <div className="w-4 h-4" /> // Empty div to maintain spacing
         )}
       </TableCell>
       <TableCell 
