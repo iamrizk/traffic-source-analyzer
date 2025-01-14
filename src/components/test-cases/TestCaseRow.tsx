@@ -28,12 +28,19 @@ export const TestCaseRow = ({
   };
 
   const handleAnalyze = () => {
-    localStorage.setItem("analyzer_url", testCase.url);
-    localStorage.setItem("analyzer_referral", testCase.referralSource || "");
-    navigate("/url-analyzer");
-    toast.success("Test case loaded", {
-      description: "The URL and referral source have been loaded into the analyzer.",
-    });
+    try {
+      localStorage.setItem("analyzer_url", testCase.url);
+      localStorage.setItem("analyzer_referral", testCase.referralSource || "");
+      navigate("/url-analyzer");
+      toast.success("Test case loaded", {
+        description: "The URL and referral source have been loaded into the analyzer.",
+      });
+    } catch (error) {
+      console.error("Error navigating to analyzer:", error);
+      toast.error("Failed to load test case", {
+        description: "There was an error loading the test case. Please try again.",
+      });
+    }
   };
 
   return (
