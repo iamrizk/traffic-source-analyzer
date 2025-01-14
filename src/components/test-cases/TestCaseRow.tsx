@@ -31,7 +31,7 @@ export const TestCaseRow = ({
     try {
       localStorage.setItem("analyzer_url", testCase.url);
       localStorage.setItem("analyzer_referral", testCase.referralSource || "");
-      navigate("/url-analyzer");
+      navigate("/");
       toast.success("Test case loaded", {
         description: "The URL and referral source have been loaded into the analyzer.",
       });
