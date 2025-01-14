@@ -10,54 +10,75 @@ interface AnalysisPDFProps {
 
 const styles = StyleSheet.create({
   page: {
-    padding: 30,
+    padding: 40,
     fontSize: 10,
     fontFamily: 'Helvetica',
+    backgroundColor: '#ffffff',
+  },
+  header: {
+    backgroundColor: '#9b87f5',
+    padding: 20,
+    marginBottom: 20,
+    borderRadius: 4,
+  },
+  headerText: {
+    color: '#ffffff',
+    fontSize: 24,
+    textAlign: 'center',
+    fontWeight: 'bold',
   },
   section: {
-    marginBottom: 15,
+    marginBottom: 20,
+    backgroundColor: '#f8f9fa',
+    padding: 15,
+    borderRadius: 4,
   },
   title: {
     fontSize: 16,
-    marginBottom: 15,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    color: '#1a365d',
+    marginBottom: 10,
+    color: '#1A1F2C',
+    backgroundColor: '#D6BCFA',
+    padding: 8,
+    borderRadius: 4,
   },
   subtitle: {
-    fontSize: 12,
+    fontSize: 14,
     marginBottom: 8,
-    marginTop: 10,
-    fontWeight: 'bold',
-    color: '#2d3748',
-    backgroundColor: '#f7fafc',
-    padding: 4,
+    color: '#6E59A5',
+    borderBottom: 1,
+    borderBottomColor: '#e2e8f0',
+    paddingBottom: 4,
   },
   row: {
     flexDirection: 'row',
-    marginBottom: 4,
+    marginBottom: 6,
     alignItems: 'flex-start',
   },
   label: {
     width: 100,
     fontWeight: 'bold',
-    color: '#4a5568',
+    color: '#7E69AB',
   },
   value: {
     flex: 1,
-    paddingRight: 10,
+    color: '#222222',
   },
   parameter: {
-    marginBottom: 3,
+    marginBottom: 4,
     fontSize: 9,
+    backgroundColor: '#f1f1f1',
+    padding: 4,
+    borderRadius: 2,
   },
   ruleMatch: {
-    marginBottom: 8,
-    padding: 4,
+    marginBottom: 10,
+    padding: 8,
     backgroundColor: '#f7fafc',
+    borderLeft: 2,
+    borderLeftColor: '#9b87f5',
   },
   noMatches: {
-    color: '#718096',
+    color: '#8E9196',
     fontStyle: 'italic',
     textAlign: 'center',
     marginTop: 10,
@@ -65,7 +86,32 @@ const styles = StyleSheet.create({
   divider: {
     borderBottom: 1,
     borderBottomColor: '#e2e8f0',
-    marginVertical: 8,
+    marginVertical: 10,
+  },
+  summaryBox: {
+    backgroundColor: '#f3f3f3',
+    padding: 10,
+    borderRadius: 4,
+    marginBottom: 15,
+  },
+  summaryItem: {
+    flexDirection: 'row',
+    marginBottom: 4,
+  },
+  summaryLabel: {
+    width: 80,
+    color: '#6E59A5',
+    fontSize: 9,
+  },
+  summaryValue: {
+    flex: 1,
+    color: '#222222',
+    fontSize: 9,
+  },
+  parametersGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
   },
 });
 
@@ -77,25 +123,25 @@ const AnalysisPDF = ({ url, referralSource, matches, parameters }: AnalysisPDFPr
   return (
     <Document>
       <Page size="A4" style={styles.page}>
-        <View style={styles.section}>
-          <Text style={styles.title}>URL Analysis Report</Text>
-          
-          <View style={styles.row}>
-            <Text style={styles.label}>URL:</Text>
-            <Text style={styles.value}>{url}</Text>
-          </View>
-          <View style={styles.row}>
-            <Text style={styles.label}>Referral:</Text>
-            <Text style={styles.value}>{referralSource || 'None'}</Text>
-          </View>
+        <View style={styles.header}>
+          <Text style={styles.headerText}>URL Analysis Report</Text>
         </View>
 
-        <View style={styles.divider} />
+        <View style={styles.summaryBox}>
+          <View style={styles.summaryItem}>
+            <Text style={styles.summaryLabel}>URL:</Text>
+            <Text style={styles.summaryValue}>{url}</Text>
+          </View>
+          <View style={styles.summaryItem}>
+            <Text style={styles.summaryLabel}>Referral:</Text>
+            <Text style={styles.summaryValue}>{referralSource || 'None'}</Text>
+          </View>
+        </View>
 
         {matches.length > 0 ? (
           <>
             <View style={styles.section}>
-              <Text style={styles.subtitle}>Consolidated Summary</Text>
+              <Text style={styles.subtitle}>Analysis Overview</Text>
               {uniqueTypes.length > 0 && (
                 <View style={styles.row}>
                   <Text style={styles.label}>Visit Nature:</Text>
@@ -116,14 +162,14 @@ const AnalysisPDF = ({ url, referralSource, matches, parameters }: AnalysisPDFPr
               )}
             </View>
 
-            <View style={styles.divider} />
-
             <View style={styles.section}>
               <Text style={styles.subtitle}>Matched Rules</Text>
               {matches.map((match, index) => (
                 <View key={index} style={styles.ruleMatch}>
-                  <Text>Rule #{match.ruleIndex + 1}: {match.ruleName}</Text>
-                  <Text style={styles.value}>
+                  <Text style={{ color: '#6E59A5', fontWeight: 'bold', marginBottom: 4 }}>
+                    Rule #{match.ruleIndex + 1}: {match.ruleName}
+                  </Text>
+                  <Text style={{ color: '#555555', fontSize: 9 }}>
                     {match.output.type && `Type: ${match.output.type}`}
                     {match.output.platform && ` • Platform: ${match.output.platform}`}
                     {match.output.channel && ` • Channel: ${match.output.channel}`}
@@ -139,19 +185,18 @@ const AnalysisPDF = ({ url, referralSource, matches, parameters }: AnalysisPDFPr
         )}
 
         {Object.keys(parameters).length > 0 && (
-          <>
-            <View style={styles.divider} />
-            <View style={styles.section}>
-              <Text style={styles.subtitle}>Parameters</Text>
-              <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
-                {Object.entries(parameters).map(([key, value], index) => (
-                  <View key={index} style={[styles.parameter, { width: '50%' }]}>
-                    <Text>{key}: {value}</Text>
-                  </View>
-                ))}
-              </View>
+          <View style={styles.section}>
+            <Text style={styles.subtitle}>URL Parameters</Text>
+            <View style={styles.parametersGrid}>
+              {Object.entries(parameters).map(([key, value], index) => (
+                <View key={index} style={[styles.parameter, { width: '48%' }]}>
+                  <Text style={{ color: '#555555' }}>
+                    <Text style={{ color: '#7E69AB', fontWeight: 'bold' }}>{key}:</Text> {value}
+                  </Text>
+                </View>
+              ))}
             </View>
-          </>
+          </View>
         )}
       </Page>
     </Document>
