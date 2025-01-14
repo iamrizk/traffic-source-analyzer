@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Shuffle } from "lucide-react";
 import { toast } from "sonner";
-import { loadTestCases, getRandomTestCase, markTestCaseAsViewed } from "./utils/testCaseUtils";
+import { loadTestCases, getRandomTestCase } from "./utils/testCaseUtils";
 
 interface RandomTestCaseButtonProps {
   onUrlChange: (value: string) => void;
@@ -29,7 +29,7 @@ export const RandomTestCaseButton = ({
       // Step 1: Clear all states and results
       onClear();
 
-      // Step 2: Get a random unviewed test case
+      // Step 2: Get a random test case
       const { testCase: selectedCase, index: randomIndex } = getRandomTestCase(testCases);
       const serialNumber = randomIndex + 1; // Serial numbers start from 1
 
@@ -39,10 +39,7 @@ export const RandomTestCaseButton = ({
       // Step 4: Set referral source
       onReferralChange(selectedCase.referralSource || "");
 
-      // Step 5: Mark as viewed
-      markTestCaseAsViewed(randomIndex);
-
-      // Step 6: Show success message with serial number
+      // Step 5: Show success message with serial number
       toast.success("Random test case loaded", {
         description: `Test case #${serialNumber} has been loaded. Click 'Analyze URL' to process it.`,
       });
