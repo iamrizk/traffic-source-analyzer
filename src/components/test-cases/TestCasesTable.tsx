@@ -14,7 +14,6 @@ import { ITEMS_PER_PAGE } from "./utils/constants";
 interface TestCase {
   url: string;
   referralSource: string;
-  viewed?: boolean;
 }
 
 interface TestCasesTableProps {
@@ -51,7 +50,6 @@ export const TestCasesTable = ({ testCases }: TestCasesTableProps) => {
           <TableHeader>
             <TableRow>
               <TableHead className="w-[80px]">No.</TableHead>
-              <TableHead className="w-[50px]">Status</TableHead>
               <TableHead>URL</TableHead>
               <TableHead>Referral Source</TableHead>
               <TableHead className="w-[100px]">Actions</TableHead>

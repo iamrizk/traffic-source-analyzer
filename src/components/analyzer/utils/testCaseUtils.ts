@@ -4,7 +4,6 @@ import { decompressData, compressData } from "@/components/test-cases/utils/file
 export interface TestCase {
   url: string;
   referralSource: string;
-  viewed?: boolean;
 }
 
 export const loadTestCases = (): TestCase[] => {
@@ -71,25 +70,8 @@ export const normalizeUrl = (url: string): string => {
 };
 
 export const getRandomTestCase = (testCases: TestCase[]): { testCase: TestCase; index: number } => {
-  // First try to find unviewed test cases
-  const unviewedTestCases = testCases
-    .map((testCase, index) => ({ testCase, index }))
-    .filter(({ testCase }) => !testCase.viewed);
-
-  // If there are unviewed test cases, select one randomly from them
-  if (unviewedTestCases.length > 0) {
-    const randomIndex = Math.floor(Math.random() * unviewedTestCases.length);
-    return unviewedTestCases[randomIndex];
-  }
-
-  // If all test cases have been viewed, reset all viewed flags and select randomly
   const randomIndex = Math.floor(Math.random() * testCases.length);
   const selectedCase = testCases[randomIndex];
-
-  // Show a toast notification when starting a new cycle
-  toast.info("Starting new analysis cycle", {
-    description: "All test cases have been analyzed. Starting a new cycle.",
-  });
   
   return {
     testCase: {
@@ -98,18 +80,4 @@ export const getRandomTestCase = (testCases: TestCase[]): { testCase: TestCase; 
     },
     index: randomIndex
   };
-};
-
-export const markTestCaseAsViewed = (index: number): void => {
-  try {
-    const testCases = loadTestCases();
-    if (testCases[index]) {
-      testCases[index].viewed = true;
-      // Use compression when saving back to localStorage
-      const compressed = compressData(testCases);
-      localStorage.setItem('testCases', compressed);
-    }
-  } catch (error) {
-    console.error('Error marking test case as viewed:', error);
-  }
 };

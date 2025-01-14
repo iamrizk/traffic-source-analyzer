@@ -1,5 +1,5 @@
 import { TableCell, TableRow } from "@/components/ui/table";
-import { Eye, ExternalLink } from "lucide-react";
+import { ExternalLink } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
@@ -8,7 +8,6 @@ interface TestCaseRowProps {
   testCase: {
     url: string;
     referralSource: string;
-    viewed?: boolean;
   };
   index: number;
   currentPage: number;
@@ -41,11 +40,6 @@ export const TestCaseRow = ({
     <TableRow className="group relative">
       <TableCell className="font-medium">
         {(currentPage - 1) * itemsPerPage + index + 1}
-      </TableCell>
-      <TableCell>
-        {testCase.viewed && (
-          <Eye className="w-4 h-4 text-muted-foreground" />
-        )}
       </TableCell>
       <TableCell 
         className="truncate max-w-[300px] cursor-pointer hover:bg-muted/50"
