@@ -165,10 +165,18 @@ const UrlAnalyzer = () => {
         />
       ).toBlob();
       
+      // Extract domain from URL
+      let domain;
+      try {
+        domain = new URL(url).hostname.replace('www.', '');
+      } catch {
+        domain = 'unknown-domain';
+      }
+      
       const pdfUrl = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = pdfUrl;
-      link.download = `url-analysis-report-${new Date().toISOString().split('T')[0]}.pdf`;
+      link.download = `url-analysis-${domain}-${new Date().toISOString().split('T')[0]}.pdf`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);

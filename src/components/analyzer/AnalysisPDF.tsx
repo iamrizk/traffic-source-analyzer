@@ -63,13 +63,6 @@ const styles = StyleSheet.create({
     flex: 1,
     color: '#222222',
   },
-  parameter: {
-    marginBottom: 4,
-    fontSize: 9,
-    backgroundColor: '#f1f1f1',
-    padding: 4,
-    borderRadius: 2,
-  },
   ruleMatch: {
     marginBottom: 10,
     padding: 8,
@@ -108,10 +101,40 @@ const styles = StyleSheet.create({
     color: '#222222',
     fontSize: 9,
   },
-  parametersGrid: {
+  table: {
+    width: '100%',
+    marginTop: 10,
+  },
+  tableHeader: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
+    backgroundColor: '#9b87f5',
+    padding: 8,
+    marginBottom: 1,
+  },
+  tableHeaderCell: {
+    color: '#ffffff',
+    fontSize: 12,
+    fontWeight: 'bold',
+    width: '50%',
+  },
+  tableRow: {
+    flexDirection: 'row',
+    borderBottom: 1,
+    borderBottomColor: '#e2e8f0',
+    backgroundColor: '#f8f9fa',
+    minHeight: 30,
+  },
+  tableCell: {
+    padding: 8,
+    fontSize: 10,
+    width: '50%',
+    color: '#4A5568',
+  },
+  pageTitle: {
+    fontSize: 18,
+    color: '#6E59A5',
+    marginBottom: 15,
+    fontWeight: 'bold',
   },
 });
 
@@ -183,22 +206,25 @@ const AnalysisPDF = ({ url, referralSource, matches, parameters }: AnalysisPDFPr
             <Text style={styles.noMatches}>No rules matched the analyzed URL.</Text>
           </View>
         )}
-
-        {Object.keys(parameters).length > 0 && (
-          <View style={styles.section}>
-            <Text style={styles.subtitle}>URL Parameters</Text>
-            <View style={styles.parametersGrid}>
-              {Object.entries(parameters).map(([key, value], index) => (
-                <View key={index} style={[styles.parameter, { width: '48%' }]}>
-                  <Text style={{ color: '#555555' }}>
-                    <Text style={{ color: '#7E69AB', fontWeight: 'bold' }}>{key}:</Text> {value}
-                  </Text>
-                </View>
-              ))}
-            </View>
-          </View>
-        )}
       </Page>
+
+      {Object.keys(parameters).length > 0 && (
+        <Page size="A4" style={styles.page}>
+          <Text style={styles.pageTitle}>URL Parameters Analysis</Text>
+          <View style={styles.table}>
+            <View style={styles.tableHeader}>
+              <Text style={styles.tableHeaderCell}>Parameter</Text>
+              <Text style={styles.tableHeaderCell}>Value</Text>
+            </View>
+            {Object.entries(parameters).map(([key, value], index) => (
+              <View key={index} style={[styles.tableRow, index % 2 === 0 && { backgroundColor: '#f1f5f9' }]}>
+                <Text style={[styles.tableCell, { fontWeight: 'bold' }]}>{key}</Text>
+                <Text style={styles.tableCell}>{value}</Text>
+              </View>
+            ))}
+          </View>
+        </Page>
+      )}
     </Document>
   );
 };
