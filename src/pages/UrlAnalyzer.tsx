@@ -12,7 +12,7 @@ import { ConsolidatedSummary } from "@/components/analyzer/ConsolidatedSummary";
 import { Button } from "@/components/ui/button";
 import { Printer } from "lucide-react";
 import { pdf } from "@react-pdf/renderer";
-import { AnalysisPDF } from "@/components/analyzer/AnalysisPDF";
+import AnalysisPDF from "@/components/analyzer/AnalysisPDF";
 
 const UrlAnalyzer = () => {
   const [url, setUrl] = useState(() => localStorage.getItem("analyzer_url") || "");
@@ -159,7 +159,7 @@ const UrlAnalyzer = () => {
       const blob = await pdf(
         <AnalysisPDF
           url={url}
-          referrer={referralSource}
+          referralSource={referralSource}
           matches={matches}
           parameters={parameters}
         />
