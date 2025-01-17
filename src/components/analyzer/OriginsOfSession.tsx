@@ -28,32 +28,37 @@ export const OriginsOfSession = ({ matches }: OriginsOfSessionProps) => {
     const referralCondition = firstMatch.conditions.find(c => c.type === 'referral');
     if (referralCondition) {
       if (referralCondition.operator === 'not_present') {
-        narrative += "the page directly without any referral source ";
+        narrative += "the landing page directly without any referral source ";
       } else if (referralCondition.operator === 'equals') {
-        narrative += `the page from ${referralCondition.value} `;
+        narrative += `the landing page from ${referralCondition.value} `;
       } else if (referralCondition.operator === 'contains') {
-        narrative += `the page via a source containing "${referralCondition.value}" `;
+        narrative += `the landing page via ${referralCondition.value} `;
       }
+    } else {
+      narrative += "the landing page ";
     }
 
-    // Add platform information
-    if (platform) {
-      narrative += `using the ${platform.toLowerCase()} platform. `;
-    }
-
-    // Add parameter-based information
+    // Add parameter-based information with context
     const parameterConditions = firstMatch.conditions.filter(c => c.type === 'parameter');
     if (parameterConditions.length > 0) {
-      narrative += "The landing URL contained ";
+      narrative += "which had ";
       const paramDescriptions = parameterConditions.map(c => {
         if (c.operator === 'not_present') {
           return "no URL parameters";
         } else if (c.operator === 'exists') {
-          return `the parameter "${c.parameter}"`;
+          if (c.parameter === 'twclid') {
+            return `the "${c.parameter}" parameter associated with Twitter/X ads`;
+          } else if (c.parameter === 'gclid') {
+            return `the "${c.parameter}" parameter associated with Google ads`;
+          } else if (c.parameter === 'fbclid') {
+            return `the "${c.parameter}" parameter associated with Facebook ads`;
+          } else {
+            return `the parameter "${c.parameter}"`;
+          }
         } else if (c.operator === 'equals') {
-          return `the parameter "${c.parameter}" with value "${c.value}"`;
+          return `the parameter "${c.parameter}" set to "${c.value}"`;
         } else if (c.operator === 'not_equals') {
-          return `the parameter "${c.parameter}" with a value different from "${c.value}"`;
+          return `the parameter "${c.parameter}" with a value other than "${c.value}"`;
         }
         return "";
       }).filter(Boolean);
@@ -61,16 +66,19 @@ export const OriginsOfSession = ({ matches }: OriginsOfSessionProps) => {
       narrative += paramDescriptions.join(" and ") + ". ";
     }
 
-    // Add conclusion about visit type and channel
+    // Add conclusion about visit type and channel in context
     if (type || channel) {
       narrative += "Based on these characteristics, ";
-      if (type) {
+      if (type === 'Paid' && platform) {
+        narrative += `this was identified as a paid visit from ${platform} `;
+      } else if (type === 'Organic' && platform) {
+        narrative += `this was identified as an organic visit through ${platform} `;
+      } else if (type) {
         narrative += `this was identified as a ${type.toLowerCase()} visit `;
       }
-      if (channel) {
-        narrative += type ? 
-          `through the ${channel.toLowerCase()} channel` : 
-          `originating from the ${channel.toLowerCase()} channel`;
+      
+      if (channel && !narrative.toLowerCase().includes(channel.toLowerCase())) {
+        narrative += `through the ${channel.toLowerCase()} channel`;
       }
       narrative += ".";
     }
