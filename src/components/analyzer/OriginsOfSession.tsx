@@ -22,15 +22,17 @@ export const OriginsOfSession = ({ matches }: OriginsOfSessionProps) => {
   // Create a narrative explanation based on the rules
   const createNarrative = () => {
     const firstMatch = matches[0];
-    let narrative = "Based on our analysis, ";
+    let narrative = "The user visited ";
 
     // Add referral information if available
     const referralCondition = firstMatch.conditions.find(c => c.type === 'referral');
     if (referralCondition) {
       if (referralCondition.operator === 'not_present') {
-        narrative += "the user accessed the page directly (no referral source) ";
-      } else {
-        narrative += `the user came from ${referralCondition.value || 'an unknown source'} `;
+        narrative += "the page directly without any referral source ";
+      } else if (referralCondition.operator === 'equals') {
+        narrative += `the page from ${referralCondition.value} `;
+      } else if (referralCondition.operator === 'contains') {
+        narrative += `the page via a source containing "${referralCondition.value}" `;
       }
     }
 
@@ -42,14 +44,16 @@ export const OriginsOfSession = ({ matches }: OriginsOfSessionProps) => {
     // Add parameter-based information
     const parameterConditions = firstMatch.conditions.filter(c => c.type === 'parameter');
     if (parameterConditions.length > 0) {
-      narrative += "The URL ";
+      narrative += "The landing URL contained ";
       const paramDescriptions = parameterConditions.map(c => {
         if (c.operator === 'not_present') {
-          return "had no parameters";
+          return "no URL parameters";
         } else if (c.operator === 'exists') {
-          return `contained the parameter '${c.parameter}'`;
+          return `the parameter "${c.parameter}"`;
         } else if (c.operator === 'equals') {
-          return `had '${c.parameter}=${c.value}'`;
+          return `the parameter "${c.parameter}" with value "${c.value}"`;
+        } else if (c.operator === 'not_equals') {
+          return `the parameter "${c.parameter}" with a value different from "${c.value}"`;
         }
         return "";
       }).filter(Boolean);
@@ -59,12 +63,14 @@ export const OriginsOfSession = ({ matches }: OriginsOfSessionProps) => {
 
     // Add conclusion about visit type and channel
     if (type || channel) {
-      narrative += "This pattern indicates ";
+      narrative += "Based on these characteristics, ";
       if (type) {
-        narrative += `a ${type.toLowerCase()} visit `;
+        narrative += `this was identified as a ${type.toLowerCase()} visit `;
       }
       if (channel) {
-        narrative += type ? `through the ${channel.toLowerCase()} channel` : `it came from the ${channel.toLowerCase()} channel`;
+        narrative += type ? 
+          `through the ${channel.toLowerCase()} channel` : 
+          `originating from the ${channel.toLowerCase()} channel`;
       }
       narrative += ".";
     }
