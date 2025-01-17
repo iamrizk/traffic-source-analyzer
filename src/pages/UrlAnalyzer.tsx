@@ -9,6 +9,7 @@ import { ParametersDisplay } from "@/components/analyzer/ParametersDisplay";
 import { AnalysisResults } from "@/components/analyzer/AnalysisResults";
 import { ParametersAudit } from "@/components/analyzer/ParametersAudit";
 import { ConsolidatedSummary } from "@/components/analyzer/ConsolidatedSummary";
+import { OriginsOfSession } from "@/components/analyzer/OriginsOfSession";
 import { Button } from "@/components/ui/button";
 import { Printer } from "lucide-react";
 import { pdf } from "@react-pdf/renderer";
@@ -202,6 +203,8 @@ const UrlAnalyzer = () => {
         onAnalyze={parseUrl}
         onClear={handleClear}
       />
+
+      <OriginsOfSession matches={matches} />
 
       <ConsolidatedSummary matches={matches} />
 
