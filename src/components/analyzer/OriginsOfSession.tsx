@@ -1,10 +1,19 @@
+import { useState, useEffect } from "react";
 import { RuleMatch } from "@/types/analyzer";
+import { generateNarrative } from "@/utils/perplexity";
+import { Input } from "../ui/input";
+import { Button } from "../ui/button";
+import { toast } from "sonner";
 
 interface OriginsOfSessionProps {
   matches: RuleMatch[];
 }
 
 export const OriginsOfSession = ({ matches }: OriginsOfSessionProps) => {
+  const [apiKey, setApiKey] = useState(() => localStorage.getItem("perplexity_api_key") || "");
+  const [narrative, setNarrative] = useState<string | null>(null);
+  const [isGenerating, setIsGenerating] = useState(false);
+
   if (matches.length === 0) return null;
 
   // Get unique values for each category
@@ -19,79 +28,65 @@ export const OriginsOfSession = ({ matches }: OriginsOfSessionProps) => {
 
   if (!type && !platform && !channel) return null;
 
-  // Create a narrative explanation based on the rules
-  const createNarrative = () => {
-    const firstMatch = matches[0];
-    let narrative = "The user visited ";
-
-    // Add referral information if available
-    const referralCondition = firstMatch.conditions.find(c => c.type === 'referral');
-    if (referralCondition) {
-      if (referralCondition.operator === 'not_present') {
-        narrative += "the landing page directly without any referral source ";
-      } else if (referralCondition.operator === 'equals') {
-        narrative += `the landing page from ${referralCondition.value} `;
-      } else if (referralCondition.operator === 'contains') {
-        narrative += `the landing page via ${referralCondition.value} `;
-      }
-    } else {
-      narrative += "the landing page ";
+  const handleGenerateNarrative = async () => {
+    if (!apiKey) {
+      toast.error("Please enter your Perplexity API key");
+      return;
     }
 
-    // Add parameter-based information with context
-    const parameterConditions = firstMatch.conditions.filter(c => c.type === 'parameter');
-    if (parameterConditions.length > 0) {
-      narrative += "which had ";
-      const paramDescriptions = parameterConditions.map(c => {
-        if (c.operator === 'not_present') {
-          return "no URL parameters";
-        } else if (c.operator === 'exists') {
-          if (c.parameter === 'twclid') {
-            return `the "${c.parameter}" parameter associated with Twitter/X ads`;
-          } else if (c.parameter === 'gclid') {
-            return `the "${c.parameter}" parameter associated with Google ads`;
-          } else if (c.parameter === 'fbclid') {
-            return `the "${c.parameter}" parameter associated with Facebook ads`;
-          } else {
-            return `the parameter "${c.parameter}"`;
-          }
-        } else if (c.operator === 'equals') {
-          return `the parameter "${c.parameter}" set to "${c.value}"`;
-        } else if (c.operator === 'not_equals') {
-          return `the parameter "${c.parameter}" with a value other than "${c.value}"`;
-        }
-        return "";
-      }).filter(Boolean);
-      
-      narrative += paramDescriptions.join(" and ") + ". ";
-    }
+    setIsGenerating(true);
+    try {
+      const firstMatch = matches[0];
+      const generatedNarrative = await generateNarrative(
+        apiKey,
+        firstMatch.conditions,
+        firstMatch.output
+      );
 
-    // Add conclusion about visit type and channel in context
-    if (type || channel) {
-      narrative += "Based on these characteristics, ";
-      if (type === 'Paid' && platform) {
-        narrative += `this was identified as a paid visit from ${platform} `;
-      } else if (type === 'Organic' && platform) {
-        narrative += `this was identified as an organic visit through ${platform} `;
-      } else if (type) {
-        narrative += `this was identified as a ${type.toLowerCase()} visit `;
+      if (generatedNarrative) {
+        setNarrative(generatedNarrative);
+        localStorage.setItem("perplexity_api_key", apiKey);
+        toast.success("Narrative generated successfully");
+      } else {
+        toast.error("Failed to generate narrative");
       }
-      
-      if (channel && !narrative.toLowerCase().includes(channel.toLowerCase())) {
-        narrative += `through the ${channel.toLowerCase()} channel`;
-      }
-      narrative += ".";
+    } catch (error) {
+      toast.error("Error generating narrative");
+    } finally {
+      setIsGenerating(false);
     }
-
-    return narrative;
   };
 
   return (
     <div className="bg-white p-6 rounded-lg shadow-sm border mb-6">
       <h3 className="text-xl font-semibold mb-4">Origins of Session</h3>
-      <p className="text-sm text-gray-600 leading-relaxed">
-        {createNarrative()}
-      </p>
+      
+      <div className="mb-4 flex gap-4">
+        <Input
+          type="password"
+          placeholder="Enter your Perplexity API key"
+          value={apiKey}
+          onChange={(e) => setApiKey(e.target.value)}
+          className="max-w-md"
+        />
+        <Button 
+          onClick={handleGenerateNarrative}
+          disabled={isGenerating}
+        >
+          {isGenerating ? "Generating..." : "Generate Narrative"}
+        </Button>
+      </div>
+
+      {narrative ? (
+        <p className="text-sm text-gray-600 leading-relaxed mb-4">
+          {narrative}
+        </p>
+      ) : (
+        <p className="text-sm text-gray-600 leading-relaxed mb-4">
+          Click "Generate Narrative" to create a detailed explanation of the session origins.
+        </p>
+      )}
+
       <div className="mt-4 space-y-2">
         {type && (
           <div className="flex items-center gap-2">
