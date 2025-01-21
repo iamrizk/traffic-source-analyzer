@@ -14,10 +14,11 @@ export const OriginsOfSession = ({ matches }: OriginsOfSessionProps) => {
   const [narrative, setNarrative] = useState<string | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [retryCount, setRetryCount] = useState(0);
+  const [showApiKeyInput, setShowApiKeyInput] = useState(!localStorage.getItem("openrouter_api_key"));
 
   useEffect(() => {
     // Auto-generate narrative when matches change and API key is present
-    if (matches.length > 0 && apiKey) {
+    if (matches.length > 0 && apiKey && !showApiKeyInput) {
       handleGenerateNarrative();
     }
   }, [matches]); // Deliberately omitting apiKey to prevent infinite loop
@@ -39,12 +40,16 @@ export const OriginsOfSession = ({ matches }: OriginsOfSessionProps) => {
   const handleGenerateNarrative = async () => {
     if (!apiKey) {
       toast.error("Please enter your OpenRouter API key");
+      setShowApiKeyInput(true);
       return;
     }
 
     // Validate API key format before making the request
     if (!apiKey.startsWith('sk-or-')) {
       toast.error("Invalid API key format. OpenRouter API keys must start with 'sk-or-'");
+      setShowApiKeyInput(true);
+      setApiKey("");
+      localStorage.removeItem("openrouter_api_key");
       return;
     }
 
@@ -62,27 +67,31 @@ export const OriginsOfSession = ({ matches }: OriginsOfSessionProps) => {
         localStorage.setItem("openrouter_api_key", apiKey);
         toast.success("Narrative generated successfully");
         setRetryCount(0); // Reset retry count on success
+        setShowApiKeyInput(false);
       } else {
         throw new Error("Failed to generate narrative");
       }
     } catch (error) {
       console.error('Error:', error);
       
-      // Only retry for non-API key related errors
-      if (error instanceof Error && error.message.includes("Invalid API key format")) {
-        toast.error("Invalid API key format. Please check your API key");
-        setNarrative(null);
-        localStorage.removeItem("openrouter_api_key"); // Clear invalid API key
-      } else if (retryCount < 3) {
-        toast.error("Retrying narrative generation...");
-        setRetryCount(prev => prev + 1);
-        setTimeout(() => handleGenerateNarrative(), 2000); // Retry after 2 seconds
-      } else {
-        toast.error("Could not generate narrative after multiple attempts");
-        setNarrative("Unable to generate a detailed narrative at this time. This session appears to be from " + 
-          [type, platform, channel].filter(Boolean).join(" via ") + 
-          ". Please try again later or contact support if the issue persists.");
-        setRetryCount(0); // Reset retry count
+      if (error instanceof Error) {
+        if (error.message.includes("Invalid API key format") || error.message.includes("Invalid API key")) {
+          toast.error("Invalid API key. Please check your API key");
+          setNarrative(null);
+          setShowApiKeyInput(true);
+          setApiKey("");
+          localStorage.removeItem("openrouter_api_key");
+        } else if (retryCount < 3) {
+          toast.error("Retrying narrative generation...");
+          setRetryCount(prev => prev + 1);
+          setTimeout(() => handleGenerateNarrative(), 2000); // Retry after 2 seconds
+        } else {
+          toast.error("Could not generate narrative after multiple attempts");
+          setNarrative("Unable to generate a detailed narrative at this time. This session appears to be from " + 
+            [type, platform, channel].filter(Boolean).join(" via ") + 
+            ". Please try again later or contact support if the issue persists.");
+          setRetryCount(0); // Reset retry count
+        }
       }
     } finally {
       setIsGenerating(false);
@@ -93,7 +102,7 @@ export const OriginsOfSession = ({ matches }: OriginsOfSessionProps) => {
     <div className="bg-white p-6 rounded-lg shadow-sm border mb-6">
       <h3 className="text-xl font-semibold mb-4">Origins of Session</h3>
       
-      {!apiKey && (
+      {(showApiKeyInput || !apiKey) && (
         <div className="mb-4 flex gap-4">
           <Input
             type="password"
@@ -117,7 +126,7 @@ export const OriginsOfSession = ({ matches }: OriginsOfSessionProps) => {
         </p>
       ) : (
         <p className="text-sm text-gray-600 leading-relaxed mb-4">
-          {apiKey ? "Generating narrative..." : "Enter your OpenRouter API key to generate a narrative."}
+          {apiKey && !showApiKeyInput ? "Generating narrative..." : "Enter your OpenRouter API key to generate a narrative."}
         </p>
       )}
 
