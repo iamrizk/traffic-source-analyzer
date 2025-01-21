@@ -1,5 +1,10 @@
 export const generateNarrative = async (apiKey: string, conditions: any[], output: any) => {
   try {
+    // Validate API key format
+    if (!apiKey.startsWith('sk-or-')) {
+      throw new Error('Invalid API key format. OpenRouter API keys must start with "sk-or-"');
+    }
+
     const prompt = `Given these URL parameters and conditions: ${JSON.stringify(conditions)}, 
     and this output classification: ${JSON.stringify(output)}, 
     write a brief, formal explanation of how a user arrived at a webpage. 
@@ -31,10 +36,20 @@ export const generateNarrative = async (apiKey: string, conditions: any[], outpu
       }),
     });
 
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error?.message || 'Failed to generate narrative');
+    }
+
     const data = await response.json();
+    
+    if (!data.choices?.[0]?.message?.content) {
+      throw new Error('Invalid response format from OpenRouter API');
+    }
+
     return data.choices[0].message.content;
   } catch (error) {
     console.error('Error generating narrative:', error);
-    return null;
+    throw error; // Re-throw to be handled by the component
   }
 };
