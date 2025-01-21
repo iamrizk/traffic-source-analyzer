@@ -65,6 +65,14 @@ const GettingStarted = () => {
           Whether you're running paid campaigns on Google Ads, Meta Ads, or other advertising platforms, or tracking organic traffic sources, 
           this tool helps you understand which channels and campaigns are driving your conversions.
         </p>
+        <div className="mt-4 p-4 bg-blue-50 rounded-lg">
+          <h3 className="font-semibold text-blue-800 mb-2">AI-Powered Analysis</h3>
+          <p className="text-sm text-blue-700">
+            The narrative generation in the analysis section is powered by Google's Gemini 2.0 Flash model through OpenRouter.ai. 
+            You can create a free API key at OpenRouter.ai to access this feature. The model provides detailed insights about your traffic sources 
+            and helps interpret the analysis results in natural language.
+          </p>
+        </div>
       </Card>
 
       <Card className="p-6">

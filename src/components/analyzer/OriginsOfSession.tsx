@@ -13,6 +13,7 @@ export const OriginsOfSession = ({ matches }: OriginsOfSessionProps) => {
   const [apiKey, setApiKey] = useState(() => localStorage.getItem("openrouter_api_key") || "");
   const [narrative, setNarrative] = useState<string | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [retryCount, setRetryCount] = useState(0);
 
   useEffect(() => {
     // Auto-generate narrative when matches change and API key is present
@@ -54,10 +55,25 @@ export const OriginsOfSession = ({ matches }: OriginsOfSessionProps) => {
         setNarrative(generatedNarrative);
         localStorage.setItem("openrouter_api_key", apiKey);
         toast.success("Narrative generated successfully");
+        setRetryCount(0); // Reset retry count on success
+      } else {
+        throw new Error("Failed to generate narrative");
       }
     } catch (error) {
-      toast.error("Error generating narrative");
       console.error('Error:', error);
+      
+      // Handle retry logic
+      if (retryCount < 3) {
+        toast.error("Retrying narrative generation...");
+        setRetryCount(prev => prev + 1);
+        setTimeout(() => handleGenerateNarrative(), 2000); // Retry after 2 seconds
+      } else {
+        toast.error("Could not generate narrative after multiple attempts");
+        setNarrative("Unable to generate a detailed narrative at this time. This session appears to be from " + 
+          [type, platform, channel].filter(Boolean).join(" via ") + 
+          ". Please try again later or contact support if the issue persists.");
+        setRetryCount(0); // Reset retry count
+      }
     } finally {
       setIsGenerating(false);
     }
