@@ -9,7 +9,7 @@ export const generateNarrative = async (apiKey: string, conditions: any[], outpu
     const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${apiKey}`,
+        'Authorization': apiKey.startsWith('sk-') ? apiKey : `Bearer ${apiKey}`,
         'Content-Type': 'application/json',
         'HTTP-Referer': window.location.href,
         'X-Title': 'URL Analyzer'
