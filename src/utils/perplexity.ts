@@ -16,8 +16,9 @@ export const generateNarrative = async (apiKey: string, conditions: any[], outpu
       headers: {
         'Authorization': `Bearer ${apiKey}`,
         'Content-Type': 'application/json',
-        'HTTP-Referer': window.location.href,
-        'X-Title': 'URL Analyzer'
+        'HTTP-Referer': window.location.origin,
+        'X-Title': 'URL Analyzer',
+        'Origin': window.location.origin,
       },
       body: JSON.stringify({
         model: 'google/gemini-2.0-flash-exp:free',
@@ -38,7 +39,7 @@ export const generateNarrative = async (apiKey: string, conditions: any[], outpu
 
     if (!response.ok) {
       const errorData = await response.json();
-      throw new Error(errorData.error?.message || 'Failed to generate narrative');
+      throw new Error(errorData.error?.message || `HTTP error! status: ${response.status}`);
     }
 
     const data = await response.json();
@@ -50,6 +51,12 @@ export const generateNarrative = async (apiKey: string, conditions: any[], outpu
     return data.choices[0].message.content;
   } catch (error) {
     console.error('Error generating narrative:', error);
-    throw error; // Re-throw to be handled by the component
+    
+    // Check if it's a network error
+    if (error instanceof TypeError && error.message === 'Failed to fetch') {
+      throw new Error('Network error: Unable to connect to OpenRouter API. Please check your internet connection.');
+    }
+    
+    throw error; // Re-throw the error to be handled by the component
   }
 };
