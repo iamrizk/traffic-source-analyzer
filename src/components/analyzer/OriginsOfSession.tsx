@@ -42,6 +42,12 @@ export const OriginsOfSession = ({ matches }: OriginsOfSessionProps) => {
       return;
     }
 
+    // Validate API key format before making the request
+    if (!apiKey.startsWith('sk-or-')) {
+      toast.error("Invalid API key format. OpenRouter API keys must start with 'sk-or-'");
+      return;
+    }
+
     setIsGenerating(true);
     try {
       const firstMatch = matches[0];
@@ -62,8 +68,12 @@ export const OriginsOfSession = ({ matches }: OriginsOfSessionProps) => {
     } catch (error) {
       console.error('Error:', error);
       
-      // Handle retry logic
-      if (retryCount < 3) {
+      // Only retry for non-API key related errors
+      if (error instanceof Error && error.message.includes("Invalid API key format")) {
+        toast.error("Invalid API key format. Please check your API key");
+        setNarrative(null);
+        localStorage.removeItem("openrouter_api_key"); // Clear invalid API key
+      } else if (retryCount < 3) {
         toast.error("Retrying narrative generation...");
         setRetryCount(prev => prev + 1);
         setTimeout(() => handleGenerateNarrative(), 2000); // Retry after 2 seconds
