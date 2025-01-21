@@ -14,6 +14,13 @@ export const OriginsOfSession = ({ matches }: OriginsOfSessionProps) => {
   const [narrative, setNarrative] = useState<string | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
 
+  useEffect(() => {
+    // Auto-generate narrative when matches change and API key is present
+    if (matches.length > 0 && apiKey) {
+      handleGenerateNarrative();
+    }
+  }, [matches]); // Deliberately omitting apiKey to prevent infinite loop
+
   if (matches.length === 0) return null;
 
   // Get unique values for each category
@@ -47,11 +54,10 @@ export const OriginsOfSession = ({ matches }: OriginsOfSessionProps) => {
         setNarrative(generatedNarrative);
         localStorage.setItem("openrouter_api_key", apiKey);
         toast.success("Narrative generated successfully");
-      } else {
-        toast.error("Failed to generate narrative");
       }
     } catch (error) {
       toast.error("Error generating narrative");
+      console.error('Error:', error);
     } finally {
       setIsGenerating(false);
     }
@@ -61,21 +67,23 @@ export const OriginsOfSession = ({ matches }: OriginsOfSessionProps) => {
     <div className="bg-white p-6 rounded-lg shadow-sm border mb-6">
       <h3 className="text-xl font-semibold mb-4">Origins of Session</h3>
       
-      <div className="mb-4 flex gap-4">
-        <Input
-          type="password"
-          placeholder="Enter your OpenRouter API key"
-          value={apiKey}
-          onChange={(e) => setApiKey(e.target.value)}
-          className="max-w-md"
-        />
-        <Button 
-          onClick={handleGenerateNarrative}
-          disabled={isGenerating}
-        >
-          {isGenerating ? "Generating..." : "Generate Narrative"}
-        </Button>
-      </div>
+      {!apiKey && (
+        <div className="mb-4 flex gap-4">
+          <Input
+            type="password"
+            placeholder="Enter your OpenRouter API key"
+            value={apiKey}
+            onChange={(e) => setApiKey(e.target.value)}
+            className="max-w-md"
+          />
+          <Button 
+            onClick={handleGenerateNarrative}
+            disabled={isGenerating}
+          >
+            {isGenerating ? "Generating..." : "Generate Narrative"}
+          </Button>
+        </div>
+      )}
 
       {narrative ? (
         <p className="text-sm text-gray-600 leading-relaxed mb-4">
@@ -83,7 +91,7 @@ export const OriginsOfSession = ({ matches }: OriginsOfSessionProps) => {
         </p>
       ) : (
         <p className="text-sm text-gray-600 leading-relaxed mb-4">
-          Click "Generate Narrative" to create a detailed explanation of the session origins.
+          {apiKey ? "Generating narrative..." : "Enter your OpenRouter API key to generate a narrative."}
         </p>
       )}
 
