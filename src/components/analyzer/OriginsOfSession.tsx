@@ -10,7 +10,7 @@ interface OriginsOfSessionProps {
 }
 
 export const OriginsOfSession = ({ matches }: OriginsOfSessionProps) => {
-  const [apiKey, setApiKey] = useState(() => localStorage.getItem("perplexity_api_key") || "");
+  const [apiKey, setApiKey] = useState(() => localStorage.getItem("openrouter_api_key") || "");
   const [narrative, setNarrative] = useState<string | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
 
@@ -30,7 +30,7 @@ export const OriginsOfSession = ({ matches }: OriginsOfSessionProps) => {
 
   const handleGenerateNarrative = async () => {
     if (!apiKey) {
-      toast.error("Please enter your Perplexity API key");
+      toast.error("Please enter your OpenRouter API key");
       return;
     }
 
@@ -45,7 +45,7 @@ export const OriginsOfSession = ({ matches }: OriginsOfSessionProps) => {
 
       if (generatedNarrative) {
         setNarrative(generatedNarrative);
-        localStorage.setItem("perplexity_api_key", apiKey);
+        localStorage.setItem("openrouter_api_key", apiKey);
         toast.success("Narrative generated successfully");
       } else {
         toast.error("Failed to generate narrative");
@@ -64,7 +64,7 @@ export const OriginsOfSession = ({ matches }: OriginsOfSessionProps) => {
       <div className="mb-4 flex gap-4">
         <Input
           type="password"
-          placeholder="Enter your Perplexity API key"
+          placeholder="Enter your OpenRouter API key"
           value={apiKey}
           onChange={(e) => setApiKey(e.target.value)}
           className="max-w-md"

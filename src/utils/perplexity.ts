@@ -6,14 +6,16 @@ export const generateNarrative = async (apiKey: string, conditions: any[], outpu
     Focus on explaining the referral source, parameters present, and what they indicate about the visit type (paid/organic) and platform.
     Keep it concise and professional.`;
 
-    const response = await fetch('https://api.perplexity.ai/chat/completions', {
+    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${apiKey}`,
         'Content-Type': 'application/json',
+        'HTTP-Referer': window.location.href,
+        'X-Title': 'URL Analyzer'
       },
       body: JSON.stringify({
-        model: 'llama-3.1-sonar-small-128k-online',
+        model: 'google/gemini-2.0-flash-exp:free',
         messages: [
           {
             role: 'system',
