@@ -3,9 +3,15 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useRules, Rule } from "@/hooks/useRules";
 import { toast } from "sonner";
-import { Download, Upload, Trash2 } from "lucide-react";
+import { Download, Upload, Trash2, Plus } from "lucide-react";
 import { RuleItem } from "@/components/RuleItem";
 import { NewRuleForm } from "@/components/rule/NewRuleForm";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
 const Settings = () => {
   const { rules, setRules, updateRule, deleteRule, moveRuleUp, moveRuleDown } = useRules();
@@ -123,11 +129,23 @@ const Settings = () => {
           </div>
         </div>
 
-        <NewRuleForm
-          newRule={newRule}
-          setNewRule={setNewRule}
-          addRule={addRule}
-        />
+        <Accordion type="single" collapsible>
+          <AccordionItem value="new-rule">
+            <AccordionTrigger className="hover:no-underline">
+              <div className="flex items-center">
+                <Plus className="w-4 h-4 mr-2" />
+                Add New Rule
+              </div>
+            </AccordionTrigger>
+            <AccordionContent>
+              <NewRuleForm
+                newRule={newRule}
+                setNewRule={setNewRule}
+                addRule={addRule}
+              />
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
       </Card>
 
       {rules.length > 0 && (
